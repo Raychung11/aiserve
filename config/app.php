@@ -5,7 +5,24 @@
 
 define('APP_NAME', 'AiServe ESG OS');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', 'http://localhost'); // Update to your domain e.g. https://yourdomain.com
+
+// Auto-detect APP_URL — works on Hostinger, localhost, and subdirectory installs.
+// No manual editing needed. Override by defining APP_URL before including this file.
+if (!defined('APP_URL')) {
+    $_esg_scheme   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $_esg_host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    // Calculate base path: subtract DOCUMENT_ROOT from this app's root directory
+    $_esg_docroot  = realpath($_SERVER['DOCUMENT_ROOT'] ?? '/');
+    $_esg_approot  = realpath(__DIR__ . '/..');          // config/ is one level below app root
+    $_esg_base     = '';
+    if ($_esg_docroot && $_esg_approot && strpos($_esg_approot, $_esg_docroot) === 0) {
+        $_esg_base = substr($_esg_approot, strlen($_esg_docroot));
+        $_esg_base = str_replace('\\', '/', rtrim($_esg_base, '/'));
+    }
+    define('APP_URL', $_esg_scheme . '://' . $_esg_host . $_esg_base);
+    unset($_esg_scheme, $_esg_host, $_esg_docroot, $_esg_approot, $_esg_base);
+}
+
 define('APP_TIMEZONE', 'Asia/Kuala_Lumpur');
 define('APP_CURRENCY', 'RM');
 define('APP_COUNTRY', 'Malaysia');
