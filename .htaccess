@@ -1,17 +1,14 @@
-# AiServe ESG OS — Apache URL Rewriting
-# Upload to public_html/ on Hostinger
-# Enables clean URLs: /dashboard instead of /index.php?page=dashboard
+# Kasih Gold Easy — Apache URL Rewriting
+# Upload to public_html/ on Hostinger or standard LAMP
+# Enables clean URLs: /dashboard, /admin/gold-price, etc.
 
 Options -Indexes
 Options +FollowSymLinks
 
 RewriteEngine On
-
-# Base path — update if installed in a subdirectory
-# e.g. if installed at yourdomain.com/esg/ use: RewriteBase /esg/
 RewriteBase /
 
-# Route everything to index.php EXCEPT real files and directories (CSS, JS, images, etc.)
+# Route everything to index.php EXCEPT real files/dirs (assets, uploads)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
@@ -22,20 +19,21 @@ RewriteRule ^(.*)$ index.php [QSA,L]
   Header always set X-Frame-Options SAMEORIGIN
   Header always set X-XSS-Protection "1; mode=block"
   Header always set Referrer-Policy strict-origin-when-cross-origin
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>
 
-# Protect sensitive files from direct browser access
-<FilesMatch "\.(sql|log|env|lock)$">
+# Protect sensitive files
+<FilesMatch "\.(sql|log|env|lock|json|md)$">
   Require all denied
 </FilesMatch>
 
 # Block direct access to backend directories
-RewriteRule ^(config|src|includes|db)(/|$) - [F,L]
+RewriteRule ^(config|inc|sql|docs|db|src|includes)(/|$) - [F,L]
 
 # PHP settings for Hostinger
 <IfModule mod_php8.c>
-  php_value upload_max_filesize 20M
-  php_value post_max_size 20M
+  php_value upload_max_filesize 5M
+  php_value post_max_size 10M
   php_value max_execution_time 60
   php_value memory_limit 256M
   php_flag display_errors Off
