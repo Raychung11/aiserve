@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../inc/auth.php';
 require_once __DIR__ . '/../inc/helpers.php';
 require_once __DIR__ . '/../inc/csrf.php';
+require_once __DIR__ . '/../inc/validation.php';
 require_once __DIR__ . '/../inc/layout.php';
 
 auth_start_session();
@@ -82,7 +83,13 @@ layout_flash();
   <div class="marketplace-grid">
     <?php foreach ($featured as $prod): ?>
     <a href="<?= APP_URL ?>/product?id=<?= $prod['id'] ?>" class="product-card" style="position:relative;">
-      <div class="product-img-placeholder"><?= h($prod['image'] ? '<img src="' . UPLOAD_URL . '/products/' . h($prod['image']) . '" alt="" style="width:100%;height:175px;object-fit:cover;">' : '🏷️') ?></div>
+      <div class="product-img-placeholder">
+        <?php if ($prod['image']): ?>
+          <img src="<?= UPLOAD_URL ?>/products/<?= h($prod['image']) ?>" alt="<?= h($prod['title']) ?>" style="width:100%;height:175px;object-fit:cover;">
+        <?php else: ?>
+          <span style="font-size:2.5rem;">🏷️</span>
+        <?php endif; ?>
+      </div>
       <span class="featured-badge">✦ Pilihan</span>
       <div class="product-body">
         <div class="product-cat"><?= h($prod['cat_name']) ?></div>
@@ -114,7 +121,14 @@ layout_flash();
   <div class="marketplace-grid" style="margin-bottom:24px;">
     <?php foreach ($products as $prod): ?>
     <a href="<?= APP_URL ?>/product?id=<?= $prod['id'] ?>" class="product-card" style="position:relative;">
-      <div class="product-img-placeholder"><?= $prod['is_featured'] ? '<span class="featured-badge">✦</span>' : '' ?>🏷️</div>
+      <div class="product-img-placeholder">
+        <?php if ($prod['image']): ?>
+          <img src="<?= UPLOAD_URL ?>/products/<?= h($prod['image']) ?>" alt="<?= h($prod['title']) ?>" style="width:100%;height:175px;object-fit:cover;">
+        <?php else: ?>
+          <span style="font-size:2.5rem;">🏷️</span>
+        <?php endif; ?>
+        <?php if ($prod['is_featured']): ?><span class="featured-badge">✦</span><?php endif; ?>
+      </div>
       <div class="product-body">
         <div class="product-cat"><?= h($prod['cat_name']) ?></div>
         <div class="product-title"><?= h($prod['title']) ?></div>
