@@ -30,6 +30,14 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 # Block direct access to backend directories
 RewriteRule ^(config|inc|sql|docs|db|src|includes)(/|$) - [F,L]
 
+# Block PHP execution in uploads directories
+<Directory uploads>
+  php_flag engine off
+</Directory>
+<FilesMatch "^uploads/.*\.(php|php5|phtml|phar)$">
+  Require all denied
+</FilesMatch>
+
 # PHP settings for Hostinger
 <IfModule mod_php8.c>
   php_value upload_max_filesize 5M

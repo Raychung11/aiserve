@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
     $keys = ['site_name','tagline','support_whatsapp','min_topup_rm','max_topup_rm','referral_enabled',
              'marketplace_enabled','campaign_module_enabled','ai_assistant_enabled','shariah_disclaimer',
-             'payout_min_points','merchant_approval_required'];
+             'payout_min_points','merchant_approval_required','bank_name','bank_account','bank_account_name'];
     // Also referral rates
     foreach ($keys as $k) {
         if (isset($_POST[$k])) {
@@ -101,6 +101,17 @@ layout_begin_admin('Tetapan Sistem');
       <div class="help-text">L1 = rujukan anda, L2 = rujukan rakan anda, L3 = 3 tahap ke atas.</div>
     </div>
 
+  </div>
+
+  <!-- Bank details -->
+  <div class="card-kasih" style="margin-top:16px;">
+    <div class="section-title">🏦 Maklumat Bank Penerima Pembayaran</div>
+    <p style="font-size:0.82rem;color:#6B7280;margin-bottom:14px;">Maklumat ini dipaparkan kepada pengguna semasa proses pembayaran manual.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+      <div class="form-group"><label class="label-kasih">Nama Bank</label><input type="text" name="bank_name" class="input-kasih" value="<?= h($s['bank_name']??'Maybank') ?>" placeholder="Maybank"></div>
+      <div class="form-group"><label class="label-kasih">No. Akaun</label><input type="text" name="bank_account" class="input-kasih" value="<?= h($s['bank_account']??'') ?>" placeholder="1234-5678-9012"></div>
+      <div class="form-group"><label class="label-kasih">Nama Pemegang Akaun</label><input type="text" name="bank_account_name" class="input-kasih" value="<?= h($s['bank_account_name']??'') ?>" placeholder="Kasih Gold Easy Sdn Bhd"></div>
+    </div>
   </div>
 
   <!-- Shariah disclaimer -->

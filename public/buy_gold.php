@@ -14,16 +14,12 @@ if (auth_is_admin()) redirect(APP_URL . '/admin');
 $user    = auth_user();
 $user_id = auth_id();
 $price   = get_active_gold_price();
-$balance = get_wallet_balance($user_id);
 $errors  = [];
 
-if (!$price) {
-    flash_set('main', 'Harga emas belum ditetapkan oleh admin. Sila cuba lagi kemudian.', 'warning');
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// ── Step 1: Initiate purchase ─────────────────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_GET['step'])) {
     csrf_verify();
-    $rm_amount = sanitize_string($_POST['rm_amount'] ?? '');
+    $rm_amount = sanitize_decimal($_POST['rm_amount'] ?? '0');
 
     if (!is_numeric($rm_amount) || (float)$rm_amount <= 0) {
         $errors['rm_amount'] = 'Sila masukkan jumlah RM yang sah.';
@@ -36,28 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $db = getDB();
-        $price_snap     = (string)$price['price_per_g'];
-        $points_est     = gold_points_from_rm($rm_amount, $price_snap);
-        $grams_est      = gold_grams_from_points($points_est);
+        $db         = getDB();
+        $price_snap = (string)$price['price_per_g'];
+        $points_est = gold_points_from_rm($rm_amount, $price_snap);
+        $grams_est  = gold_grams_from_points($points_est);
 
-        // Create purchase record with pending status
         $db->prepare("INSERT INTO gold_purchases (user_id,rm_amount,price_per_g_snapshot,points_credited,grams_credited,payment_status,purchase_status,payment_gateway,created_at) VALUES (?,?,?,?,?,'pending','pending','manual',NOW())")
            ->execute([$user_id, $rm_amount, $price_snap, $points_est, $grams_est]);
         $purchase_id = (int)$db->lastInsertId();
-
         audit_log($user_id, 'user', 'buy_gold_initiated', 'gold_purchases', $purchase_id, null, ['rm_amount' => $rm_amount]);
-
-        // Redirect to payment instruction page
         redirect(APP_URL . '/buy-gold?step=pay&id=' . $purchase_id);
     }
 }
 
-// Payment step — show manual transfer instructions
-$step       = sanitize_string($_GET['step'] ?? '');
-$purchase   = null;
+// ── Step 2: Show payment instructions + proof upload ─────────────────────────
+$step     = sanitize_string($_GET['step'] ?? '');
+$purchase = null;
 if ($step === 'pay' && isset($_GET['id'])) {
-    $db = getDB();
+    $db   = getDB();
     $stmt = $db->prepare("SELECT * FROM gold_purchases WHERE id=? AND user_id=? AND payment_status='pending'");
     $stmt->execute([(int)$_GET['id'], $user_id]);
     $purchase = $stmt->fetch();
@@ -67,24 +59,34 @@ if ($step === 'pay' && isset($_GET['id'])) {
     }
 }
 
-// Mark paid (for MVP manual confirmation — in production this comes from payment gateway callback)
+// ── Step 3: User submits proof of payment ─────────────────────────────────────
 if ($step === 'confirm' && isset($_GET['id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
-    $db = getDB();
+    $db   = getDB();
     $stmt = $db->prepare("SELECT * FROM gold_purchases WHERE id=? AND user_id=? AND payment_status='pending'");
     $stmt->execute([(int)$_GET['id'], $user_id]);
     $p = $stmt->fetch();
+
     if ($p) {
-        $db->prepare("UPDATE gold_purchases SET payment_status='paid',purchase_status='processing',paid_at=NOW() WHERE id=?")->execute([$p['id']]);
-        // Credit wallet
-        $wallet_id = ensure_wallet_exists($user_id);
-        $desc      = 'Pembelian Emas — RM ' . number_format((float)$p['rm_amount'], 2);
-        $lid = ledger_credit($wallet_id, $user_id, $p['points_credited'], $p['grams_credited'], $p['rm_amount'], $p['price_per_g_snapshot'], 'buy_credit', (int)$p['id'], $desc);
-        $db->prepare("UPDATE gold_purchases SET purchase_status='credited', ledger_entry_id=? WHERE id=?")->execute([$lid, $p['id']]);
-        // Process referral commissions
-        process_referral_commissions($user_id, 'gold_purchase', (int)$p['id'], $p['points_credited'], $p['price_per_g_snapshot']);
-        audit_log($user_id, 'user', 'buy_gold_credited', 'gold_purchases', (int)$p['id'], null, ['points' => $p['points_credited']]);
-        flash_set('main', 'Pembayaran berjaya! ' . gold_format_points($p['points_credited']) . ' Gold Points telah dikreditkan ke wallet anda.', 'success');
+        $proof_filename = null;
+        if (!empty($_FILES['payment_proof']['name'])) {
+            $uploaded = upload_file('payment_proof', ['image/jpeg','image/png','image/webp','application/pdf'], __DIR__.'/../uploads/payments/', 5242880);
+            if ($uploaded) {
+                $proof_filename = $uploaded;
+            } else {
+                flash_set('main', 'Fail bukti tidak sah (JPG/PNG/WebP/PDF, maks 5MB). Sila cuba lagi.', 'error');
+                redirect(APP_URL . '/buy-gold?step=pay&id=' . $p['id']);
+            }
+        }
+
+        // Mark as paid/processing — wallet credit happens ONLY after admin confirms
+        $ref_note = sanitize_string($_POST['payment_ref'] ?? '');
+        $combined_ref = trim(($ref_note ? $ref_note : '') . ($proof_filename ? '|proof:' . $proof_filename : ''));
+        $db->prepare("UPDATE gold_purchases SET payment_status='paid', purchase_status='processing', paid_at=NOW(), payment_reference=? WHERE id=?")
+           ->execute([$combined_ref ?: null, $p['id']]);
+
+        audit_log($user_id, 'user', 'buy_gold_proof_submitted', 'gold_purchases', (int)$p['id'], null, ['ref' => $ref_note]);
+        flash_set('main', '✅ Bukti pembayaran diterima! Admin akan mengesahkan dalam <strong>1–2 jam bekerja</strong>. Gold Points akan dikreditkan setelah disahkan.', 'success');
         redirect(APP_URL . '/wallet');
     }
 }
@@ -108,24 +110,58 @@ if ($purchase):
       <div class="calc-result-row"><span class="calc-result-label">Emas Dijangka</span><span class="calc-result-value"><?= gold_format_grams($purchase['grams_credited']) ?></span></div>
       <div class="calc-result-row"><span class="calc-result-label">Harga Emas (Terkunci)</span><span class="calc-result-value">RM <?= number_format((float)$purchase['price_per_g_snapshot'], 2) ?>/g</span></div>
     </div>
-    <div class="alert alert-info" style="font-size:0.82rem;">
-      <strong>Cara Pembayaran:</strong> Buat pemindahan ke akaun berikut, kemudian klik "Saya Telah Bayar" di bawah.<br>
-      <strong>Bank:</strong> Maybank &nbsp;|&nbsp; <strong>No. Akaun:</strong> 1234-5678-9012 &nbsp;|&nbsp; <strong>Nama:</strong> Kasih Gold Easy Sdn Bhd<br>
-      <small style="color:#6B7280;">Sertakan ID Pembelian #<?= $purchase['id'] ?> dalam rujukan pembayaran.</small>
+  </div>
+
+  <!-- Bank Details -->
+  <div class="card-kasih" style="margin-bottom:16px;">
+    <div class="section-title">🏦 Maklumat Akaun Penerima</div>
+    <div style="display:grid;gap:8px;">
+      <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#F9FAFB;border-radius:8px;">
+        <span style="color:#6B7280;font-size:0.85rem;">Bank</span>
+        <strong><?= h(get_setting('bank_name', 'Maybank')) ?></strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#F9FAFB;border-radius:8px;">
+        <span style="color:#6B7280;font-size:0.85rem;">No. Akaun</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <strong id="bank-acc"><?= h(get_setting('bank_account', '1234-5678-9012')) ?></strong>
+          <button type="button" class="btn-gold-outline btn-sm" data-copy="<?= h(get_setting('bank_account', '1234-5678-9012')) ?>">Salin</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#F9FAFB;border-radius:8px;">
+        <span style="color:#6B7280;font-size:0.85rem;">Nama</span>
+        <strong><?= h(get_setting('bank_account_name', 'Kasih Gold Easy Sdn Bhd')) ?></strong>
+      </div>
+      <div style="background:#FEF3C7;border-radius:8px;padding:10px 12px;font-size:0.82rem;color:#92400E;">
+        📝 Sertakan <strong>ID #<?= $purchase['id'] ?></strong> dalam rujukan pembayaran anda.
+      </div>
     </div>
   </div>
 
-  <form method="POST" action="<?= APP_URL ?>/buy-gold?step=confirm&id=<?= $purchase['id'] ?>">
-    <?= csrf_field() ?>
-    <button type="submit" class="btn-gold btn-block btn-lg" onclick="return confirm('Sahkan anda telah membuat pembayaran RM <?= number_format((float)$purchase['rm_amount'],2) ?>?')">
-      ✅ Saya Telah Membuat Pembayaran
-    </button>
-  </form>
-  <div style="text-align:center;margin-top:12px;">
-    <a href="<?= APP_URL ?>/buy-gold" style="font-size:0.82rem;color:#9CA3AF;">Batal &amp; kembali</a>
+  <!-- Submit Proof Form -->
+  <div class="card-kasih" style="margin-bottom:16px;">
+    <div class="section-title">📤 Muat Naik Bukti Pembayaran</div>
+    <form method="POST" action="<?= APP_URL ?>/buy-gold?step=confirm&id=<?= $purchase['id'] ?>" enctype="multipart/form-data">
+      <?= csrf_field() ?>
+      <div style="margin-bottom:12px;">
+        <label class="form-label">No. Rujukan / ID Transaksi Bank (pilihan)</label>
+        <input type="text" name="payment_ref" class="form-input" placeholder="cth: IBK2024012345678">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label class="form-label">Tangkapan Skrin Resit (JPG/PNG/PDF, maks 5MB)</label>
+        <input type="file" name="payment_proof" class="form-input" accept="image/jpeg,image/png,image/webp,application/pdf">
+        <small style="color:#9CA3AF;">Muat naik resit mempercepatkan pengesahan admin.</small>
+      </div>
+      <button type="submit" class="btn-gold btn-block btn-lg" onclick="return confirm('Sahkan anda telah membuat pembayaran RM <?= number_format((float)$purchase['rm_amount'],2) ?>?')">
+        ✅ Saya Telah Membuat Pembayaran
+      </button>
+    </form>
+    <div style="text-align:center;margin-top:10px;">
+      <a href="<?= APP_URL ?>/buy-gold" style="font-size:0.82rem;color:#9CA3AF;">Batal &amp; kembali</a>
+    </div>
   </div>
-  <div class="alert alert-warning" style="margin-top:16px;font-size:0.8rem;">
-    <strong>Nota:</strong> Untuk MVP ini, pengesahan pembayaran adalah manual. Dalam versi pengeluaran penuh, ini akan diproses secara automatik melalui FPX/payment gateway.
+
+  <div class="alert alert-info" style="font-size:0.82rem;">
+    ⏳ <strong>Proses pengesahan:</strong> Setelah menghantar, admin akan menyemak dan mengesahkan pembayaran anda dalam <strong>1–2 jam bekerja</strong>. Gold Points akan dikreditkan automatik selepas disahkan.
   </div>
 </div>
 <?php else: ?>
@@ -151,7 +187,7 @@ if ($purchase):
         <label class="label-kasih" for="rm_amount_input">Jumlah Pembelian (RM) <span class="required">*</span></label>
         <div class="input-group">
           <span class="input-group-prefix">RM</span>
-          <input type="number" id="rm_amount_input" name="rm_amount" class="input-kasih"
+          <input type="number" id="rm_amount_input" name="rm_amount" class="form-input"
                  min="<?= get_setting('min_topup_rm','5') ?>" max="<?= get_setting('max_topup_rm','50000') ?>"
                  step="0.01" placeholder="0.00" required
                  data-price-per-g="<?= h($price ? (string)$price['price_per_g'] : '0') ?>"
@@ -161,23 +197,18 @@ if ($purchase):
         <?php if (isset($errors['rm_amount'])): ?><span class="error-text"><?= h($errors['rm_amount']) ?></span><?php endif; ?>
       </div>
 
-      <!-- Live Calculator -->
       <?php if ($price): ?>
       <div class="calc-panel" style="margin-bottom:20px;">
         <div style="font-size:0.75rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Anggaran Pengiraan</div>
         <div class="calc-result-row"><span class="calc-result-label">Gold Points</span><span class="calc-result-value" id="estimated_points">—</span></div>
         <div class="calc-result-row"><span class="calc-result-label">Emas (gram)</span><span class="calc-result-value" id="estimated_grams">—</span></div>
         <div class="calc-result-row"><span class="calc-result-label">Nilai RM</span><span class="calc-result-value" id="estimated_rm_value">—</span></div>
-        <div style="font-size:0.72rem;color:#9CA3AF;margin-top:8px;text-align:center;">
-          Nilai anggaran sahaja. Jumlah sebenar berdasarkan harga terkunci semasa transaksi.
-        </div>
       </div>
       <?php endif; ?>
 
       <div style="background:#FEFCE8;border-radius:8px;padding:12px;margin-bottom:16px;font-size:0.8rem;color:#92400E;">
-        ⚠️ <strong>Nota Penting:</strong> Pastikan anda mempunyai dana yang mencukupi sebelum meneruskan. Pembelian yang dikemukakan tidak boleh dibatalkan setelah pembayaran disahkan.
+        ⚠️ Gold Points dikreditkan selepas admin mengesahkan pembayaran anda (1–2 jam bekerja).
       </div>
-
       <button type="submit" class="btn-gold btn-block btn-lg" <?= !$price ? 'disabled' : '' ?>>
         Teruskan ke Pembayaran →
       </button>

@@ -136,7 +136,10 @@ INSERT INTO settings (setting_key, setting_value, description, is_public, update
 ('payout_min_points',        '1000',                                   'Minimum mata untuk bayaran', 0, 1),
 ('merchant_approval_required','1',                                     'Peniaga mesti diluluskan admin', 0, 1),
 ('ai_model',                 'claude-sonnet-4-6',                      'Model AI yang digunakan', 0, 1),
-('ai_system_prompt',         'Anda adalah pembantu AI untuk platform Kasih Gold Easy. Bantu pengguna memahami simpanan emas, pengiraan mata, dan cara menggunakan platform. Sentiasa gunakan harga emas terkini yang ditetapkan oleh admin. Jangan sesekali mengesahkan transaksi yang belum diproses.', 'Prompt sistem AI', 0, 1);
+('ai_system_prompt',         'Anda adalah pembantu AI untuk platform Kasih Gold Easy. Bantu pengguna memahami simpanan emas, pengiraan mata, dan cara menggunakan platform. Sentiasa gunakan harga emas terkini yang ditetapkan oleh admin. Jangan sesekali mengesahkan transaksi yang belum diproses.', 'Prompt sistem AI', 0, 1),
+('bank_name',                'Maybank',                                 'Nama bank penerima pembayaran', 0, 1),
+('bank_account',             '1234-5678-9012',                          'No. akaun bank penerima', 0, 1),
+('bank_account_name',        'Kasih Gold Easy Sdn Bhd',                 'Nama pemegang akaun bank', 0, 1);
 
 -- =============================================================================
 -- AUDIT LOGS (initial entries)
