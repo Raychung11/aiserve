@@ -7,7 +7,7 @@ require_once __DIR__ . '/../inc/csrf.php';
 require_once __DIR__ . '/../inc/layout.php';
 
 auth_start_session();
-auth_require_login(APP_URL . '/login');
+auth_require_login('/login');
 
 // Redirect admins/merchants to their dashboards
 if (auth_is_admin())    redirect(APP_URL . '/admin');

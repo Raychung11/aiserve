@@ -8,7 +8,7 @@ require_once __DIR__ . '/../inc/validation.php';
 require_once __DIR__ . '/../inc/layout.php';
 
 auth_start_session();
-auth_require_login(APP_URL . '/login');
+auth_require_login('/login');
 $user_id = auth_id();
 $user    = auth_user();
 $db      = getDB();

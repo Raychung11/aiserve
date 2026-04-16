@@ -136,7 +136,8 @@ function auth_require_login(string $redirect = '/login'): void
 {
     if (!auth_check()) {
         $_SESSION['auth_intended'] = $_SERVER['REQUEST_URI'] ?? '/';
-        header('Location: ' . APP_URL . $redirect);
+        $url = str_starts_with($redirect, 'http') ? $redirect : APP_URL . $redirect;
+        header('Location: ' . $url);
         exit;
     }
 }
