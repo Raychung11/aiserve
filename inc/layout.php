@@ -91,6 +91,7 @@ function layout_header(?array $user = null): void {
             ['Pindah', '/transfer'],
             ['Pasaran', '/marketplace'],
             ['Kempen', '/campaigns'],
+            ['Rujukan', '/referrals'],
         ];
     }
 
@@ -152,8 +153,9 @@ function layout_header(?array $user = null): void {
 // layout_footer
 // ----------------------------------------------------------------
 function layout_footer(): void {
-    $wa  = h(get_setting('support_whatsapp', '+60123456789'));
-    $year = date('Y');
+    $wa      = h(get_setting('support_whatsapp', '+60123456789'));
+    $year    = date('Y');
+    $app_url = APP_URL;
     echo <<<HTML
 <footer style="background:var(--kasih-dark);color:#fff;padding:40px 0 24px;margin-top:40px;">
   <div class="page-container">
@@ -169,16 +171,16 @@ function layout_footer(): void {
         <div>
           <div style="font-size:0.75rem;color:rgba(201,168,76,0.8);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Platform</div>
           <div style="display:flex;flex-direction:column;gap:6px;font-size:0.82rem;color:rgba(255,255,255,0.55);">
-            <a href="/marketplace" style="color:rgba(255,255,255,0.55);">Pasaran Maya</a>
-            <a href="/campaigns"   style="color:rgba(255,255,255,0.55);">Kempen Simpanan</a>
-            <a href="/referrals"   style="color:rgba(255,255,255,0.55);">Program Rujukan</a>
+            <a href="{$app_url}/marketplace" style="color:rgba(255,255,255,0.55);">Pasaran Maya</a>
+            <a href="{$app_url}/campaigns"   style="color:rgba(255,255,255,0.55);">Kempen Simpanan</a>
+            <a href="{$app_url}/referrals"   style="color:rgba(255,255,255,0.55);">Program Rujukan</a>
           </div>
         </div>
         <div>
           <div style="font-size:0.75rem;color:rgba(201,168,76,0.8);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Sokongan</div>
           <div style="display:flex;flex-direction:column;gap:6px;font-size:0.82rem;color:rgba(255,255,255,0.55);">
-            <a href="/terms"   style="color:rgba(255,255,255,0.55);">Terma &amp; Syarat</a>
-            <a href="/privacy" style="color:rgba(255,255,255,0.55);">Dasar Privasi</a>
+            <a href="{$app_url}/terms"   style="color:rgba(255,255,255,0.55);">Terma &amp; Syarat</a>
+            <a href="{$app_url}/privacy" style="color:rgba(255,255,255,0.55);">Dasar Privasi</a>
             <a href="https://wa.me/{$wa}" style="color:rgba(255,255,255,0.55);">WhatsApp Kami</a>
           </div>
         </div>
