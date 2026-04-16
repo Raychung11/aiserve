@@ -383,6 +383,10 @@ function status_badge(string $status): string {
         'failed'      => ['bg'=>'#FEE2E2','color'=>'#991B1B','label'=>'Gagal'],
         'superseded'  => ['bg'=>'#F3F4F6','color'=>'#6B7280','label'=>'Diganti'],
         'processing'  => ['bg'=>'#DBEAFE','color'=>'#1E40AF','label'=>'Diproses'],
+        'draft'               => ['bg'=>'#F3F4F6','color'=>'#374151','label'=>'Draf'],
+        'sold_out'            => ['bg'=>'#FEE2E2','color'=>'#991B1B','label'=>'Habis'],
+        'paid_by_points'      => ['bg'=>'#DBEAFE','color'=>'#1E40AF','label'=>'Dibayar'],
+        'merchant_processing' => ['bg'=>'#EDE9FE','color'=>'#5B21B6','label'=>'Diproses'],
     ];
     $s   = strtolower($status);
     $cfg = $map[$s] ?? ['bg'=>'#F3F4F6','color'=>'#374151','label'=>h($status)];

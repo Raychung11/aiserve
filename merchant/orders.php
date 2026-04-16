@@ -21,55 +21,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action   = $_POST['action'] ?? '';
     $order_id = (int)($_POST['order_id'] ?? 0);
 
-    // Verify order belongs to merchant
     $chk = $db->prepare("SELECT * FROM marketplace_orders WHERE id=? AND merchant_id=?");
     $chk->execute([$order_id, $merchant_id]);
     $order = $chk->fetch();
 
     if (!$order) { flash_set('main','Pesanan tidak dijumpai.','error'); redirect(APP_URL.'/merchant/orders'); }
 
-    if ($action === 'ship') {
-        if ($order['status'] === 'paid') {
-            $db->prepare("UPDATE marketplace_orders SET status='shipped', updated_at=NOW() WHERE id=?")->execute([$order_id]);
-            flash_set('main','Status pesanan dikemaskini: Dihantar.','success');
+    if ($action === 'process') {
+        // Merchant starts processing (after buyer pays)
+        if ($order['status'] === 'paid_by_points') {
+            $db->prepare("UPDATE marketplace_orders SET status='merchant_processing', updated_at=NOW() WHERE id=?")->execute([$order_id]);
+            flash_set('main','Pesanan #' . $order_id . ' sedang diproses.','success');
         }
     } elseif ($action === 'complete') {
-        if ($order['status'] === 'shipped') {
+        if ($order['status'] === 'merchant_processing') {
             $db->prepare("UPDATE marketplace_orders SET status='completed', updated_at=NOW() WHERE id=?")->execute([$order_id]);
-            flash_set('main','Pesanan ditandakan selesai.','success');
+            flash_set('main','Pesanan #' . $order_id . ' ditandakan selesai.','success');
         }
     } elseif ($action === 'cancel') {
-        if (in_array($order['status'], ['pending','paid'])) {
+        if (in_array($order['status'], ['pending', 'paid_by_points', 'merchant_processing'])) {
             $db->beginTransaction();
             try {
-                // Refund buyer if already paid
-                if ($order['status'] === 'paid') {
-                    $wallet = get_wallet($order['buyer_user_id']);
-                    $price  = get_active_gold_price();
-                    $price_snap = $price ? (string)$price['price_per_g'] : '0';
-                    $grams  = gold_grams_from_points((string)$order['total_points']);
-                    $rm_val = $price ? gold_rm_from_points((string)$order['total_points'], $price_snap) : '0.00';
-                    if ($wallet) {
-                        ledger_credit((int)$wallet['id'], $order['buyer_user_id'], (string)$order['total_points'], $grams, $rm_val, $price_snap, 'marketplace_refund', $order_id, 'Bayaran balik: pesanan #'.$order_id.' dibatalkan pedagang');
-                    }
-                    // Reverse merchant debit
-                    $m_wallet = get_wallet($user_id);
-                    if ($m_wallet) {
-                        ledger_debit((int)$m_wallet['id'], $user_id, (string)$order['total_points'], $grams, $rm_val, $price_snap, 'marketplace_refund', $order_id, 'Bayaran balik dikeluarkan: pesanan #'.$order_id);
-                    }
+                // Refund buyer if payment was taken
+                if (in_array($order['status'], ['paid_by_points', 'merchant_processing'])) {
+                    $price      = get_active_gold_price();
+                    $price_snap = $price ? (string)$price['price_per_g'] : '390.0000';
+                    $pts        = (string)$order['total_points'];
+                    $grams      = gold_grams_from_points($pts);
+                    $rm_val     = gold_rm_from_points($pts, $price_snap);
+
+                    // Refund buyer
+                    $buyer_wid = ensure_wallet_exists((int)$order['buyer_user_id']);
+                    ledger_credit($buyer_wid, (int)$order['buyer_user_id'], $pts, $grams, $rm_val, $price_snap,
+                        'marketplace_refund', $order_id, 'Bayaran balik: pesanan #' . $order_id . ' dibatalkan pedagang');
+
+                    // Reverse merchant credit
+                    $m_wid = ensure_wallet_exists($user_id);
+                    ledger_debit($m_wid, $user_id, $pts, $grams, $rm_val, $price_snap,
+                        'marketplace_refund', $order_id, 'Bayaran balik dikeluarkan: pesanan #' . $order_id);
                 }
-                // Restore stock
-                $items = $db->prepare("SELECT * FROM marketplace_order_items WHERE order_id=?");
+
+                // Restore stock for each item
+                $items = $db->prepare("SELECT product_id, qty FROM marketplace_order_items WHERE order_id=?");
                 $items->execute([$order_id]);
                 foreach ($items->fetchAll() as $item) {
-                    $db->prepare("UPDATE marketplace_products SET stock_quantity=stock_quantity+? WHERE id=?")->execute([$item['quantity'],$item['product_id']]);
+                    $db->prepare("UPDATE marketplace_products SET stock_qty=stock_qty+? WHERE id=? AND stock_qty IS NOT NULL")
+                       ->execute([$item['qty'], $item['product_id']]);
                 }
+
                 $db->prepare("UPDATE marketplace_orders SET status='cancelled', updated_at=NOW() WHERE id=?")->execute([$order_id]);
                 $db->commit();
-                flash_set('main','Pesanan dibatalkan.','success');
+                flash_set('main','Pesanan #' . $order_id . ' dibatalkan.','success');
             } catch (\Throwable $e) {
                 $db->rollBack();
-                flash_set('main','Ralat membatalkan pesanan.','error');
+                flash_set('main','Ralat membatalkan pesanan: ' . $e->getMessage(),'error');
             }
         }
     }
@@ -77,9 +82,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ── Fetch orders ─────────────────────────────────────────────────────────────
+// Status label map matching actual schema ENUM
+$statuses = [
+    'pending'             => 'Tertangguh',
+    'paid_by_points'      => 'Dibayar',
+    'merchant_processing' => 'Diproses',
+    'completed'           => 'Selesai',
+    'cancelled'           => 'Dibatalkan',
+    'refunded'            => 'Dikembalikan',
+];
+
 $status_filter = $_GET['status'] ?? '';
 $q             = trim($_GET['q'] ?? '');
-$page          = max(1,(int)($_GET['page'] ?? 1));
+$page          = max(1, (int)($_GET['page'] ?? 1));
 $per           = 20;
 
 $where  = "mo.merchant_id = ?";
@@ -88,39 +103,58 @@ if ($status_filter) { $where .= " AND mo.status=?"; $params[] = $status_filter; 
 if ($q) { $where .= " AND (u.full_name LIKE ? OR mo.id LIKE ?)"; $params[] = "%{$q}%"; $params[] = "%{$q}%"; }
 
 $ct = $db->prepare("SELECT COUNT(*) FROM marketplace_orders mo JOIN users u ON u.id=mo.buyer_user_id WHERE {$where}");
-$ct->execute($params); $total = (int)$ct->fetchColumn();
+$ct->execute($params);
+$total = (int)$ct->fetchColumn();
 
 $pag = paginate($total, $per, $page, APP_URL.'/merchant/orders?status='.urlencode($status_filter).'&q='.urlencode($q).'&page={page}');
-$params_pg = array_merge($params, [$pag['offset'], $per]);
 $o_stmt = $db->prepare("SELECT mo.*,u.full_name AS buyer_name,u.email AS buyer_email FROM marketplace_orders mo JOIN users u ON u.id=mo.buyer_user_id WHERE {$where} ORDER BY mo.created_at DESC LIMIT ?,?");
-$o_stmt->execute($params_pg);
+$o_stmt->execute(array_merge($params, [$pag['offset'], $per]));
 $orders = $o_stmt->fetchAll();
 
-$statuses = ['pending'=>'Tertangguh','paid'=>'Dibayar','shipped'=>'Dihantar','completed'=>'Selesai','cancelled'=>'Dibatalkan','refunded'=>'Dikembalikan'];
+// Stats for this merchant
+$s = $db->prepare("SELECT
+    COUNT(*) AS total,
+    SUM(CASE WHEN status='paid_by_points'      THEN 1 ELSE 0 END) AS new_orders,
+    SUM(CASE WHEN status='merchant_processing' THEN 1 ELSE 0 END) AS processing,
+    SUM(CASE WHEN status='completed'           THEN 1 ELSE 0 END) AS completed
+FROM marketplace_orders WHERE merchant_id=?");
+$s->execute([$merchant_id]);
+$order_stats = $s->fetch();
 
 layout_begin_merchant('Pesanan');
 ?>
 <div class="page-title">📋 Pesanan Saya</div>
 <?= flash_html('main') ?>
 
+<!-- Stats -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px;">
+  <div class="stat-card"><div class="stat-value"><?= (int)$order_stats['total'] ?></div><div class="stat-label">Jumlah Pesanan</div></div>
+  <div class="stat-card stat-card-blue" style="<?= (int)$order_stats['new_orders']>0?'border-left:3px solid #EF4444;':'' ?>">
+    <div class="stat-value" style="color:<?= (int)$order_stats['new_orders']>0?'#EF4444':'inherit' ?>;"><?= (int)$order_stats['new_orders'] ?></div>
+    <div class="stat-label">Pesanan Baharu</div>
+  </div>
+  <div class="stat-card stat-card-purple"><div class="stat-value"><?= (int)$order_stats['processing'] ?></div><div class="stat-label">Sedang Diproses</div></div>
+  <div class="stat-card stat-card-green"><div class="stat-value"><?= (int)$order_stats['completed'] ?></div><div class="stat-label">Selesai</div></div>
+</div>
+
 <!-- Filter Bar -->
 <div class="card-kasih" style="margin-bottom:16px;">
   <form method="get" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
     <div>
       <label class="form-label" style="font-size:0.78rem;">Status</label>
-      <select name="status" class="form-input" style="min-width:140px;">
+      <select name="status" class="form-input" style="min-width:160px;">
         <option value="">Semua Status</option>
-        <?php foreach ($statuses as $v=>$l): ?>
+        <?php foreach ($statuses as $v => $l): ?>
           <option value="<?= $v ?>" <?= $status_filter===$v ? 'selected' : '' ?>><?= $l ?></option>
         <?php endforeach; ?>
       </select>
     </div>
     <div>
-      <label class="form-label" style="font-size:0.78rem;">Cari Pembeli/ID</label>
-      <input type="text" name="q" class="form-input" placeholder="Nama atau ID..." value="<?= h($q) ?>" style="min-width:160px;">
+      <label class="form-label" style="font-size:0.78rem;">Cari Pembeli / #ID</label>
+      <input type="text" name="q" class="form-input" placeholder="Nama atau ID pesanan..." value="<?= h($q) ?>" style="min-width:160px;">
     </div>
     <button type="submit" class="btn-gold btn-sm">Tapis</button>
-    <a href="<?= APP_URL ?>/merchant/orders" class="btn-gold-outline btn-sm">Padam Penapis</a>
+    <a href="<?= APP_URL ?>/merchant/orders" class="btn-gold-outline btn-sm">Reset</a>
   </form>
 </div>
 
@@ -139,8 +173,8 @@ layout_begin_merchant('Pesanan');
       </thead>
       <tbody>
         <?php foreach ($orders as $o): ?>
-        <tr>
-          <td style="font-size:0.78rem;color:#9CA3AF;">#<?= $o['id'] ?></td>
+        <tr style="<?= $o['status']==='paid_by_points' ? 'background:#FFFBEB;' : '' ?>">
+          <td style="font-size:0.78rem;color:#9CA3AF;font-weight:600;">#<?= $o['id'] ?></td>
           <td>
             <div style="font-weight:600;font-size:0.85rem;"><?= h($o['buyer_name']) ?></div>
             <div style="font-size:0.75rem;color:#9CA3AF;"><?= h($o['buyer_email']) ?></div>
@@ -150,23 +184,35 @@ layout_begin_merchant('Pesanan');
           <td style="font-size:0.75rem;color:#9CA3AF;white-space:nowrap;"><?= format_date($o['created_at']) ?></td>
           <td>
             <div style="display:flex;gap:4px;flex-wrap:wrap;">
-              <?php if ($o['status']==='paid'): ?>
+              <?php if ($o['status'] === 'paid_by_points'): ?>
               <form method="post" style="display:inline;">
-                <?= csrf_field() ?><input type="hidden" name="action" value="ship"><input type="hidden" name="order_id" value="<?= $o['id'] ?>">
-                <button class="btn-gold btn-sm">Hantar</button>
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="process">
+                <input type="hidden" name="order_id" value="<?= $o['id'] ?>">
+                <button class="btn-gold btn-sm">▶ Proses</button>
               </form>
               <?php endif; ?>
-              <?php if ($o['status']==='shipped'): ?>
+
+              <?php if ($o['status'] === 'merchant_processing'): ?>
               <form method="post" style="display:inline;">
-                <?= csrf_field() ?><input type="hidden" name="action" value="complete"><input type="hidden" name="order_id" value="<?= $o['id'] ?>">
-                <button class="btn-gold btn-sm">Selesai</button>
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="complete">
+                <input type="hidden" name="order_id" value="<?= $o['id'] ?>">
+                <button class="btn-gold btn-sm">✅ Selesai</button>
               </form>
               <?php endif; ?>
-              <?php if (in_array($o['status'],['pending','paid'])): ?>
-              <form method="post" style="display:inline;" onsubmit="return confirm('Batalkan pesanan ini?')">
-                <?= csrf_field() ?><input type="hidden" name="action" value="cancel"><input type="hidden" name="order_id" value="<?= $o['id'] ?>">
-                <button class="btn-sm" style="background:#EF4444;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;">Batal</button>
+
+              <?php if (in_array($o['status'], ['pending','paid_by_points','merchant_processing'])): ?>
+              <form method="post" style="display:inline;" onsubmit="return confirm('Batalkan pesanan #<?= $o['id'] ?>? Mata akan dikembalikan kepada pembeli.')">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="cancel">
+                <input type="hidden" name="order_id" value="<?= $o['id'] ?>">
+                <button class="btn-sm" style="background:#FEE2E2;color:#991B1B;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;">Batal</button>
               </form>
+              <?php endif; ?>
+
+              <?php if ($o['status'] === 'completed' || $o['status'] === 'cancelled'): ?>
+                <span style="color:#D1D5DB;font-size:0.78rem;">—</span>
               <?php endif; ?>
             </div>
           </td>

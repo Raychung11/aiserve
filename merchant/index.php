@@ -19,9 +19,8 @@ $balance = get_wallet_balance($user_id);
 $price   = get_active_gold_price();
 
 // Stats
-$total_products = (int)$db->prepare("SELECT COUNT(*) FROM marketplace_products WHERE merchant_id=? AND deleted_at IS NULL")->execute([$merchant['id']]) ? 0 : 0;
 $tp = $db->prepare("SELECT COUNT(*) FROM marketplace_products WHERE merchant_id=? AND deleted_at IS NULL"); $tp->execute([$merchant['id']]); $total_products = (int)$tp->fetchColumn();
-$po = $db->prepare("SELECT COUNT(*) FROM marketplace_orders WHERE merchant_id=? AND status NOT IN ('cancelled','refunded')"); $po->execute([$merchant['id']]); $pending_orders = (int)$po->fetchColumn();
+$po = $db->prepare("SELECT COUNT(*) FROM marketplace_orders WHERE merchant_id=? AND status IN ('paid_by_points','merchant_processing')"); $po->execute([$merchant['id']]); $pending_orders = (int)$po->fetchColumn();
 $ts = $db->prepare("SELECT COALESCE(SUM(total_points),0) FROM marketplace_orders WHERE merchant_id=? AND status NOT IN ('cancelled','refunded')"); $ts->execute([$merchant['id']]); $total_sales = $ts->fetchColumn();
 $pp = $db->prepare("SELECT COUNT(*) FROM merchant_payout_requests WHERE merchant_id=? AND status='pending'"); $pp->execute([$merchant['id']]); $pend_payouts = (int)$pp->fetchColumn();
 

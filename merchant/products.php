@@ -17,29 +17,28 @@ if (!$merchant) { flash_set('main','Data pedagang tidak dijumpai.','error'); red
 $merchant_id = (int)$merchant['id'];
 
 $errors = [];
-$success = '';
 
 // ── Handle POST actions ──────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
-
     $action = $_POST['action'] ?? '';
 
     if ($action === 'add' || $action === 'edit') {
         if ($merchant['status'] !== 'active') {
             $errors[] = 'Akaun pedagang anda belum aktif. Tidak boleh tambah/edit produk.';
         } else {
-            $name        = sanitize_string($_POST['product_name'] ?? '');
-            $desc        = sanitize_string($_POST['description'] ?? '');
-            $price_pts   = sanitize_decimal($_POST['price_points'] ?? '0');
-            $stock       = (int)($_POST['stock_quantity'] ?? 0);
+            $title       = sanitize_string($_POST['product_title'] ?? '');
+            $desc        = sanitize_string($_POST['description'] ?? '', 2000);
+            $points_price = sanitize_decimal($_POST['points_price'] ?? '0');
+            $rm_ref      = sanitize_decimal($_POST['rm_reference_value'] ?? '0');
+            $stock       = $_POST['stock_qty'] === '' ? null : (int)$_POST['stock_qty'];
             $cat_id      = (int)($_POST['category_id'] ?? 0);
             $is_featured = isset($_POST['is_featured']) ? 1 : 0;
-            $status      = $_POST['status'] ?? 'active';
+            $status      = $_POST['status'] ?? 'draft';
 
-            if (!$name)             $errors[] = 'Nama produk diperlukan.';
-            if ((float)$price_pts <= 0) $errors[] = 'Harga mata mesti lebih dari 0.';
-            if ($stock < 0)         $errors[] = 'Stok tidak boleh negatif.';
+            if (!$title)                   $errors[] = 'Nama produk diperlukan.';
+            if ((float)$points_price <= 0) $errors[] = 'Harga mata mesti lebih dari 0.';
+            if ($stock !== null && $stock < 0) $errors[] = 'Stok tidak boleh negatif.';
 
             if (empty($errors)) {
                 // Handle image upload
@@ -50,16 +49,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     else $errors[] = 'Gambar tidak sah (PNG/JPG/WebP, maks 3MB).';
                 }
 
+                // Generate slug
+                $slug_base = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $title));
+                $slug      = $slug_base . '-' . substr(bin2hex(random_bytes(4)), 0, 6);
+
                 if (empty($errors)) {
                     if ($action === 'add') {
-                        $sql = "INSERT INTO marketplace_products (merchant_id,category_id,name,description,price_points,stock_quantity,is_featured,status,created_at) VALUES (?,?,?,?,?,?,?,?,NOW())";
-                        $stmt = $db->prepare($sql);
-                        $stmt->execute([$merchant_id,$cat_id,$name,$desc,$price_pts,$stock,$is_featured,$status]);
+                        $sql = "INSERT INTO marketplace_products (merchant_id,category_id,title,slug,description,points_price,rm_reference_value,stock_qty,is_featured,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,NOW())";
+                        $db->prepare($sql)->execute([$merchant_id,$cat_id,$title,$slug,$desc,$points_price,$rm_ref,$stock,$is_featured,$status]);
                         $new_id = (int)$db->lastInsertId();
                         if ($image_filename) {
-                            $db->prepare("UPDATE marketplace_products SET image_url=? WHERE id=?")->execute([$image_filename, $new_id]);
+                            $db->prepare("UPDATE marketplace_products SET image=? WHERE id=?")->execute([$image_filename, $new_id]);
                         }
-                        audit_log($user_id,'merchant','product_added','marketplace_products',$new_id,null,['name'=>$name]);
+                        audit_log($user_id,'merchant','product_added','marketplace_products',$new_id,null,['title'=>$title]);
                         flash_set('main','Produk berjaya ditambah.','success');
                     } else {
                         $edit_id = (int)($_POST['product_id'] ?? 0);
@@ -67,12 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $chk->execute([$edit_id,$merchant_id]);
                         if (!$chk->fetch()) { flash_set('main','Produk tidak dijumpai.','error'); redirect(APP_URL.'/merchant/products'); }
 
-                        $set = "category_id=?,name=?,description=?,price_points=?,stock_quantity=?,is_featured=?,status=?,updated_at=NOW()";
-                        $params = [$cat_id,$name,$desc,$price_pts,$stock,$is_featured,$status];
-                        if ($image_filename) { $set .= ",image_url=?"; $params[] = $image_filename; }
+                        $set    = "category_id=?,title=?,description=?,points_price=?,rm_reference_value=?,stock_qty=?,is_featured=?,status=?,updated_at=NOW()";
+                        $params = [$cat_id,$title,$desc,$points_price,$rm_ref,$stock,$is_featured,$status];
+                        if ($image_filename) { $set .= ",image=?"; $params[] = $image_filename; }
                         $params[] = $edit_id;
                         $db->prepare("UPDATE marketplace_products SET {$set} WHERE id=?")->execute($params);
-                        audit_log($user_id,'merchant','product_updated','marketplace_products',$edit_id,null,['name'=>$name]);
+                        audit_log($user_id,'merchant','product_updated','marketplace_products',$edit_id,null,['title'=>$title]);
                         flash_set('main','Produk berjaya dikemaskini.','success');
                     }
                     redirect(APP_URL.'/merchant/products');
@@ -92,23 +94,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// ── Fetch data ────────────────────────────────────────────────────────────────
-$q       = trim($_GET['q'] ?? '');
-$page    = max(1,(int)($_GET['page'] ?? 1));
-$per     = 15;
+// ── Fetch products ────────────────────────────────────────────────────────────
+$q    = trim($_GET['q'] ?? '');
+$page = max(1,(int)($_GET['page'] ?? 1));
+$per  = 15;
 
 $where  = "mp.merchant_id = ? AND mp.deleted_at IS NULL";
 $params = [$merchant_id];
-if ($q) { $where .= " AND mp.name LIKE ?"; $params[] = "%{$q}%"; }
+if ($q) { $where .= " AND mp.title LIKE ?"; $params[] = "%{$q}%"; }
 
-$total = (int)$db->prepare("SELECT COUNT(*) FROM marketplace_products mp WHERE {$where}")->execute($params) ? 0 : 0;
-$ct = $db->prepare("SELECT COUNT(*) FROM marketplace_products mp WHERE {$where}"); $ct->execute($params); $total = (int)$ct->fetchColumn();
+$ct = $db->prepare("SELECT COUNT(*) FROM marketplace_products mp WHERE {$where}");
+$ct->execute($params);
+$total = (int)$ct->fetchColumn();
 
-$pag    = paginate($total, $per, $page, APP_URL.'/merchant/products?q='.urlencode($q).'&page={page}');
-$params_paged = array_merge($params, [$pag['offset'], $per]);
-$prod_stmt = $db->prepare("SELECT mp.*,mc.name AS cat_name FROM marketplace_products mp LEFT JOIN marketplace_categories mc ON mc.id=mp.category_id WHERE {$where} ORDER BY mp.created_at DESC LIMIT ?,?");
-$prod_stmt->execute($params_paged);
-$products = $prod_stmt->fetchAll();
+$pag = paginate($total, $per, $page, APP_URL.'/merchant/products?q='.urlencode($q).'&page={page}');
+$stmt = $db->prepare("SELECT mp.*,mc.name AS cat_name FROM marketplace_products mp LEFT JOIN marketplace_categories mc ON mc.id=mp.category_id WHERE {$where} ORDER BY mp.created_at DESC LIMIT ?,?");
+$stmt->execute(array_merge($params, [$pag['offset'], $per]));
+$products = $stmt->fetchAll();
 
 $cats = $db->query("SELECT id,name FROM marketplace_categories WHERE is_active=1 ORDER BY sort_order")->fetchAll();
 
@@ -119,6 +121,9 @@ if (isset($_GET['edit'])) {
     $ep->execute([(int)$_GET['edit'], $merchant_id]);
     $edit_product = $ep->fetch() ?: null;
 }
+
+// Get active gold price to suggest RM reference
+$price = get_active_gold_price();
 
 layout_begin_merchant('Produk Saya');
 ?>
@@ -139,7 +144,7 @@ layout_begin_merchant('Produk Saya');
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div>
         <label class="form-label">Nama Produk *</label>
-        <input type="text" name="product_name" class="form-input" required value="<?= h($edit_product['name'] ?? '') ?>">
+        <input type="text" name="product_title" class="form-input" required value="<?= h($edit_product['title'] ?? '') ?>">
       </div>
       <div>
         <label class="form-label">Kategori</label>
@@ -152,33 +157,38 @@ layout_begin_merchant('Produk Saya');
       </div>
       <div>
         <label class="form-label">Harga (Mata Emas) *</label>
-        <input type="number" name="price_points" class="form-input" step="0.01" min="0.01" required value="<?= h($edit_product['price_points'] ?? '') ?>">
+        <input type="number" name="points_price" class="form-input" step="0.01" min="0.01" required value="<?= h($edit_product['points_price'] ?? '') ?>">
       </div>
       <div>
-        <label class="form-label">Stok</label>
-        <input type="number" name="stock_quantity" class="form-input" min="0" value="<?= h($edit_product['stock_quantity'] ?? '0') ?>">
+        <label class="form-label">Nilai Rujukan RM</label>
+        <input type="number" name="rm_reference_value" class="form-input" step="0.01" min="0" value="<?= h($edit_product['rm_reference_value'] ?? '0') ?>">
+        <small style="color:#9CA3AF;">Nilai RM untuk rujukan sahaja (tidak digunakan dalam transaksi).</small>
+      </div>
+      <div>
+        <label class="form-label">Stok (kosongkan untuk ∞)</label>
+        <input type="number" name="stock_qty" class="form-input" min="0" value="<?= $edit_product['stock_qty'] !== null ? (int)$edit_product['stock_qty'] : '' ?>" placeholder="Kosong = tidak terhad">
       </div>
       <div>
         <label class="form-label">Status</label>
         <select name="status" class="form-input">
-          <option value="active" <?= ($edit_product['status']??'active')==='active' ? 'selected' : '' ?>>Aktif</option>
-          <option value="inactive" <?= ($edit_product['status']??'')==='inactive' ? 'selected' : '' ?>>Tidak Aktif</option>
+          <option value="draft"  <?= ($edit_product['status']??'draft')==='draft'  ? 'selected' : '' ?>>Draf (Tersembunyi)</option>
+          <option value="active" <?= ($edit_product['status']??'')==='active' ? 'selected' : '' ?>>Aktif (Kelihatan)</option>
         </select>
       </div>
       <div>
         <label class="form-label">Gambar Produk (PNG/JPG/WebP, maks 3MB)</label>
         <input type="file" name="product_image" class="form-input" accept="image/jpeg,image/png,image/webp">
-        <?php if ($edit_product && $edit_product['image_url']): ?>
-          <img src="<?= APP_URL ?>/uploads/products/<?= h($edit_product['image_url']) ?>" style="height:50px;margin-top:6px;border-radius:6px;">
+        <?php if ($edit_product && $edit_product['image']): ?>
+          <img src="<?= APP_URL ?>/uploads/products/<?= h($edit_product['image']) ?>" style="height:50px;margin-top:6px;border-radius:6px;">
         <?php endif; ?>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding-top:24px;">
+        <input type="checkbox" name="is_featured" id="is_featured" value="1" <?= ($edit_product['is_featured']??0) ? 'checked' : '' ?>>
+        <label for="is_featured" class="form-label" style="margin:0;">Produk Pilihan (Featured)</label>
       </div>
       <div style="grid-column:1/-1;">
         <label class="form-label">Penerangan</label>
         <textarea name="description" class="form-input" rows="3"><?= h($edit_product['description'] ?? '') ?></textarea>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="checkbox" name="is_featured" id="is_featured" value="1" <?= ($edit_product['is_featured']??0) ? 'checked' : '' ?>>
-        <label for="is_featured" class="form-label" style="margin:0;">Produk Pilihan (Featured)</label>
       </div>
     </div>
     <div style="margin-top:16px;display:flex;gap:8px;">
@@ -209,14 +219,14 @@ layout_begin_merchant('Produk Saya');
         <tr>
           <td style="font-size:0.78rem;color:#9CA3AF;"><?= $p['id'] ?></td>
           <td>
-            <?php if ($p['image_url']): ?>
-              <img src="<?= APP_URL ?>/uploads/products/<?= h($p['image_url']) ?>" style="width:40px;height:40px;object-fit:cover;border-radius:6px;">
+            <?php if ($p['image']): ?>
+              <img src="<?= APP_URL ?>/uploads/products/<?= h($p['image']) ?>" style="width:40px;height:40px;object-fit:cover;border-radius:6px;">
             <?php else: ?><span style="font-size:1.4rem;">📦</span><?php endif; ?>
           </td>
-          <td style="font-weight:600;font-size:0.875rem;"><?= h($p['name']) ?></td>
+          <td style="font-weight:600;font-size:0.875rem;"><?= h($p['title']) ?></td>
           <td style="font-size:0.8rem;color:#6B7280;"><?= h($p['cat_name'] ?? '-') ?></td>
-          <td style="font-weight:600;color:var(--gold-dark);"><?= gold_format_points($p['price_points']) ?></td>
-          <td style="font-size:0.85rem;"><?= (int)$p['stock_quantity'] ?></td>
+          <td style="font-weight:600;color:var(--gold-dark);"><?= gold_format_points($p['points_price']) ?></td>
+          <td style="font-size:0.85rem;"><?= $p['stock_qty'] !== null ? (int)$p['stock_qty'] : '∞' ?></td>
           <td><?= status_badge($p['status']) ?></td>
           <td>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
