@@ -17,6 +17,11 @@ $user    = auth_user();
 $user_id = auth_id();
 $db      = getDB();
 
+// KYC status
+$kyc_row = $db->prepare("SELECT status, rejection_reason FROM kyc_submissions WHERE user_id=?");
+$kyc_row->execute([$user_id]);
+$kyc_info = $kyc_row->fetch();
+
 // Wallet balance
 $balance = get_wallet_balance($user_id);
 $price   = get_active_gold_price();
@@ -55,6 +60,33 @@ $featured_products = $prod_stmt->fetchAll();
 
 layout_begin_user('Dashboard');
 ?>
+
+<?php if (!$kyc_info): ?>
+<div class="alert alert-warning" style="margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+  <span style="font-size:1.5rem;">🪪</span>
+  <div style="flex:1;">
+    <strong>Pengesahan Identiti (eKYC) Diperlukan</strong><br>
+    <span style="font-size:0.85rem;">Sila selesaikan eKYC untuk mengakses semua ciri platform.</span>
+  </div>
+  <a href="<?= APP_URL ?>/kyc" class="btn-gold btn-sm" style="white-space:nowrap;">Mula eKYC →</a>
+</div>
+<?php elseif ($kyc_info['status'] === 'pending'): ?>
+<div class="alert" style="background:#FFFBEB;border-left:4px solid #F59E0B;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+  <span style="font-size:1.5rem;">⏳</span>
+  <div>
+    <strong style="color:#92400E;">eKYC Sedang Disemak</strong><br>
+    <span style="font-size:0.85rem;color:#6B7280;">Permohonan anda sedang disemak oleh admin. Proses ini mengambil masa 1–3 hari bekerja.</span>
+  </div>
+</div>
+<?php elseif ($kyc_info['status'] === 'rejected'): ?>
+<div class="alert alert-error" style="margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+  <span style="font-size:1.5rem;">❌</span>
+  <div style="flex:1;">
+    <strong>eKYC Ditolak</strong> — <?= h($kyc_info['rejection_reason'] ?: 'Sila semak dan hantar semula.') ?>
+  </div>
+  <a href="<?= APP_URL ?>/kyc" class="btn-gold btn-sm" style="white-space:nowrap;">Hantar Semula →</a>
+</div>
+<?php endif; ?>
 
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;" class="md:grid-cols-3 grid-cols-1">
   <!-- Wallet Card -->
@@ -102,6 +134,7 @@ layout_begin_user('Dashboard');
     ['🎯', 'Kempen', '/campaigns', 'Simpanan bersasar'],
     ['📊', 'Wallet', '/wallet', 'Sejarah transaksi'],
     ['📢', 'Rujukan', '/referrals', 'Jana komisen'],
+    ['🪪', 'eKYC', '/kyc', 'Sahkan identiti'],
   ];
   foreach ($actions as [$icon, $label, $path, $desc]):
   ?>

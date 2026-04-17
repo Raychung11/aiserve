@@ -92,6 +92,7 @@ function layout_header(?array $user = null): void {
             ['Pasaran', '/marketplace'],
             ['Kempen', '/campaigns'],
             ['Rujukan', '/referrals'],
+            ['eKYC', '/kyc'],
         ];
     }
 
@@ -284,6 +285,7 @@ function layout_sidebar_admin(): void {
     echo '<div class="sidebar-section"><div class="sidebar-group-label">KEWANGAN</div>';
     _slink('/admin/payouts',      '💰', 'Permintaan Bayaran',  $cp, $app_url);
     _slink('/admin/referrals',    '📢', 'Rujukan',             $cp, $app_url);
+    _slink('/admin/kyc',          '🪪', 'eKYC',               $cp, $app_url);
     echo '</div>';
 
     echo '<div class="sidebar-section"><div class="sidebar-group-label">SISTEM</div>';

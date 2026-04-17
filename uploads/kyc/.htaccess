@@ -1,0 +1,5 @@
+# Block direct web access to KYC identity documents
+Options -Indexes
+<FilesMatch ".*">
+  Require all denied
+</FilesMatch>

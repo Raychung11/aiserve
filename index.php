@@ -55,6 +55,8 @@ $user_routes = [
     'transfer'   => 'public/transfer.php',
     'referrals'  => 'public/referrals.php',
     'profile'    => 'public/profile.php',
+    'kyc'        => 'public/kyc.php',
+    'kyc-image'  => 'public/kyc-image.php',
 ];
 
 // admin pages
@@ -69,6 +71,8 @@ $admin_routes = [
     'campaigns'  => 'admin/campaigns.php',
     'payouts'    => 'admin/payouts.php',
     'referrals'  => 'admin/referrals.php',
+    'kyc'        => 'admin/kyc.php',
+    'kyc-image'  => 'admin/kyc-image.php',
     'settings'   => 'admin/settings.php',
     'ai-settings'=> 'admin/ai_settings.php',
     'audit-logs' => 'admin/audit_logs.php',
