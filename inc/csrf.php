@@ -55,6 +55,28 @@ function csrf_verify(): void
 {
     csrf_generate(); // ensure a token exists in session
 
+    // When a file upload exceeds post_max_size, PHP silently empties $_POST.
+    // Detect this before comparing tokens so we show a size error, not a CSRF error.
+    if (empty($_POST) && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+        $cl = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+        if ($cl > 0) {
+            http_response_code(413);
+            echo '<!DOCTYPE html><html lang="ms"><head><meta charset="UTF-8">'
+                . '<title>Fail Terlalu Besar</title>'
+                . '<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#fff7ed;}'
+                . '.box{background:#fff;border:1px solid #fed7aa;border-radius:8px;padding:2rem 3rem;text-align:center;max-width:440px;}'
+                . 'h1{color:#c2410c;font-size:1.4rem;margin:0 0 .5rem}p{color:#6b7280;margin:0 0 1rem;line-height:1.6}'
+                . 'a{color:#d97706;font-weight:600;text-decoration:none}</style></head>'
+                . '<body><div class="box">'
+                . '<h1>&#128247; Fail Terlalu Besar</h1>'
+                . '<p>Gambar yang dimuat naik melebihi had pelayan.<br>'
+                . 'Sila kompres gambar anda hingga di bawah <strong>8MB setiap satu</strong> dan cuba lagi.</p>'
+                . '<a href="javascript:history.back()">&#8592; Kembali &amp; Cuba Lagi</a>'
+                . '</div></body></html>';
+            exit;
+        }
+    }
+
     $submitted = (string)($_POST['csrf_token'] ?? '');
     $expected  = (string)($_SESSION['csrf_token'] ?? '');
 

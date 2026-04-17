@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$postcode)   $errors[] = 'Poskod diperlukan.';
 
     $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
-    $max_size     = 10 * 1024 * 1024; // 10 MB (matches .user.ini)
+    $max_size     = 8 * 1024 * 1024; // 8 MB (matches .user.ini upload_max_filesize)
 
     $ic_front_file = $_FILES['ic_front'] ?? null;
     $ic_back_file  = $_FILES['ic_back']  ?? null;
@@ -300,7 +300,7 @@ if ($status === 'approved'): ?>
   <div class="card-kasih" style="margin-bottom:20px;">
     <div class="section-title">📷 Gambar Kad Pengenalan (IC)</div>
     <p style="font-size:0.82rem;color:#6B7280;margin-bottom:16px;">
-      Muat naik gambar jelas IC hadapan dan belakang. Format: JPG, PNG atau WebP. Saiz maksimum: <strong>10MB</strong> setiap satu.
+      Muat naik gambar jelas IC hadapan dan belakang. Format: JPG, PNG atau WebP. Saiz maksimum: <strong>8MB</strong> setiap satu.
     </p>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
@@ -369,9 +369,9 @@ if ($status === 'approved'): ?>
 function previewImage(input, imgId, previewId, placeholderId) {
     if (!input.files || !input.files[0]) return;
     var file = input.files[0];
-    var maxBytes = 10 * 1024 * 1024;
+    var maxBytes = 8 * 1024 * 1024;
     if (file.size > maxBytes) {
-        alert('Fail terlalu besar (' + (file.size / 1024 / 1024).toFixed(1) + 'MB). Saiz maksimum ialah 10MB.');
+        alert('Fail terlalu besar (' + (file.size / 1024 / 1024).toFixed(1) + 'MB). Saiz maksimum ialah 8MB.');
         input.value = '';
         return;
     }

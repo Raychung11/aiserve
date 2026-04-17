@@ -38,10 +38,18 @@ RewriteRule ^(config|inc|sql|docs|db|src|includes)(/|$) - [F,L]
   Require all denied
 </FilesMatch>
 
-# PHP settings for Hostinger
+# PHP settings (mod_php fallback — Hostinger uses PHP-FPM + .user.ini)
 <IfModule mod_php8.c>
-  php_value upload_max_filesize 5M
-  php_value post_max_size 10M
+  php_value upload_max_filesize 8M
+  php_value post_max_size 20M
+  php_value max_execution_time 60
+  php_value memory_limit 256M
+  php_flag display_errors Off
+  php_flag log_errors On
+</IfModule>
+<IfModule mod_php7.c>
+  php_value upload_max_filesize 8M
+  php_value post_max_size 20M
   php_value max_execution_time 60
   php_value memory_limit 256M
   php_flag display_errors Off
