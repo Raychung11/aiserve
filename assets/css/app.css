@@ -726,8 +726,10 @@ img { max-width: 100%; height: auto; }
   .sidebar-kasih { transform: translateX(-100%); }
   .sidebar-kasih.open { transform: translateX(0); }
   .main-with-sidebar { margin-left: 0; }
-  .hamburger-btn { display: flex; }
+  /* Hamburger shown via inline style on element; this ensures sidebar pages also show it */
+  #hamburger-btn { display: flex !important; }
   .nav-links { display: none !important; }
+  .points-badge { display: none !important; }
 }
 @media (max-width: 768px) {
   .card-kasih { padding: 16px; }

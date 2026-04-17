@@ -140,9 +140,9 @@ function layout_header(?array $user = null): void {
         echo '<div class="border-t border-gray-100 my-1"></div>';
         echo '<a href="' . h($app_url . '/logout') . '" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">🚪 Log Keluar</a>';
         echo '</div></div>'; // end dropdown
-        // Hamburger (visible on mobile)
-        echo '<button id="hamburger-btn" class="hamburger-btn" aria-label="Menu" aria-expanded="false">';
-        echo '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
+        // Hamburger (visible on mobile) — onclick wired directly, no JS init needed
+        echo '<button id="hamburger-btn" onclick="kasihToggleNav()" class="hamburger-btn" aria-label="Menu" style="display:none;background:none;border:none;cursor:pointer;padding:8px;color:#1A1A2E;">';
+        echo '<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>';
         echo '</button>';
     } else {
         echo '<a href="' . h($app_url . '/login') . '" class="btn-gold-outline btn-sm">Log Masuk</a>';
@@ -178,8 +178,23 @@ function layout_header(?array $user = null): void {
         echo '<a href="' . h($app_url . '/profile') . '" style="display:flex;align-items:center;gap:10px;padding:14px 20px;font-size:0.95rem;font-weight:500;color:#374151;text-decoration:none;border-bottom:1px solid #F9FAFB;">👤 Profil Saya</a>';
         echo '<a href="' . h($app_url . '/logout') . '" style="display:flex;align-items:center;gap:10px;padding:14px 20px;font-size:0.95rem;font-weight:500;color:#DC2626;text-decoration:none;">🚪 Log Keluar</a>';
         echo '</div>';
-        // Dark overlay behind the panel
-        echo '<div id="mobile-nav-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9998;" onclick="kasihCloseNav()"></div>';
+        // Dark overlay — closes panel on tap-outside
+        echo '<div id="mobile-nav-overlay" onclick="kasihToggleNav()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;"></div>';
+
+        // Inline script — defined immediately in HTML, no DOMContentLoaded or app.js dependency
+        echo '<script>
+function kasihToggleNav() {
+    var panel   = document.getElementById("mobile-nav-panel");
+    var overlay = document.getElementById("mobile-nav-overlay");
+    var btn     = document.getElementById("hamburger-btn");
+    if (!panel) return;
+    var opening = panel.style.display !== "block";
+    panel.style.display   = opening ? "block"  : "none";
+    if (overlay) overlay.style.display = opening ? "block"  : "none";
+    document.body.style.overflow = opening ? "hidden" : "";
+    if (btn) btn.setAttribute("aria-expanded", opening);
+}
+</script>';
     }
 }
 
