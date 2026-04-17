@@ -57,6 +57,8 @@ $user_routes = [
     'profile'    => 'public/profile.php',
     'kyc'        => 'public/kyc.php',
     'kyc-image'  => 'public/kyc-image.php',
+    'sell-gold'  => 'public/sell_gold.php',
+    'ar-rahnu'   => 'public/ar_rahnu.php',
 ];
 
 // admin pages
@@ -73,6 +75,8 @@ $admin_routes = [
     'referrals'  => 'admin/referrals.php',
     'kyc'        => 'admin/kyc.php',
     'kyc-image'  => 'admin/kyc-image.php',
+    'sell-gold'  => 'admin/sell_gold.php',
+    'ar-rahnu'   => 'admin/ar_rahnu.php',
     'settings'   => 'admin/settings.php',
     'ai-settings'=> 'admin/ai_settings.php',
     'audit-logs' => 'admin/audit_logs.php',

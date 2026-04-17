@@ -63,6 +63,15 @@ function get_active_gold_price(): ?array {
     return $cached;
 }
 
+function get_active_sell_price(): ?array {
+    static $cached = null;
+    if ($cached !== null) return $cached;
+    $db = getDB();
+    $stmt = $db->query("SELECT * FROM gold_sell_prices WHERE status='active' ORDER BY effective_at DESC LIMIT 1");
+    $cached = $stmt->fetch() ?: null;
+    return $cached;
+}
+
 function get_wallet(int $user_id): ?array {
     $db = getDB();
     $stmt = $db->prepare("SELECT * FROM wallets WHERE user_id = ?");
@@ -388,6 +397,11 @@ function status_badge(string $status): string {
         'sold_out'            => ['bg'=>'#FEE2E2','color'=>'#991B1B','label'=>'Habis'],
         'paid_by_points'      => ['bg'=>'#DBEAFE','color'=>'#1E40AF','label'=>'Dibayar'],
         'merchant_processing' => ['bg'=>'#EDE9FE','color'=>'#5B21B6','label'=>'Diproses'],
+        'paid'                => ['bg'=>'#D1FAE5','color'=>'#065F46','label'=>'Dibayar'],
+        'active'              => ['bg'=>'#DBEAFE','color'=>'#1E40AF','label'=>'Aktif'],
+        'redeemed'            => ['bg'=>'#D1FAE5','color'=>'#065F46','label'=>'Ditebus'],
+        'defaulted'           => ['bg'=>'#FEE2E2','color'=>'#991B1B','label'=>'Tamat Tempoh'],
+        'cancelled'           => ['bg'=>'#F3F4F6','color'=>'#6B7280','label'=>'Dibatalkan'],
     ];
     $s   = strtolower($status);
     $cfg = $map[$s] ?? ['bg'=>'#F3F4F6','color'=>'#374151','label'=>h($status)];

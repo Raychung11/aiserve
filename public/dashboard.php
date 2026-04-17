@@ -134,6 +134,8 @@ layout_begin_user('Dashboard');
     ['🎯', 'Kempen', '/campaigns', 'Simpanan bersasar'],
     ['📊', 'Wallet', '/wallet', 'Sejarah transaksi'],
     ['📢', 'Rujukan', '/referrals', 'Jana komisen'],
+    ['💰', 'Jual Emas', '/sell-gold', 'Tukar emas ke RM'],
+    ['🕌', 'Ar Rahnu', '/ar-rahnu', 'Gadai emas Islam'],
     ['🪪', 'eKYC', '/kyc', 'Sahkan identiti'],
   ];
   foreach ($actions as [$icon, $label, $path, $desc]):
