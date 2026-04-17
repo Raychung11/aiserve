@@ -140,8 +140,8 @@ function layout_header(?array $user = null): void {
         echo '<div class="border-t border-gray-100 my-1"></div>';
         echo '<a href="' . h($app_url . '/logout') . '" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">🚪 Log Keluar</a>';
         echo '</div></div>'; // end dropdown
-        // Hamburger
-        echo '<button id="hamburger-btn" class="hamburger-btn" aria-label="Menu">';
+        // Hamburger (visible on mobile)
+        echo '<button id="hamburger-btn" class="hamburger-btn" aria-label="Menu" aria-expanded="false">';
         echo '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
         echo '</button>';
     } else {
@@ -150,6 +150,29 @@ function layout_header(?array $user = null): void {
     }
     echo '</div>'; // nav-right
     echo '</div></nav>' . "\n";
+
+    // ── Mobile nav panel (user pages only — no sidebar) ──────────────────────
+    if ($logged_in && $role === 'user' && !empty($links)) {
+        echo '<div id="mobile-nav-panel" class="mobile-nav-panel">';
+        // Wallet balance
+        try {
+            $bal = get_wallet_balance((int)$user['id']);
+            echo '<div style="padding:16px 20px;background:#FAFAF8;border-bottom:1px solid #F3F4F6;">';
+            echo '<div style="font-size:0.72rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;">Baki Gold Points</div>';
+            echo '<div style="font-size:1.4rem;font-weight:800;color:var(--gold-dark);">' . gold_format_points($bal['points']) . ' <span style="font-size:0.9rem;font-weight:500;">pts</span></div>';
+            echo '</div>';
+        } catch (\Throwable $e) { /* ignore */ }
+        // Nav links
+        echo '<div class="mobile-nav-section-label">Menu</div>';
+        foreach ($links as [$label, $path]) {
+            $active = (strpos($current_path, $path) === 0) ? ' active' : '';
+            echo '<a href="' . h($app_url . $path) . '" class="mobile-nav-link' . $active . '">' . h($label) . '</a>';
+        }
+        echo '<div class="mobile-nav-divider"></div>';
+        echo '<a href="' . h($app_url . '/profile') . '" class="mobile-nav-link">👤 Profil Saya</a>';
+        echo '<a href="' . h($app_url . '/logout') . '" class="mobile-nav-link" style="color:#DC2626;">🚪 Log Keluar</a>';
+        echo '</div>';
+    }
 }
 
 // ----------------------------------------------------------------

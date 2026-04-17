@@ -88,9 +88,9 @@ layout_begin_user('Dashboard');
 </div>
 <?php endif; ?>
 
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;" class="md:grid-cols-3 grid-cols-1">
+<div class="dash-hero-grid">
   <!-- Wallet Card -->
-  <div class="card-wallet" style="grid-column:1/3;">
+  <div class="card-wallet">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
       <div>
         <div class="wallet-balance-label">Baki Gold Points Anda</div>
@@ -113,13 +113,24 @@ layout_begin_user('Dashboard');
     </div>
   </div>
 
-  <!-- Quick stats -->
-  <div class="card-kasih" style="display:flex;flex-direction:column;justify-content:space-between;">
-    <div class="stat-label">Kod Rujukan Anda</div>
-    <div style="font-size:1.4rem;font-weight:800;color:var(--gold-dark);letter-spacing:0.1em;"><?= h($user['referral_code'] ?? '-') ?></div>
-    <div style="margin-top:8px;display:flex;gap:8px;">
-      <button class="btn-gold-outline btn-sm" data-copy="<?= h(APP_URL . '/register?ref=' . ($user['referral_code'] ?? '')) ?>">📋 Salin</button>
-      <a href="<?= APP_URL ?>/referrals" class="btn-gold btn-sm">Lihat Rujukan</a>
+  <!-- Referral + KYC quick info -->
+  <div class="card-kasih" style="display:flex;flex-direction:column;gap:14px;">
+    <div>
+      <div class="stat-label" style="margin-bottom:4px;">Kod Rujukan Anda</div>
+      <div style="font-size:1.3rem;font-weight:800;color:var(--gold-dark);letter-spacing:0.1em;word-break:break-all;"><?= h($user['referral_code'] ?? '-') ?></div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn-gold-outline btn-sm" data-copy="<?= h(APP_URL . '/register?ref=' . ($user['referral_code'] ?? '')) ?>">📋 Salin</button>
+        <a href="<?= APP_URL ?>/referrals" class="btn-gold btn-sm">Lihat Rujukan</a>
+      </div>
+    </div>
+    <?php if ($kyc_info && $kyc_info['status'] === 'approved'): ?>
+    <div style="background:#D1FAE5;border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#065F46;font-weight:600;">✅ eKYC Disahkan</div>
+    <?php else: ?>
+    <a href="<?= APP_URL ?>/kyc" style="background:#FFFBEB;border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#92400E;font-weight:600;text-decoration:none;display:block;">🪪 Lengkapkan eKYC →</a>
+    <?php endif; ?>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <a href="<?= APP_URL ?>/sell-gold" class="btn-gold-outline btn-sm" style="font-size:0.78rem;">💰 Jual Emas</a>
+      <a href="<?= APP_URL ?>/ar-rahnu"  class="btn-gold-outline btn-sm" style="font-size:0.78rem;">🕌 Ar Rahnu</a>
     </div>
   </div>
 </div>
@@ -148,7 +159,7 @@ layout_begin_user('Dashboard');
   <?php endforeach; ?>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;" class="lg:grid-cols-2 grid-cols-1">
+<div class="dash-two-col">
   <!-- Recent Transactions -->
   <div class="card-kasih">
     <div class="section-title">📊 Transaksi Terkini</div>

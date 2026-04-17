@@ -184,28 +184,51 @@ function initFileUpload() {
 // MOBILE MENU / SIDEBAR TOGGLE
 // ============================================================
 function initMobileMenu() {
-  var btn     = document.getElementById('hamburger-btn');
-  var sidebar = document.querySelector('.sidebar-kasih');
-  if (!btn || !sidebar) return;
+  var btn      = document.getElementById('hamburger-btn');
+  var sidebar  = document.querySelector('.sidebar-kasih');
+  var navPanel = document.getElementById('mobile-nav-panel');
 
-  var overlay = document.getElementById('sidebar-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'sidebar-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:49;display:none;';
-    document.body.appendChild(overlay);
+  if (!btn) return;
+
+  // ── Admin/Merchant: slide sidebar in from left ────────────
+  if (sidebar) {
+    var overlay = document.getElementById('sidebar-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'sidebar-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:49;display:none;';
+      document.body.appendChild(overlay);
+    }
+    btn.addEventListener('click', function() {
+      var isOpen = sidebar.classList.toggle('open');
+      overlay.style.display = isOpen ? 'block' : 'none';
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+      btn.setAttribute('aria-expanded', isOpen);
+    });
+    overlay.addEventListener('click', function() {
+      sidebar.classList.remove('open');
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+      btn.setAttribute('aria-expanded', false);
+    });
+    return;
   }
 
-  btn.addEventListener('click', function() {
-    var isOpen = sidebar.classList.toggle('open');
-    overlay.style.display = isOpen ? 'block' : 'none';
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  });
-  overlay.addEventListener('click', function() {
-    sidebar.classList.remove('open');
-    overlay.style.display = 'none';
-    document.body.style.overflow = '';
-  });
+  // ── User pages: toggle full-screen mobile nav panel ───────
+  if (navPanel) {
+    btn.addEventListener('click', function() {
+      var isOpen = navPanel.classList.toggle('open');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+      btn.setAttribute('aria-expanded', isOpen);
+    });
+    // Close on nav link click
+    navPanel.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        navPanel.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+  }
 }
 
 // ============================================================
