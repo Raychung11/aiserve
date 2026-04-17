@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$state)      $errors[] = 'Negeri diperlukan.';
     if (!$postcode)   $errors[] = 'Poskod diperlukan.';
 
-    $allowed_types = ['image/jpeg', 'image/png', 'image/webp'];
-    $max_size      = 5 * 1024 * 1024; // 5MB
+    $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
+    $max_size     = 10 * 1024 * 1024; // 10 MB (matches .user.ini)
 
     $ic_front_file = $_FILES['ic_front'] ?? null;
     $ic_back_file  = $_FILES['ic_back']  ?? null;
@@ -61,39 +61,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kyc_dir = UPLOAD_PATH . '/kyc';
     if (!is_dir($kyc_dir)) mkdir($kyc_dir, 0755, true);
 
-    // IC Front
-    if (!empty($ic_front_file['tmp_name'])) {
-        if ($ic_front_file['error'] !== UPLOAD_ERR_OK)    $errors[] = 'Ralat memuat naik IC Hadapan.';
-        elseif ($ic_front_file['size'] > $max_size)        $errors[] = 'IC Hadapan melebihi 5MB.';
-        elseif (!in_array($ic_front_file['type'], $allowed_types)) $errors[] = 'IC Hadapan mestilah JPG/PNG/WebP.';
-        else {
-            $ext             = pathinfo($ic_front_file['name'], PATHINFO_EXTENSION);
-            $ic_front_saved  = 'kyc_front_' . $user_id . '_' . time() . '.' . strtolower($ext);
-            if (!move_uploaded_file($ic_front_file['tmp_name'], $kyc_dir . '/' . $ic_front_saved)) {
-                $errors[] = 'Gagal menyimpan IC Hadapan.';
-                $ic_front_saved = $kyc['ic_front'] ?? '';
-            }
-        }
-    } elseif (!$ic_front_saved) {
-        $errors[] = 'Sila muat naik gambar IC Hadapan.';
-    }
+    // Translate PHP upload error codes to readable messages
+    $upload_err_msg = function(int $code): string {
+        return match($code) {
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Fail terlalu besar. Saiz maksimum ialah 10MB.',
+            UPLOAD_ERR_PARTIAL  => 'Muat naik tidak lengkap. Sila cuba lagi.',
+            UPLOAD_ERR_NO_FILE  => '',
+            default             => 'Ralat muat naik (kod ' . $code . '). Sila cuba lagi.',
+        };
+    };
 
-    // IC Back
-    if (!empty($ic_back_file['tmp_name'])) {
-        if ($ic_back_file['error'] !== UPLOAD_ERR_OK)    $errors[] = 'Ralat memuat naik IC Belakang.';
-        elseif ($ic_back_file['size'] > $max_size)        $errors[] = 'IC Belakang melebihi 5MB.';
-        elseif (!in_array($ic_back_file['type'], $allowed_types)) $errors[] = 'IC Belakang mestilah JPG/PNG/WebP.';
-        else {
-            $ext            = pathinfo($ic_back_file['name'], PATHINFO_EXTENSION);
-            $ic_back_saved  = 'kyc_back_' . $user_id . '_' . time() . '.' . strtolower($ext);
-            if (!move_uploaded_file($ic_back_file['tmp_name'], $kyc_dir . '/' . $ic_back_saved)) {
-                $errors[] = 'Gagal menyimpan IC Belakang.';
-                $ic_back_saved = $kyc['ic_back'] ?? '';
-            }
+    // Validate & save one IC image; returns saved filename or '' on skip, appends to $errors
+    $save_ic = function(array $file, string $prefix, string $existing) use ($allowed_mime, $max_size, $kyc_dir, $user_id, &$errors, $upload_err_msg): string {
+        $label = ($prefix === 'front') ? 'IC Hadapan' : 'IC Belakang';
+        $err   = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+
+        if ($err === UPLOAD_ERR_NO_FILE || empty($file['tmp_name'])) {
+            // No new file — keep existing if already uploaded
+            if (!$existing) $errors[] = 'Sila muat naik gambar ' . $label . '.';
+            return $existing;
         }
-    } elseif (!$ic_back_saved) {
-        $errors[] = 'Sila muat naik gambar IC Belakang.';
-    }
+
+        if ($err !== UPLOAD_ERR_OK) {
+            $msg = $upload_err_msg($err);
+            if ($msg) $errors[] = $label . ': ' . $msg;
+            return $existing;
+        }
+
+        if ($file['size'] > $max_size) {
+            $errors[] = $label . ' melebihi 10MB. Sila kompres gambar dan cuba lagi.';
+            return $existing;
+        }
+
+        // Use finfo for reliable MIME detection (ignores browser-supplied type)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime  = $finfo->file($file['tmp_name']);
+        if (!in_array($mime, $allowed_mime, true)) {
+            $errors[] = $label . ' mestilah fail JPG, PNG, atau WebP (fail yang dimuat naik: ' . h($mime) . ').';
+            return $existing;
+        }
+
+        $ext_map = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+        $ext     = $ext_map[$mime];
+        $fname   = 'kyc_' . $prefix . '_' . $user_id . '_' . time() . '.' . $ext;
+        if (!move_uploaded_file($file['tmp_name'], $kyc_dir . '/' . $fname)) {
+            $errors[] = 'Gagal menyimpan ' . $label . '. Sila cuba lagi.';
+            return $existing;
+        }
+        return $fname;
+    };
+
+    $ic_front_saved = $save_ic($ic_front_file ?? ['error' => UPLOAD_ERR_NO_FILE, 'tmp_name' => ''], 'front', $ic_front_saved);
+    $ic_back_saved  = $save_ic($ic_back_file  ?? ['error' => UPLOAD_ERR_NO_FILE, 'tmp_name' => ''], 'back',  $ic_back_saved);
 
     if (empty($errors)) {
         if ($kyc) {
@@ -281,7 +300,7 @@ if ($status === 'approved'): ?>
   <div class="card-kasih" style="margin-bottom:20px;">
     <div class="section-title">📷 Gambar Kad Pengenalan (IC)</div>
     <p style="font-size:0.82rem;color:#6B7280;margin-bottom:16px;">
-      Muat naik gambar jelas IC hadapan dan belakang. Format: JPG, PNG atau WebP. Saiz maksimum: 5MB setiap satu.
+      Muat naik gambar jelas IC hadapan dan belakang. Format: JPG, PNG atau WebP. Saiz maksimum: <strong>10MB</strong> setiap satu.
     </p>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
@@ -348,15 +367,27 @@ if ($status === 'approved'): ?>
 
 <script>
 function previewImage(input, imgId, previewId, placeholderId) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById(imgId).src = e.target.result;
-            document.getElementById(previewId).style.display = 'block';
-            document.getElementById(placeholderId).style.display = 'none';
-        };
-        reader.readAsDataURL(input.files[0]);
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    var maxBytes = 10 * 1024 * 1024;
+    if (file.size > maxBytes) {
+        alert('Fail terlalu besar (' + (file.size / 1024 / 1024).toFixed(1) + 'MB). Saiz maksimum ialah 10MB.');
+        input.value = '';
+        return;
     }
+    var allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (allowed.indexOf(file.type) === -1) {
+        alert('Fail mesti dalam format JPG, PNG, atau WebP.');
+        input.value = '';
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById(imgId).src = e.target.result;
+        document.getElementById(previewId).style.display = 'block';
+        document.getElementById(placeholderId).style.display = 'none';
+    };
+    reader.readAsDataURL(file);
 }
 </script>
 
