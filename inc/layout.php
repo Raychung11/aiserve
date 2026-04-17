@@ -87,15 +87,21 @@ function layout_header(?array $user = null): void {
         $links = [
             ['Dashboard', '/dashboard'],
             ['Wallet', '/wallet'],
-            ['Beli Emas', '/buy-gold'],
-            ['Pindah', '/transfer'],
-            ['Pasaran', '/marketplace'],
-            ['Kempen', '/campaigns'],
-            ['Rujukan', '/referrals'],
-            ['Jual Emas', '/sell-gold'],
-            ['Ar Rahnu', '/ar-rahnu'],
-            ['Emas Fizikal', '/physical-gold'],
-            ['eKYC', '/kyc'],
+            ['_group', '💛 Emas', [
+                ['Beli Emas',     '/buy-gold'],
+                ['Jual Emas',     '/sell-gold'],
+                ['Emas Fizikal',  '/physical-gold'],
+                ['Ar Rahnu',      '/ar-rahnu'],
+            ]],
+            ['_group', '🛍️ Aktiviti', [
+                ['Pasaran',   '/marketplace'],
+                ['Kempen',    '/campaigns'],
+                ['Rujukan',   '/referrals'],
+            ]],
+            ['_group', '⚙️ Akaun', [
+                ['Pindah',  '/transfer'],
+                ['eKYC',    '/kyc'],
+            ]],
         ];
     }
 
@@ -105,12 +111,37 @@ function layout_header(?array $user = null): void {
     echo '<a href="' . ($logged_in ? ($role === 'super_admin' ? '/admin' : ($role === 'merchant' ? '/merchant' : '/dashboard')) : '/') . '" class="nav-brand">';
     echo '✦ Kasih Gold Easy<small>Emas Mudah, Kaya Mudah.</small></a>';
 
-    // Center nav links
+    // Center nav links (supports flat items and _group dropdowns)
     if (!empty($links)) {
         echo '<ul class="nav-links hidden md:flex">';
-        foreach ($links as [$label, $path]) {
-            $active = (strpos($current_path, $path) === 0) ? ' active' : '';
-            echo '<li><a href="' . h($app_url . $path) . '" class="' . $active . '">' . h($label) . '</a></li>';
+        foreach ($links as $item) {
+            if (($item[0] ?? '') === '_group') {
+                [, $grp_label, $subitems] = $item;
+                $grp_active = false;
+                foreach ($subitems as [$sl, $sp]) {
+                    if (strpos($current_path, $sp) === 0) { $grp_active = true; break; }
+                }
+                $btn_color  = $grp_active ? '#A07830' : '#374151';
+                $btn_weight = $grp_active ? '700' : '500';
+                echo '<li x-data="{open:false}" style="position:relative;list-style:none;">';
+                echo '<button @click="open=!open" @click.outside="open=false" @keydown.escape="open=false"'
+                   . ' style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:3px;'
+                   . 'padding:8px 10px;font-size:0.875rem;font-weight:' . $btn_weight . ';color:' . $btn_color . ';white-space:nowrap;">'
+                   . h($grp_label)
+                   . '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-top:1px;flex-shrink:0;"><path d="M6 9l6 6 6-6"/></svg>'
+                   . '</button>';
+                echo '<div x-show="open" x-cloak style="position:absolute;top:calc(100% + 4px);left:0;min-width:170px;background:#fff;border:1px solid #EEECE8;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.10);padding:6px 0;z-index:100;">';
+                foreach ($subitems as [$sl, $sp]) {
+                    $sa = strpos($current_path, $sp) === 0;
+                    $ss = $sa ? 'background:rgba(201,168,76,0.09);color:#A07830;font-weight:600;' : 'color:#374151;';
+                    echo '<a href="' . h($app_url . $sp) . '" style="display:block;padding:9px 16px;font-size:0.875rem;text-decoration:none;' . $ss . '">' . h($sl) . '</a>';
+                }
+                echo '</div></li>';
+            } else {
+                [$label, $path] = $item;
+                $active = (strpos($current_path, $path) === 0) ? ' active' : '';
+                echo '<li><a href="' . h($app_url . $path) . '" class="' . $active . '">' . h($label) . '</a></li>';
+            }
         }
         echo '</ul>';
     }
@@ -165,15 +196,29 @@ function layout_header(?array $user = null): void {
             echo '</div>';
         } catch (\Throwable $e) { /* ignore */ }
         // Nav links — fully inline-styled so they render correctly even if app.css is stale
-        echo '<div style="padding:8px 20px 4px;font-size:0.68rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;">Menu</div>';
-        foreach ($links as [$label, $path]) {
-            $is_active = strpos($current_path, $path) === 0;
-            $bg    = $is_active ? 'background:rgba(201,168,76,0.1);color:#A07830;font-weight:600;' : 'color:#374151;';
-            $border = $is_active ? 'border-left:3px solid #C9A84C;' : 'border-left:3px solid transparent;';
-            echo '<a href="' . h($app_url . $path) . '" '
-               . 'style="display:flex;align-items:center;padding:14px 20px;font-size:0.95rem;'
-               . 'font-weight:500;text-decoration:none;border-bottom:1px solid #F9FAFB;' . $bg . $border . '">'
-               . h($label) . '</a>';
+        foreach ($links as $item) {
+            if (($item[0] ?? '') === '_group') {
+                [, $grp_label, $subitems] = $item;
+                echo '<div style="padding:9px 20px 5px;font-size:0.67rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;background:#FAFAF8;border-top:1px solid #F3F4F6;border-bottom:1px solid #F3F4F6;">' . h($grp_label) . '</div>';
+                foreach ($subitems as [$sl, $sp]) {
+                    $is_active = strpos($current_path, $sp) === 0;
+                    $bg     = $is_active ? 'background:rgba(201,168,76,0.1);color:#A07830;font-weight:600;' : 'color:#374151;';
+                    $border = $is_active ? 'border-left:3px solid #C9A84C;' : 'border-left:3px solid transparent;';
+                    echo '<a href="' . h($app_url . $sp) . '" '
+                       . 'style="display:flex;align-items:center;padding:13px 20px 13px 28px;font-size:0.9rem;'
+                       . 'font-weight:500;text-decoration:none;border-bottom:1px solid #F9FAFB;' . $bg . $border . '">'
+                       . h($sl) . '</a>';
+                }
+            } else {
+                [$label, $path] = $item;
+                $is_active = strpos($current_path, $path) === 0;
+                $bg     = $is_active ? 'background:rgba(201,168,76,0.1);color:#A07830;font-weight:600;' : 'color:#374151;';
+                $border = $is_active ? 'border-left:3px solid #C9A84C;' : 'border-left:3px solid transparent;';
+                echo '<a href="' . h($app_url . $path) . '" '
+                   . 'style="display:flex;align-items:center;padding:14px 20px;font-size:0.95rem;'
+                   . 'font-weight:500;text-decoration:none;border-bottom:1px solid #F9FAFB;' . $bg . $border . '">'
+                   . h($label) . '</a>';
+            }
         }
         echo '<div style="height:1px;background:#F3F4F6;margin:8px 0;"></div>';
         echo '<a href="' . h($app_url . '/profile') . '" style="display:flex;align-items:center;gap:10px;padding:14px 20px;font-size:0.95rem;font-weight:500;color:#374151;text-decoration:none;border-bottom:1px solid #F9FAFB;">👤 Profil Saya</a>';
