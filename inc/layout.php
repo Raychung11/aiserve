@@ -369,6 +369,7 @@ function layout_sidebar_admin(): void {
     echo '<div class="sidebar-section"><div class="sidebar-group-label">PENGGUNA</div>';
     _slink('/admin/users',        '👤', 'Pengguna',            $cp, $app_url);
     _slink('/admin/merchants',    '🏪', 'Pedagang',            $cp, $app_url);
+    _slink('/admin/kyc',          '🪪', 'eKYC',               $cp, $app_url);
     echo '</div>';
 
     echo '<div class="sidebar-section"><div class="sidebar-group-label">PASARAN</div>';
@@ -382,7 +383,6 @@ function layout_sidebar_admin(): void {
     _slink('/admin/ar-rahnu',       '🕌', 'Ar Rahnu',            $cp, $app_url);
     _slink('/admin/physical-gold',  '🥇', 'Emas Fizikal',        $cp, $app_url);
     _slink('/admin/referrals',    '📢', 'Rujukan',             $cp, $app_url);
-    _slink('/admin/kyc',          '🪪', 'eKYC',               $cp, $app_url);
     echo '</div>';
 
     echo '<div class="sidebar-section"><div class="sidebar-group-label">SISTEM</div>';
