@@ -146,6 +146,7 @@ layout_begin_user('Dashboard');
     ['📊', 'Wallet', '/wallet', 'Sejarah transaksi'],
     ['📢', 'Rujukan', '/referrals', 'Jana komisen'],
     ['💰', 'Jual Emas', '/sell-gold', 'Tukar emas ke RM'],
+    ['🥇', 'Emas Fizikal', '/physical-gold', 'Tukar ke plat 0.2g'],
     ['🕌', 'Ar Rahnu', '/ar-rahnu', 'Gadai emas Islam'],
     ['🪪', 'eKYC', '/kyc', 'Sahkan identiti'],
   ];

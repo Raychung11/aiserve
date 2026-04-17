@@ -94,6 +94,7 @@ function layout_header(?array $user = null): void {
             ['Rujukan', '/referrals'],
             ['Jual Emas', '/sell-gold'],
             ['Ar Rahnu', '/ar-rahnu'],
+            ['Emas Fizikal', '/physical-gold'],
             ['eKYC', '/kyc'],
         ];
     }
@@ -332,8 +333,9 @@ function layout_sidebar_admin(): void {
 
     echo '<div class="sidebar-section"><div class="sidebar-group-label">KEWANGAN</div>';
     _slink('/admin/payouts',      '💰', 'Permintaan Bayaran',  $cp, $app_url);
-    _slink('/admin/sell-gold',    '💵', 'Jual Emas',           $cp, $app_url);
-    _slink('/admin/ar-rahnu',     '🕌', 'Ar Rahnu',            $cp, $app_url);
+    _slink('/admin/sell-gold',      '💵', 'Jual Emas',           $cp, $app_url);
+    _slink('/admin/ar-rahnu',       '🕌', 'Ar Rahnu',            $cp, $app_url);
+    _slink('/admin/physical-gold',  '🥇', 'Emas Fizikal',        $cp, $app_url);
     _slink('/admin/referrals',    '📢', 'Rujukan',             $cp, $app_url);
     _slink('/admin/kyc',          '🪪', 'eKYC',               $cp, $app_url);
     echo '</div>';

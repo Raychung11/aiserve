@@ -402,6 +402,8 @@ function status_badge(string $status): string {
         'redeemed'            => ['bg'=>'#D1FAE5','color'=>'#065F46','label'=>'Ditebus'],
         'defaulted'           => ['bg'=>'#FEE2E2','color'=>'#991B1B','label'=>'Tamat Tempoh'],
         'cancelled'           => ['bg'=>'#F3F4F6','color'=>'#6B7280','label'=>'Dibatalkan'],
+        'ready'               => ['bg'=>'#D1FAE5','color'=>'#065F46','label'=>'Siap Ambil'],
+        'collected'           => ['bg'=>'#DBEAFE','color'=>'#1D4ED8','label'=>'Dikutip'],
     ];
     $s   = strtolower($status);
     $cfg = $map[$s] ?? ['bg'=>'#F3F4F6','color'=>'#374151','label'=>h($status)];
