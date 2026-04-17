@@ -208,11 +208,37 @@ if ($status === 'approved'): ?>
 <?php else: ?>
 
 <?php if ($status === 'rejected'): ?>
-<div class="alert alert-error" style="margin-bottom:20px;">
-  <strong>❌ Permohonan Ditolak</strong><br>
-  Sebab: <?= h($kyc['rejection_reason'] ?: 'Sila hubungi admin untuk maklumat lanjut.') ?><br>
-  <small style="color:#9CA3AF;">Ditolak pada: <?= format_date($kyc['reviewed_at']) ?></small><br>
-  <small style="margin-top:6px;display:block;">Anda boleh hantar semula permohonan di bawah.</small>
+<div style="background:#FFF5F5;border:2px solid #EF4444;border-radius:12px;padding:20px;margin-bottom:24px;">
+  <div style="display:flex;align-items:flex-start;gap:14px;">
+    <div style="font-size:2.2rem;flex-shrink:0;">❌</div>
+    <div style="flex:1;">
+      <div style="font-weight:700;font-size:1.05rem;color:#991B1B;margin-bottom:6px;">Permohonan eKYC Ditolak</div>
+      <div style="font-size:0.78rem;color:#9CA3AF;margin-bottom:12px;">Ditolak pada: <?= format_date($kyc['reviewed_at']) ?></div>
+
+      <!-- Rejection reason box -->
+      <div style="background:#fff;border:1px solid #FECACA;border-left:4px solid #EF4444;border-radius:8px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:0.72rem;color:#9CA3AF;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Sebab Penolakan daripada Admin</div>
+        <div style="color:#991B1B;font-weight:600;font-size:0.95rem;line-height:1.5;">
+          <?= h($kyc['rejection_reason'] ?: 'Sila hubungi admin untuk maklumat lanjut.') ?>
+        </div>
+      </div>
+
+      <!-- What to do next -->
+      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px;">
+        <div style="font-size:0.78rem;font-weight:700;color:#92400E;margin-bottom:8px;">📋 Apa yang perlu anda lakukan:</div>
+        <ul style="margin:0;padding-left:18px;font-size:0.82rem;color:#374151;line-height:1.8;">
+          <li>Baca sebab penolakan di atas dengan teliti</li>
+          <li>Betulkan maklumat atau ambil semula gambar IC yang jelas</li>
+          <li>Pastikan gambar IC <strong>tidak kabur, tidak terpotong</strong> dan semua teks boleh dibaca</li>
+          <li>Hantar semula borang di bawah</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:12px;padding:8px 12px;background:#D1FAE5;border-radius:6px;font-size:0.8rem;color:#065F46;font-weight:500;">
+        ✅ Borang di bawah sudah diisi semula dengan maklumat lama anda. Hanya perbetulkan bahagian yang bermasalah.
+      </div>
+    </div>
+  </div>
 </div>
 <?php endif; ?>
 

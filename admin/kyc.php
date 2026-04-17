@@ -168,33 +168,76 @@ layout_begin_admin('eKYC — Pengesahan Identiti');
 
   <!-- Actions -->
   <?php if ($view_kyc['status'] === 'pending'): ?>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid #F3F4F6;padding-top:16px;">
-    <form method="POST" onsubmit="return confirm('Luluskan permohonan eKYC ini?')">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action"  value="approve">
-      <input type="hidden" name="kyc_id"  value="<?= $view_kyc['id'] ?>">
-      <button class="btn-gold" style="padding:10px 28px;">✅ Luluskan</button>
-    </form>
+  <div style="border-top:1px solid #F3F4F6;padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
 
-    <div x-data="{open:false}" style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-      <button @click="open=!open" class="btn-sm" style="background:#FEE2E2;color:#991B1B;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;">
-        ❌ Tolak
-      </button>
-      <div x-show="open" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
-        <form method="POST" onsubmit="return document.getElementById('rej_reason_<?= $view_kyc['id'] ?>').value.trim() !== '' || (alert('Sila masukkan sebab penolakan.'), false)">
-          <?= csrf_field() ?>
-          <input type="hidden" name="action"  value="reject">
-          <input type="hidden" name="kyc_id"  value="<?= $view_kyc['id'] ?>">
-          <div style="display:flex;gap:8px;align-items:flex-end;">
-            <div>
-              <label class="form-label" style="font-size:0.78rem;">Sebab Penolakan</label>
-              <input type="text" id="rej_reason_<?= $view_kyc['id'] ?>" name="rejection_reason"
-                     class="form-input" placeholder="Masukkan sebab..." style="min-width:220px;">
-            </div>
-            <button type="submit" class="btn-sm" style="background:#EF4444;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;">Hantar</button>
+    <!-- Approve -->
+    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:16px;">
+      <div style="font-weight:700;color:#065F46;margin-bottom:10px;font-size:0.9rem;">✅ Luluskan eKYC</div>
+      <p style="font-size:0.8rem;color:#6B7280;margin-bottom:12px;">Semua maklumat dan gambar IC adalah sah dan jelas.</p>
+      <form method="POST" onsubmit="return confirm('Sahkan kelulusan eKYC untuk <?= h(addslashes($view_kyc['full_name'])) ?>?')">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="approve">
+        <input type="hidden" name="kyc_id" value="<?= $view_kyc['id'] ?>">
+        <button class="btn-gold" style="width:100%;padding:10px;">✅ Luluskan Sekarang</button>
+      </form>
+    </div>
+
+    <!-- Reject -->
+    <div style="background:#FFF5F5;border:1px solid #FECACA;border-radius:10px;padding:16px;">
+      <div style="font-weight:700;color:#991B1B;margin-bottom:10px;font-size:0.9rem;">❌ Tolak & Maklumkan Pengguna</div>
+      <form method="POST" id="reject-form-<?= $view_kyc['id'] ?>">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="reject">
+        <input type="hidden" name="kyc_id" value="<?= $view_kyc['id'] ?>">
+
+        <!-- Quick-select reason chips -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:0.72rem;color:#9CA3AF;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Sebab Biasa</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;" id="reason-chips-<?= $view_kyc['id'] ?>">
+            <?php
+            $quick_reasons = [
+                'Gambar IC hadapan tidak jelas atau kabur.',
+                'Gambar IC belakang tidak jelas atau kabur.',
+                'Nama dalam IC tidak sepadan dengan borang.',
+                'Nombor IC tidak sepadan dengan gambar IC.',
+                'IC telah tamat tempoh.',
+                'Gambar IC terpotong — sila ambil gambar penuh IC.',
+                'Kedua-dua gambar yang sama dimuat naik (hadapan & belakang mesti berbeza).',
+                'Tarikh lahir tidak sepadan dengan maklumat IC.',
+            ];
+            foreach ($quick_reasons as $reason): ?>
+            <button type="button"
+                    onclick="document.getElementById('reject_reason_<?= $view_kyc['id'] ?>').value='<?= addslashes($reason) ?>'; this.closest('[id^=reason-chips]').querySelectorAll('button').forEach(b=>b.style.background=''); this.style.background='#FECACA';"
+                    style="font-size:0.72rem;padding:4px 10px;border:1px solid #FECACA;border-radius:20px;background:#FFF5F5;color:#991B1B;cursor:pointer;white-space:nowrap;transition:background 0.15s;">
+              <?= h($reason) ?>
+            </button>
+            <?php endforeach; ?>
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:0.75rem;color:#374151;font-weight:600;display:block;margin-bottom:4px;">Mesej kepada Pengguna <span style="color:#EF4444;">*</span></label>
+          <textarea id="reject_reason_<?= $view_kyc['id'] ?>" name="rejection_reason" rows="3"
+                    style="width:100%;border:1px solid #FECACA;border-radius:6px;padding:8px;font-size:0.82rem;resize:vertical;box-sizing:border-box;"
+                    placeholder="Terangkan dengan jelas apa yang perlu diperbetulkan..."
+                    required></textarea>
+          <div style="font-size:0.7rem;color:#9CA3AF;margin-top:2px;">Pengguna akan melihat mesej ini dan boleh hantar semula dengan pembetulan.</div>
+        </div>
+
+        <button type="submit"
+                onclick="var r=document.getElementById('reject_reason_<?= $view_kyc['id'] ?>').value.trim(); if(!r){alert('Sila masukkan sebab penolakan.');return false;} return confirm('Tolak eKYC ini dan maklumkan pengguna?');"
+                style="width:100%;background:#EF4444;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;font-size:0.9rem;">
+          ❌ Tolak &amp; Hantar Makluman
+        </button>
+      </form>
+    </div>
+
+  </div>
+  <?php elseif ($view_kyc['status'] === 'rejected' && $view_kyc['rejection_reason']): ?>
+  <div style="border-top:1px solid #F3F4F6;padding-top:16px;">
+    <div style="background:#FFF5F5;border:1px solid #FECACA;border-radius:8px;padding:14px;">
+      <div style="font-size:0.78rem;color:#9CA3AF;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Mesej Penolakan Yang Dihantar</div>
+      <div style="color:#991B1B;font-weight:500;"><?= h($view_kyc['rejection_reason']) ?></div>
     </div>
   </div>
   <?php endif; ?>
