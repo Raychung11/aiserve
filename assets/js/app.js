@@ -216,17 +216,32 @@ function initMobileMenu() {
 
   // ── User pages: toggle full-screen mobile nav panel ───────
   if (navPanel) {
+    var navOverlay = document.getElementById('mobile-nav-overlay');
+
+    window.kasihOpenNav = function() {
+      navPanel.style.display  = 'block';
+      if (navOverlay) navOverlay.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      btn.setAttribute('aria-expanded', 'true');
+    };
+    window.kasihCloseNav = function() {
+      navPanel.style.display  = 'none';
+      if (navOverlay) navOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+      btn.setAttribute('aria-expanded', 'false');
+    };
+
     btn.addEventListener('click', function() {
-      var isOpen = navPanel.classList.toggle('open');
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-      btn.setAttribute('aria-expanded', isOpen);
+      if (navPanel.style.display === 'block') {
+        kasihCloseNav();
+      } else {
+        kasihOpenNav();
+      }
     });
-    // Close on nav link click
+
+    // Close when a nav link is tapped
     navPanel.querySelectorAll('a').forEach(function(link) {
-      link.addEventListener('click', function() {
-        navPanel.classList.remove('open');
-        document.body.style.overflow = '';
-      });
+      link.addEventListener('click', kasihCloseNav);
     });
   }
 }

@@ -153,25 +153,33 @@ function layout_header(?array $user = null): void {
 
     // ── Mobile nav panel (user pages only — no sidebar) ──────────────────────
     if ($logged_in && $role === 'user' && !empty($links)) {
-        echo '<div id="mobile-nav-panel" class="mobile-nav-panel">';
-        // Wallet balance
+        // Inline styles guarantee hidden on load regardless of CSS cache
+        echo '<div id="mobile-nav-panel" style="display:none;position:fixed;top:64px;left:0;right:0;bottom:0;background:#fff;z-index:9999;overflow-y:auto;border-top:3px solid #C9A84C;">';
+        // Wallet balance strip
         try {
             $bal = get_wallet_balance((int)$user['id']);
-            echo '<div style="padding:16px 20px;background:#FAFAF8;border-bottom:1px solid #F3F4F6;">';
-            echo '<div style="font-size:0.72rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;">Baki Gold Points</div>';
-            echo '<div style="font-size:1.4rem;font-weight:800;color:var(--gold-dark);">' . gold_format_points($bal['points']) . ' <span style="font-size:0.9rem;font-weight:500;">pts</span></div>';
+            echo '<div style="padding:14px 20px;background:#FAFAF8;border-bottom:1px solid #F3F4F6;">';
+            echo '<div style="font-size:0.7rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;">Baki Gold Points</div>';
+            echo '<div style="font-size:1.3rem;font-weight:800;color:#A07830;">' . gold_format_points($bal['points']) . ' <span style="font-size:0.85rem;font-weight:500;color:#6B7280;">pts</span></div>';
             echo '</div>';
         } catch (\Throwable $e) { /* ignore */ }
-        // Nav links
-        echo '<div class="mobile-nav-section-label">Menu</div>';
+        // Nav links — fully inline-styled so they render correctly even if app.css is stale
+        echo '<div style="padding:8px 20px 4px;font-size:0.68rem;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;">Menu</div>';
         foreach ($links as [$label, $path]) {
-            $active = (strpos($current_path, $path) === 0) ? ' active' : '';
-            echo '<a href="' . h($app_url . $path) . '" class="mobile-nav-link' . $active . '">' . h($label) . '</a>';
+            $is_active = strpos($current_path, $path) === 0;
+            $bg    = $is_active ? 'background:rgba(201,168,76,0.1);color:#A07830;font-weight:600;' : 'color:#374151;';
+            $border = $is_active ? 'border-left:3px solid #C9A84C;' : 'border-left:3px solid transparent;';
+            echo '<a href="' . h($app_url . $path) . '" '
+               . 'style="display:flex;align-items:center;padding:14px 20px;font-size:0.95rem;'
+               . 'font-weight:500;text-decoration:none;border-bottom:1px solid #F9FAFB;' . $bg . $border . '">'
+               . h($label) . '</a>';
         }
-        echo '<div class="mobile-nav-divider"></div>';
-        echo '<a href="' . h($app_url . '/profile') . '" class="mobile-nav-link">👤 Profil Saya</a>';
-        echo '<a href="' . h($app_url . '/logout') . '" class="mobile-nav-link" style="color:#DC2626;">🚪 Log Keluar</a>';
+        echo '<div style="height:1px;background:#F3F4F6;margin:8px 0;"></div>';
+        echo '<a href="' . h($app_url . '/profile') . '" style="display:flex;align-items:center;gap:10px;padding:14px 20px;font-size:0.95rem;font-weight:500;color:#374151;text-decoration:none;border-bottom:1px solid #F9FAFB;">👤 Profil Saya</a>';
+        echo '<a href="' . h($app_url . '/logout') . '" style="display:flex;align-items:center;gap:10px;padding:14px 20px;font-size:0.95rem;font-weight:500;color:#DC2626;text-decoration:none;">🚪 Log Keluar</a>';
         echo '</div>';
+        // Dark overlay behind the panel
+        echo '<div id="mobile-nav-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9998;" onclick="kasihCloseNav()"></div>';
     }
 }
 
