@@ -37,13 +37,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         audit_log((int)$admin['id'], 'super_admin', 'physical_gold_approved', 'gold_physical_redemptions', $req_id, null, ['ref' => $ref]);
         flash_set('main', 'Permohonan #' . $req_id . ' diluluskan. Ref: ' . $ref, 'success');
 
-    // Mark collected
+    // Mark collected — deduct from physical vault stock
     } elseif ($action === 'collected' && $req['status'] === 'ready') {
-        $db->prepare("UPDATE gold_physical_redemptions SET status='collected', collected_at=NOW(), updated_at=NOW() WHERE id=?")
-          ->execute([$req_id]);
-
-        audit_log((int)$admin['id'], 'super_admin', 'physical_gold_collected', 'gold_physical_redemptions', $req_id, null, null);
-        flash_set('main', 'Permohonan #' . $req_id . ' ditanda sebagai dikutip.', 'success');
+        $db->beginTransaction();
+        try {
+            $db->prepare("UPDATE gold_physical_redemptions SET status='collected', collected_at=NOW(), updated_at=NOW() WHERE id=?")
+              ->execute([$req_id]);
+            adjust_gold_stock(
+                -(float)$req['total_grams'], 'redemption_out',
+                'Plat emas dikutip — permohonan #' . $req_id . ' (' . $req['plates_count'] . ' plat, ' . $req['total_grams'] . 'g)',
+                'physical_redemption', $req_id, (int)$admin['id']
+            );
+            $db->commit();
+            audit_log((int)$admin['id'], 'super_admin', 'physical_gold_collected', 'gold_physical_redemptions', $req_id, null, null);
+            flash_set('main', 'Permohonan #' . $req_id . ' ditanda sebagai dikutip. Stok dikurangkan ' . $req['total_grams'] . 'g.', 'success');
+        } catch (Throwable $e) {
+            $db->rollBack();
+            flash_set('main', 'Ralat sistem semasa menanda kutipan.', 'error');
+        }
 
     // Reject — refund points
     } elseif ($action === 'reject' && in_array($req['status'], ['pending', 'approved', 'ready'])) {

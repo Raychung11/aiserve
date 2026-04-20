@@ -362,6 +362,7 @@ function layout_sidebar_admin(): void {
 
     echo '<div class="sidebar-section"><div class="sidebar-group-label">EMAS</div>';
     _slink('/admin/gold-price',   '💛', 'Harga Emas',          $cp, $app_url);
+    _slink('/admin/gold-stock',   '📦', 'Stok Emas',           $cp, $app_url);
     _slink('/admin/purchases',    '🛒', 'Pembelian',           $cp, $app_url);
     _slink('/admin/transfers',    '↔️', 'Pindahan',            $cp, $app_url);
     echo '</div>';

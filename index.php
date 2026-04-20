@@ -66,6 +66,7 @@ $user_routes = [
 $admin_routes = [
     ''           => 'admin/index.php',
     'gold-price' => 'admin/gold_price.php',
+    'gold-stock' => 'admin/gold_stock.php',
     'users'      => 'admin/users.php',
     'merchants'  => 'admin/merchants.php',
     'purchases'  => 'admin/purchases.php',

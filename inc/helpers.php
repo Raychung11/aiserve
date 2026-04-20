@@ -72,6 +72,38 @@ function get_active_sell_price(): ?array {
     return $cached;
 }
 
+function get_gold_stock(): array {
+    $db  = getDB();
+    $row = $db->query("SELECT * FROM gold_stock WHERE id=1 LIMIT 1")->fetch();
+    return $row ?: ['current_grams' => 0, 'min_alert_grams' => 100, 'alert_enabled' => 1];
+}
+
+function gold_stock_is_low(): bool {
+    $s = get_gold_stock();
+    return (bool)$s['alert_enabled'] && (float)$s['current_grams'] <= (float)$s['min_alert_grams'];
+}
+
+function adjust_gold_stock(float $grams_change, string $movement_type, string $notes = '',
+                            string $ref_type = null, int $ref_id = null, int $created_by = null): float {
+    $db = getDB();
+    $db->beginTransaction();
+    try {
+        $stock     = $db->query("SELECT * FROM gold_stock WHERE id=1 LIMIT 1 FOR UPDATE")->fetch();
+        $new_grams = max(0, (float)$stock['current_grams'] + $grams_change);
+        $db->prepare("UPDATE gold_stock SET current_grams=?, updated_at=NOW() WHERE id=1")
+           ->execute([$new_grams]);
+        $db->prepare("INSERT INTO gold_stock_movements
+                      (movement_type,grams_change,grams_after,notes,reference_type,reference_id,created_by,created_at)
+                      VALUES (?,?,?,?,?,?,?,NOW())")
+           ->execute([$movement_type, $grams_change, $new_grams, $notes, $ref_type, $ref_id, $created_by]);
+        $db->commit();
+        return $new_grams;
+    } catch (\Throwable $e) {
+        $db->rollBack();
+        throw $e;
+    }
+}
+
 function get_wallet(int $user_id): ?array {
     $db = getDB();
     $stmt = $db->prepare("SELECT * FROM wallets WHERE user_id = ?");

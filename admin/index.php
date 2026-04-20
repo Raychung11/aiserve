@@ -23,10 +23,12 @@ $stats['referral_commissions_rm'] = (float)$db->query("SELECT COALESCE(SUM(rm_va
 // ── Pending action counts (for notification badges) ───────────────────────────
 $pending['kyc']          = (int)$db->query("SELECT COUNT(*) FROM kyc_submissions WHERE status='pending'")->fetchColumn();
 $pending['sell_gold']    = (int)$db->query("SELECT COUNT(*) FROM gold_sell_requests WHERE status='pending'")->fetchColumn();
+$stock     = get_gold_stock();
+$stock_low = gold_stock_is_low();
 $pending['ar_rahnu']     = (int)$db->query("SELECT COUNT(*) FROM ar_rahnu_applications WHERE status='pending'")->fetchColumn();
 $pending['physical_gold']= (int)$db->query("SELECT COUNT(*) FROM gold_physical_redemptions WHERE status='pending'")->fetchColumn();
 
-$total_pending = array_sum($pending) + $stats['pending_merchants'] + $stats['pending_payouts'];
+$total_pending = array_sum($pending) + $stats['pending_merchants'] + $stats['pending_payouts'] + ($stock_low ? 1 : 0);
 
 // ── Today's activity ──────────────────────────────────────────────────────────
 $today_purchases = (float)$db->query("SELECT COALESCE(SUM(rm_amount),0) FROM gold_purchases WHERE DATE(created_at)=CURDATE() AND payment_status='paid'")->fetchColumn();
@@ -100,6 +102,20 @@ layout_begin_admin('Admin Dashboard');
         <div style="font-size:0.75rem;color:#6B7280;">Luluskan akaun pedagang</div>
       </div>
       <div style="margin-left:auto;color:#10B981;font-size:1.1rem;">→</div>
+    </a>
+    <?php endif; ?>
+
+    <?php if ($stock_low): ?>
+    <a href="<?= APP_URL ?>/admin/gold-stock" style="display:flex;align-items:center;gap:12px;background:#fff;border:2px solid #EF4444;border-radius:8px;padding:12px 14px;text-decoration:none;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow=''">
+      <div style="font-size:1.8rem;">📦</div>
+      <div>
+        <div style="font-weight:700;font-size:0.95rem;color:#991B1B;">⚠️ Stok Emas Rendah!</div>
+        <div style="font-size:0.75rem;color:#6B7280;">
+          Semasa: <strong><?= number_format((float)$stock['current_grams'], 4) ?>g</strong>
+          — Had: <?= number_format((float)$stock['min_alert_grams'], 4) ?>g
+        </div>
+      </div>
+      <div style="margin-left:auto;color:#EF4444;font-size:1.1rem;">→</div>
     </a>
     <?php endif; ?>
 

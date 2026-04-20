@@ -36,14 +36,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // ── Approve request ──
+    // ── Approve request — gold returns to vault stock ──
     elseif ($action === 'approve') {
         $req_id = (int)($_POST['req_id'] ?? 0);
         $rs = $db->prepare("SELECT * FROM gold_sell_requests WHERE id=?"); $rs->execute([$req_id]); $req = $rs->fetch();
         if ($req && $req['status'] === 'pending') {
-            $db->prepare("UPDATE gold_sell_requests SET status='approved', reviewed_by=?, reviewed_at=NOW(), updated_at=NOW() WHERE id=?")
-               ->execute([$admin_id, $req_id]);
-            flash_set('main', 'Permintaan #'.$req_id.' diluluskan.', 'success');
+            $db->beginTransaction();
+            try {
+                $db->prepare("UPDATE gold_sell_requests SET status='approved', reviewed_by=?, reviewed_at=NOW(), updated_at=NOW() WHERE id=?")
+                   ->execute([$admin_id, $req_id]);
+                adjust_gold_stock(
+                    (float)$req['grams_amount'], 'buyback_in',
+                    'Beli balik emas — permintaan jual #' . $req_id . ' (' . $req['grams_amount'] . 'g @ RM' . $req['price_per_g_snapshot'] . '/g)',
+                    'sell_request', $req_id, (int)$admin_id
+                );
+                $db->commit();
+                flash_set('main', 'Permintaan #'.$req_id.' diluluskan. Stok ditambah ' . $req['grams_amount'] . 'g.', 'success');
+            } catch (Throwable $e) {
+                $db->rollBack();
+                flash_set('main', 'Ralat sistem semasa meluluskan.', 'error');
+            }
         }
         redirect(APP_URL . '/admin/sell-gold');
     }
