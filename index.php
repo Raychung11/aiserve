@@ -41,6 +41,7 @@ $routes = [
     'rent-payments'           => 'pages/rent_payments.php',
     'einvoice'                => 'pages/einvoice.php',
     'cp58'                    => 'pages/cp58.php',
+    'str-report'              => 'pages/str_report.php',
 ];
 
 $page = $routes[$path] ?? null;

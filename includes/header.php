@@ -62,6 +62,7 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
     <li class="nav-item"><a href="<?= APP_URL ?>/rent-payments" class="nav-link <?= ($activePage??'')==='rent-payments'?'active':'' ?>"><i class="bi bi-cash-coin"></i> Rent Payments</a></li>
     <li class="nav-section">Finance</li>
     <li class="nav-item"><a href="<?= APP_URL ?>/revenue" class="nav-link <?= ($activePage??'')==='revenue'?'active':'' ?>"><i class="bi bi-cash-stack"></i> Revenue &amp; Expenses</a></li>
+    <li class="nav-item"><a href="<?= APP_URL ?>/str-report" class="nav-link <?= ($activePage??'')==='str-report'?'active':'' ?>"><i class="bi bi-table"></i> STR Monthly Report</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/roi-calculator" class="nav-link <?= ($activePage??'')==='roi'?'active':'' ?>"><i class="bi bi-calculator-fill"></i> ROI Calculator</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/revenue?report=1" class="nav-link"><i class="bi bi-bar-chart-fill"></i> Annual Report</a></li>
     <li class="nav-section">Network</li>
