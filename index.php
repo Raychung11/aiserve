@@ -39,6 +39,8 @@ $routes = [
     'owner-document-download' => 'pages/owner_document_download.php',
     'renters'                 => 'pages/renters.php',
     'rent-payments'           => 'pages/rent_payments.php',
+    'einvoice'                => 'pages/einvoice.php',
+    'cp58'                    => 'pages/cp58.php',
 ];
 
 $page = $routes[$path] ?? null;

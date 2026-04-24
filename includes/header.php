@@ -69,6 +69,9 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
     <li class="nav-item"><a href="<?= APP_URL ?>/owner-documents" class="nav-link <?= ($activePage??'')==='owner-documents'?'active':'' ?>"><i class="bi bi-folder-fill"></i> Documents</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/agents" class="nav-link <?= ($activePage??'')==='agents'?'active':'' ?>"><i class="bi bi-person-badge-fill"></i> Agents</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/agents?leaderboard=1" class="nav-link"><i class="bi bi-trophy-fill"></i> Leaderboard</a></li>
+    <li class="nav-section">Tax &amp; Compliance</li>
+    <li class="nav-item"><a href="<?= APP_URL ?>/einvoice" class="nav-link <?= ($activePage??'')==='einvoice'?'active':'' ?>"><i class="bi bi-receipt-cutoff"></i> e-Invoice &amp; SST</a></li>
+    <li class="nav-item"><a href="<?= APP_URL ?>/cp58" class="nav-link <?= ($activePage??'')==='cp58'?'active':'' ?>"><i class="bi bi-file-earmark-text-fill"></i> CP58</a></li>
     <li class="nav-section">Account</li>
     <li class="nav-item"><a href="<?= APP_URL ?>/subscription" class="nav-link <?= ($activePage??'')==='subscription'?'active':'' ?>"><i class="bi bi-credit-card-fill"></i> Subscription</a></li>
   </ul>
