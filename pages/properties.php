@@ -129,13 +129,13 @@ if (isset($_GET['action']) && in_array($_GET['action'], ['create','edit'])) {
 $pageTitle    = 'Properties';
 $pageSubtitle = 'Manage your portfolio units';
 
-$where  = 'tenant_id=? AND deleted_at IS NULL';
+$where  = 'p.tenant_id=? AND p.deleted_at IS NULL';
 $params = [$_tenantId];
-if (!empty($_GET['compliance'])) { $where .= ' AND compliance_status=?'; $params[] = $_GET['compliance']; }
-if (!empty($_GET['strategy']))   { $where .= ' AND strategy_mode=?';     $params[] = $_GET['strategy']; }
-if (!empty($_GET['status']))     { $where .= ' AND listing_status=?';    $params[] = $_GET['status']; }
+if (!empty($_GET['compliance'])) { $where .= ' AND p.compliance_status=?'; $params[] = $_GET['compliance']; }
+if (!empty($_GET['strategy']))   { $where .= ' AND p.strategy_mode=?';     $params[] = $_GET['strategy']; }
+if (!empty($_GET['status']))     { $where .= ' AND p.listing_status=?';    $params[] = $_GET['status']; }
 
-$properties = Database::fetchAll("SELECT p.*, u.name AS agent_name FROM properties p LEFT JOIN users u ON u.id=p.agent_id WHERE $where ORDER BY p.created_at DESC", $params);
+$properties = Database::fetchAll("SELECT p.*, u.name AS agent_name FROM properties p LEFT JOIN users u ON u.id=p.agent_id AND u.tenant_id=p.tenant_id WHERE $where ORDER BY p.created_at DESC", $params);
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
