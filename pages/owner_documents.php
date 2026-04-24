@@ -4,6 +4,7 @@ require_once __DIR__.'/../includes/auth_check.php';
 $flash      = [];
 $ownerId    = (int)($_GET['owner_id'] ?? 0);
 $propertyId = (int)($_GET['property_id'] ?? 0);
+$renterId   = (int)($_GET['renter_id'] ?? 0);
 
 // Ensure upload directory exists
 $uploadDir = __DIR__.'/../uploads/documents/';
@@ -12,12 +13,19 @@ if (!is_dir($uploadDir)) { mkdir($uploadDir, 0755, true); }
 // ── POST HANDLER ──────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Auth::verifyCsrf();
-    $action = $_POST['action'] ?? '';
-
-    // Verify the target property belongs to this tenant
+    $action     = $_POST['action'] ?? '';
     $targetProp = (int)($_POST['property_id'] ?? 0);
-    $prop = Database::fetchOne("SELECT id, owner_id FROM properties WHERE id=? AND tenant_id=? AND deleted_at IS NULL", [$targetProp, $_tenantId]);
-    if (!$prop) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Property not found.']; header('Location: '.APP_URL.'/owner-documents'); exit; }
+    $targetRenter = (int)($_POST['renter_id'] ?? 0);
+
+    // Property is optional when uploading renter docs
+    $prop = null;
+    if ($targetProp) {
+        $prop = Database::fetchOne("SELECT id, owner_id FROM properties WHERE id=? AND tenant_id=? AND deleted_at IS NULL", [$targetProp, $_tenantId]);
+        if (!$prop) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Property not found.']; header('Location: '.APP_URL.'/owner-documents'); exit; }
+    }
+    if (!$targetProp && !$targetRenter) {
+        $_SESSION['flash'] = ['type'=>'danger','msg'=>'Select a property or renter.']; header('Location: '.APP_URL.'/owner-documents'); exit;
+    }
 
     if ($action === 'upload') {
         $title = trim($_POST['title'] ?? '');
@@ -62,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         Database::insert('owner_documents', [
             'tenant_id'   => $_tenantId,
-            'property_id' => $targetProp,
+            'property_id' => $targetProp ?: null,
+            'renter_id'   => $targetRenter ?: null,
             'title'       => $title,
             'description' => trim($_POST['description'] ?? '') ?: null,
             'file_path'   => $filePath,
@@ -72,9 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'uploaded_by' => $_user['id'],
             'created_at'  => date('Y-m-d H:i:s'),
         ]);
-        ActivityLog::record('document.upload', "Uploaded doc '$title' for property #$targetProp", $_tenantId, $_user['id']);
+        $logCtx = $targetProp ? "property #$targetProp" : "renter #$targetRenter";
+        ActivityLog::record('document.upload', "Uploaded doc '$title' for $logCtx", $_tenantId, $_user['id']);
         $_SESSION['flash'] = ['type'=>'success','msg'=>'Document added.'];
-        header('Location: '.APP_URL.'/owner-documents?property_id='.$targetProp); exit;
+        $redirect = $targetRenter ? APP_URL.'/owner-documents?renter_id='.$targetRenter : APP_URL.'/owner-documents?property_id='.$targetProp;
+        header('Location: '.$redirect); exit;
     }
 
     if ($action === 'delete') {
@@ -88,18 +99,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ActivityLog::record('document.delete', "Deleted doc #$docId", $_tenantId, $_user['id']);
             $_SESSION['flash'] = ['type'=>'success','msg'=>'Document deleted.'];
         }
-        header('Location: '.APP_URL.'/owner-documents?property_id='.$targetProp); exit;
+        $redirect = $doc && $doc['renter_id'] ? APP_URL.'/owner-documents?renter_id='.$doc['renter_id'] : APP_URL.'/owner-documents?property_id='.$targetProp;
+        header('Location: '.$redirect); exit;
     }
 }
 
 if (isset($_SESSION['flash'])) { $flash = $_SESSION['flash']; unset($_SESSION['flash']); }
 
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
-// Properties list for filter dropdown
 $allProperties = Database::fetchAll(
     "SELECT p.id, p.name, o.name AS owner_name FROM properties p
      LEFT JOIN owners o ON o.id = p.owner_id
      WHERE p.tenant_id=? AND p.deleted_at IS NULL ORDER BY p.name",
+    [$_tenantId]
+);
+$allRenters = Database::fetchAll(
+    "SELECT id, name, phone FROM renter_profiles WHERE tenant_id=? ORDER BY name",
     [$_tenantId]
 );
 
@@ -118,14 +133,20 @@ if ($propertyId) {
     $where  .= ' AND d.property_id=?';
     $params[] = $propertyId;
 }
+if ($renterId) {
+    $where  .= ' AND d.renter_id=?';
+    $params[] = $renterId;
+}
 
 $docs = Database::fetchAll(
     "SELECT d.*, p.name AS property_name, p.owner_id,
-            o.name AS owner_name, u.name AS uploader
+            o.name AS owner_name, u.name AS uploader,
+            r.name AS renter_name
      FROM owner_documents d
-     JOIN properties p ON p.id = d.property_id
+     LEFT JOIN properties p ON p.id = d.property_id
      LEFT JOIN owners o ON o.id = p.owner_id
      LEFT JOIN users u ON u.id = d.uploaded_by
+     LEFT JOIN renter_profiles r ON r.id = d.renter_id
      WHERE $where
      ORDER BY d.created_at DESC",
     $params
@@ -156,12 +177,23 @@ include __DIR__.'/../includes/header.php'; ?>
         <input type="hidden" name="_token" value="<?= Auth::csrfToken() ?>">
         <input type="hidden" name="action" value="upload">
         <div class="mb-3">
-          <label class="form-label fw-semibold">Property</label>
-          <select name="property_id" class="form-select" required>
-            <option value="">Select property</option>
+          <label class="form-label fw-semibold">Property <span class="text-muted fw-normal">(optional if renter set)</span></label>
+          <select name="property_id" class="form-select" id="docPropertySel">
+            <option value="">— None —</option>
             <?php foreach ($allProperties as $p): ?>
             <option value="<?= $p['id'] ?>" <?= $p['id']==$propertyId?'selected':'' ?>>
               <?= htmlspecialchars($p['name']) ?><?= $p['owner_name']?' — '.$p['owner_name']:'' ?>
+            </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Renter <span class="text-muted fw-normal">(optional if property set)</span></label>
+          <select name="renter_id" class="form-select" id="docRenterSel">
+            <option value="">— None —</option>
+            <?php foreach ($allRenters as $rn): ?>
+            <option value="<?= $rn['id'] ?>" <?= $rn['id']==$renterId?'selected':'' ?>>
+              <?= htmlspecialchars($rn['name']) ?><?= $rn['phone']?' ('.$rn['phone'].')':'' ?>
             </option>
             <?php endforeach; ?>
           </select>
@@ -193,13 +225,24 @@ include __DIR__.'/../includes/header.php'; ?>
     <!-- Filter -->
     <div class="card-box mb-3">
       <form method="GET" action="<?= APP_URL ?>/owner-documents" class="row g-2">
-        <div class="col-md-6">
+        <div class="col-md-5">
           <select name="property_id" class="form-select form-select-sm" onchange="this.form.submit()">
             <option value="">All Properties</option>
             <?php foreach ($allProperties as $p): ?>
             <option value="<?= $p['id'] ?>" <?= $p['id']==$propertyId?'selected':'' ?>><?= htmlspecialchars($p['name']) ?></option>
             <?php endforeach; ?>
           </select>
+        </div>
+        <div class="col-md-5">
+          <select name="renter_id" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All Renters</option>
+            <?php foreach ($allRenters as $rn): ?>
+            <option value="<?= $rn['id'] ?>" <?= $rn['id']==$renterId?'selected':'' ?>><?= htmlspecialchars($rn['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <a href="<?= APP_URL ?>/owner-documents" class="btn btn-sm btn-outline-secondary w-100">Clear</a>
         </div>
       </form>
     </div>
@@ -226,9 +269,13 @@ include __DIR__.'/../includes/header.php'; ?>
               <?php endif; ?>
             </td>
             <td style="font-size:.8rem;">
+              <?php if ($doc['property_name']): ?>
               <div><?= htmlspecialchars($doc['property_name']) ?></div>
-              <?php if ($doc['owner_name']): ?>
-              <div class="text-muted"><?= htmlspecialchars($doc['owner_name']) ?></div>
+              <?php if ($doc['owner_name']): ?><div class="text-muted"><?= htmlspecialchars($doc['owner_name']) ?></div><?php endif; ?>
+              <?php elseif ($doc['renter_name']): ?>
+              <div class="text-muted"><i class="bi bi-person me-1"></i><?= htmlspecialchars($doc['renter_name']) ?></div>
+              <?php else: ?>
+              <span class="text-muted">—</span>
               <?php endif; ?>
             </td>
             <td style="font-size:.8rem;" class="text-muted">

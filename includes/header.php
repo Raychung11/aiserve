@@ -58,6 +58,8 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
     <li class="nav-section">Portfolio</li>
     <li class="nav-item"><a href="<?= APP_URL ?>/properties" class="nav-link <?= ($activePage??'')==='properties'?'active':'' ?>"><i class="bi bi-buildings"></i> Properties</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/tenancies" class="nav-link <?= ($activePage??'')==='tenancies'?'active':'' ?>"><i class="bi bi-people-fill"></i> Tenancies</a></li>
+    <li class="nav-item"><a href="<?= APP_URL ?>/renters" class="nav-link <?= ($activePage??'')==='renters'?'active':'' ?>"><i class="bi bi-person-lines-fill"></i> Renter Profiles</a></li>
+    <li class="nav-item"><a href="<?= APP_URL ?>/rent-payments" class="nav-link <?= ($activePage??'')==='rent-payments'?'active':'' ?>"><i class="bi bi-cash-coin"></i> Rent Payments</a></li>
     <li class="nav-section">Finance</li>
     <li class="nav-item"><a href="<?= APP_URL ?>/revenue" class="nav-link <?= ($activePage??'')==='revenue'?'active':'' ?>"><i class="bi bi-cash-stack"></i> Revenue &amp; Expenses</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/roi-calculator" class="nav-link <?= ($activePage??'')==='roi'?'active':'' ?>"><i class="bi bi-calculator-fill"></i> ROI Calculator</a></li>
