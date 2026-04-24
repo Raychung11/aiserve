@@ -19,11 +19,9 @@ $requestUri  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $scriptDir   = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 $path        = substr($requestUri, strlen($scriptDir));
 $path        = trim($path, '/');
-if ($path === '') $path = 'dashboard';
-
 // Route map: URL segment => page file
 $routes = [
-    ''               => 'pages/dashboard.php',
+    ''               => 'pages/landing.php',
     'dashboard'      => 'pages/dashboard.php',
     'login'          => 'pages/login.php',
     'register'       => 'pages/register.php',
