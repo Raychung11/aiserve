@@ -68,10 +68,19 @@
       <option value="<?=$a['id']?>" <?= ($property['agent_id']??'')==$a['id']?'selected':'' ?>><?= htmlspecialchars($a['name']) ?></option>
       <?php endforeach; ?>
     </select></div>
-  <div class="col-md-4"><label class="form-label fw-semibold">Owner Name</label>
-    <input type="text" name="owner_name" class="form-control" value="<?= htmlspecialchars($property['owner_name']??'') ?>"></div>
-  <div class="col-md-4"><label class="form-label fw-semibold">Owner Phone</label>
-    <input type="text" name="owner_phone" class="form-control" value="<?= htmlspecialchars($property['owner_phone']??'') ?>"></div>
+  <div class="col-md-8">
+    <label class="form-label fw-semibold">Owner
+      <a href="<?= APP_URL ?>/owners?action=create" class="ms-2 text-primary" style="font-size:.75rem;" target="_blank"><i class="bi bi-plus-circle me-1"></i>New Owner</a>
+    </label>
+    <select name="owner_id" class="form-select">
+      <option value="">No owner assigned</option>
+      <?php foreach($owners as $ow): ?>
+      <option value="<?=$ow['id']?>" <?= ($property['owner_id']??'')==$ow['id']?'selected':'' ?>>
+        <?= htmlspecialchars($ow['name']) ?><?= $ow['phone']?' — '.$ow['phone']:'' ?>
+      </option>
+      <?php endforeach; ?>
+    </select>
+  </div>
   <div class="col-md-4"><label class="form-label fw-semibold">Monthly Target (RM)</label>
     <input type="number" name="monthly_target" class="form-control" value="<?= $property['monthly_target']??0 ?>" min="0" step="50"></div>
   <div class="col-md-6"><label class="form-label fw-semibold">Airbnb URL</label>

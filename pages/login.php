@@ -6,13 +6,16 @@ require_once __DIR__ . '/../src/ActivityLog.php';
 require_once __DIR__ . '/../src/Auth.php';
 
 Auth::start();
-if (Auth::check()) { header('Location: ' . APP_URL . '/dashboard'); exit; }
+if (Auth::check()) {
+    $dest = Auth::isOwner() ? '/owner-portal' : '/dashboard';
+    header('Location: ' . APP_URL . $dest); exit;
+}
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = Auth::login($_POST['email'] ?? '', $_POST['password'] ?? '');
     if ($result['success']) {
-        header('Location: ' . APP_URL . '/dashboard');
+        header('Location: ' . APP_URL . ($result['redirect'] ?? '/dashboard'));
         exit;
     }
     $error = $result['error'];

@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'strategy_mode'    => $_POST['strategy_mode'] ?? 'STR',
             'listing_status'   => $_POST['listing_status'] ?? 'pending',
             'agent_id'         => $_POST['agent_id'] ?: null,
+            'owner_id'         => $_POST['owner_id'] ?: null,
             'owner_name'       => trim($_POST['owner_name'] ?? ''),
             'owner_phone'      => trim($_POST['owner_phone'] ?? ''),
-            'owner_email'      => trim($_POST['owner_email'] ?? ''),
             'monthly_target'   => (float)($_POST['monthly_target'] ?? 0),
             'airbnb_url'       => trim($_POST['airbnb_url'] ?? ''),
             'notes'            => trim($_POST['notes'] ?? ''),
@@ -89,7 +89,9 @@ if (isset($_GET['view'])) {
     $period       = date('Y-m');
     $monthRevenue = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND property_id=? AND period=? AND type="income"',  [$_tenantId,$property['id'],$period])['s']??0);
     $monthExpense = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND property_id=? AND period=? AND type="expense"', [$_tenantId,$property['id'],$period])['s']??0);
-    $agents = Database::fetchAll('SELECT id,name FROM users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
+    $agents       = Database::fetchAll('SELECT id,name FROM users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
+    $propertyOwner = $property['owner_id'] ? Database::fetchOne('SELECT * FROM owners WHERE id=?', [$property['owner_id']]) : null;
+    $propertyDocs = Database::fetchAll('SELECT * FROM owner_documents WHERE property_id=? AND tenant_id=? ORDER BY created_at DESC', [$property['id'], $_tenantId]);
 
     require_once __DIR__ . '/../includes/header.php';
     include __DIR__ . '/partials/property_view.php';
@@ -114,6 +116,7 @@ if (isset($_GET['action']) && in_array($_GET['action'], ['create','edit'])) {
         }
     }
     $agents    = Database::fetchAll('SELECT id,name FROM users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
+    $owners    = Database::fetchAll('SELECT id,name,phone FROM owners WHERE tenant_id=? AND is_active=1 ORDER BY name', [$_tenantId]);
     $pageTitle = $property ? 'Edit Property' : 'Add Property';
     $pageSubtitle = $property ? $property['name'] : 'Register a new portfolio unit';
     require_once __DIR__ . '/../includes/header.php';

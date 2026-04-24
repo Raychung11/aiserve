@@ -63,6 +63,8 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
     <li class="nav-item"><a href="<?= APP_URL ?>/roi-calculator" class="nav-link <?= ($activePage??'')==='roi'?'active':'' ?>"><i class="bi bi-calculator-fill"></i> ROI Calculator</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/revenue?report=1" class="nav-link"><i class="bi bi-bar-chart-fill"></i> Annual Report</a></li>
     <li class="nav-section">Network</li>
+    <li class="nav-item"><a href="<?= APP_URL ?>/owners" class="nav-link <?= ($activePage??'')==='owners'?'active':'' ?>"><i class="bi bi-person-vcard-fill"></i> Owners</a></li>
+    <li class="nav-item"><a href="<?= APP_URL ?>/owner-documents" class="nav-link <?= ($activePage??'')==='owner-documents'?'active':'' ?>"><i class="bi bi-folder-fill"></i> Documents</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/agents" class="nav-link <?= ($activePage??'')==='agents'?'active':'' ?>"><i class="bi bi-person-badge-fill"></i> Agents</a></li>
     <li class="nav-item"><a href="<?= APP_URL ?>/agents?leaderboard=1" class="nav-link"><i class="bi bi-trophy-fill"></i> Leaderboard</a></li>
     <li class="nav-section">Account</li>

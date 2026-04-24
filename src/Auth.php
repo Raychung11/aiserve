@@ -63,7 +63,8 @@ class Auth {
         $_SESSION['user_id'] = $user['id'];
         unset($_SESSION['_user_cache']);
         ActivityLog::record('auth.login', 'User logged in', $user['tenant_id'], $user['id']);
-        return ['success' => true];
+        $redirect = ($user['role'] ?? 'admin') === 'owner' ? '/owner-portal' : '/dashboard';
+        return ['success' => true, 'redirect' => $redirect];
     }
 
     public static function register(array $data): array {
@@ -116,6 +117,10 @@ class Auth {
 
     public static function isAdmin(): bool {
         return in_array(self::user()['role'] ?? '', ['admin', 'super_admin']);
+    }
+
+    public static function isOwner(): bool {
+        return (self::user()['role'] ?? '') === 'owner';
     }
 
     public static function csrfToken(): string {

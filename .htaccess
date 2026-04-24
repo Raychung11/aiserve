@@ -9,6 +9,9 @@ RewriteRule ^src/ - [F,L]
 RewriteRule ^db/ - [F,L]
 RewriteRule ^includes/ - [F,L]
 
+# Block direct access to uploaded documents (served via PHP download handler)
+RewriteRule ^uploads/documents/ - [F,L]
+
 # Allow direct access to real files and directories (assets)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

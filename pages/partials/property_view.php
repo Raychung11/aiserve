@@ -53,8 +53,8 @@
           ['Bedrooms / Bathrooms', $property['bedrooms'].' BR / '.$property['bathrooms'].' BA'],
           ['Area', $property['area_sqft'] ? number_format($property['area_sqft'],0).' sqft' : '—'],
           ['Building', $property['strata_building'] ?: '—'],
-          ['Owner', $property['owner_name'] ?: '—'],
-          ['Owner Phone', $property['owner_phone'] ?: '—'],
+          ['Owner', $propertyOwner ? $propertyOwner['name'] : ($property['owner_name'] ?: '—')],
+          ['Owner Phone', $propertyOwner ? ($propertyOwner['phone'] ?: '—') : ($property['owner_phone'] ?: '—')],
           ['Monthly Target', 'RM '.number_format($property['monthly_target'],0)],
           ['Strategy', $property['strategy_mode']],
           ['Status', ucfirst($property['listing_status'])],
@@ -101,7 +101,51 @@
         </div>
       <?php else: ?><p class="text-muted mb-0" style="font-size:.875rem;">No active tenancy.</p><?php endif; ?>
     </div>
+
+    <?php if($propertyOwner): ?>
+    <div class="card-box mt-3">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h6 class="fw-semibold mb-0">Owner</h6>
+        <a href="<?= APP_URL ?>/owners?view=<?= $propertyOwner['id'] ?>" class="btn btn-sm btn-outline-secondary">Profile</a>
+      </div>
+      <div class="fw-semibold"><?= htmlspecialchars($propertyOwner['name']) ?></div>
+      <div class="text-muted" style="font-size:.78rem;"><?= htmlspecialchars($propertyOwner['phone'] ?: '') ?></div>
+      <?php if($propertyOwner['bank_name']): ?>
+      <div class="text-muted mt-1" style="font-size:.78rem;"><?= htmlspecialchars($propertyOwner['bank_name']) ?> · <?= htmlspecialchars($propertyOwner['bank_account'] ?: '') ?></div>
+      <?php endif; ?>
+    </div>
+    <?php endif; ?>
   </div>
+</div>
+
+<!-- Documents Card -->
+<div class="card-box mt-3">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h6 class="fw-semibold mb-0">Documents (<?= count($propertyDocs) ?>)</h6>
+    <a href="<?= APP_URL ?>/owner-documents?property_id=<?= $property['id'] ?>" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-upload me-1"></i>Manage
+    </a>
+  </div>
+  <?php if($propertyDocs): ?>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <tbody>
+        <?php foreach(array_slice($propertyDocs,0,5) as $doc): ?>
+        <tr>
+          <td style="font-size:.82rem;"><i class="bi bi-file-earmark-text me-1 text-muted"></i><?= htmlspecialchars($doc['title']) ?></td>
+          <td style="font-size:.75rem;" class="text-muted"><?= date('d M Y',strtotime($doc['created_at'])) ?></td>
+          <td><a href="<?= APP_URL ?>/owner-document-download?id=<?= $doc['id'] ?>" class="btn btn-xs btn-outline-secondary" style="font-size:.72rem;padding:2px 6px;"><i class="bi bi-download"></i></a></td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+  <?php if(count($propertyDocs)>5): ?>
+  <a href="<?= APP_URL ?>/owner-documents?property_id=<?= $property['id'] ?>" class="text-muted" style="font-size:.78rem;">+<?= count($propertyDocs)-5 ?> more</a>
+  <?php endif; ?>
+  <?php else: ?>
+  <p class="text-muted mb-0" style="font-size:.875rem;">No documents uploaded. <a href="<?= APP_URL ?>/owner-documents?property_id=<?= $property['id'] ?>">Upload now</a></p>
+  <?php endif; ?>
 </div>
 
 <div class="mt-3 d-flex gap-2">

@@ -32,9 +32,13 @@ $routes = [
     'revenue'        => 'pages/revenue.php',
     'tenancies'      => 'pages/tenancies.php',
     'agents'         => 'pages/agents.php',
-    'investment'     => 'pages/investment.php',
-    'subscription'   => 'pages/subscription.php',
-    'roi-calculator' => 'pages/roi_calculator.php',
+    'investment'              => 'pages/investment.php',
+    'subscription'            => 'pages/subscription.php',
+    'roi-calculator'          => 'pages/roi_calculator.php',
+    'owners'                  => 'pages/owners.php',
+    'owner-portal'            => 'pages/owner_portal.php',
+    'owner-documents'         => 'pages/owner_documents.php',
+    'owner-document-download' => 'pages/owner_document_download.php',
 ];
 
 $page = $routes[$path] ?? null;
