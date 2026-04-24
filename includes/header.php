@@ -9,11 +9,16 @@
 <style>
 :root { --sidebar-bg:#0f172a; --sidebar-w:260px; --accent:#6366f1; }
 body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
-.sidebar { width:var(--sidebar-w); background:var(--sidebar-bg); min-height:100vh;
-           position:fixed; top:0; left:0; z-index:100; overflow-y:auto; }
-.sidebar-brand { padding:1.5rem 1.25rem 1rem; border-bottom:1px solid rgba(255,255,255,.08); }
+.sidebar { width:var(--sidebar-w); background:var(--sidebar-bg); height:100vh;
+           position:fixed; top:0; left:0; z-index:100;
+           display:flex; flex-direction:column; }
+.sidebar-brand { padding:1.5rem 1.25rem 1rem; border-bottom:1px solid rgba(255,255,255,.08); flex-shrink:0; }
 .sidebar-brand h5 { color:#fff; font-weight:700; margin:0; font-size:1.1rem; }
 .sidebar-brand small { color:#94a3b8; font-size:.72rem; }
+.sidebar-nav { flex:1; overflow-y:auto; padding-bottom:.5rem; }
+.sidebar-nav::-webkit-scrollbar { width:4px; }
+.sidebar-nav::-webkit-scrollbar-track { background:transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:4px; }
 .nav-section { color:#64748b; font-size:.65rem; font-weight:600; text-transform:uppercase;
                letter-spacing:.08em; padding:.75rem 1.25rem .25rem; }
 .nav-item { margin:.1rem .5rem; }
@@ -41,7 +46,7 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
 .btn-primary:hover { background:#4f46e5; border-color:#4f46e5; }
 .card-hover { transition:box-shadow .2s; }
 .card-hover:hover { box-shadow:0 4px 20px rgba(0,0,0,.08); }
-.sidebar-footer { padding:1rem; position:absolute; bottom:0; width:100%; border-top:1px solid rgba(255,255,255,.08); }
+.sidebar-footer { padding:1rem; border-top:1px solid rgba(255,255,255,.08); flex-shrink:0; }
 @media(max-width:768px){ .sidebar{display:none;} .main-wrapper{margin-left:0;} }
 </style>
 </head>
@@ -52,7 +57,7 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
     <h5><i class="bi bi-house-heart-fill" style="color:#6366f1"></i> STRHub AI</h5>
     <small><?= htmlspecialchars($_user['tenant_name'] ?? 'Platform') ?></small>
   </div>
-  <ul class="list-unstyled mb-0 pb-5">
+  <div class="sidebar-nav"><ul class="list-unstyled mb-0">
     <li class="nav-section">Overview</li>
     <li class="nav-item"><a href="<?= APP_URL ?>/dashboard" class="nav-link <?= ($activePage??'')==='dashboard'?'active':'' ?>"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a></li>
     <li class="nav-section">Portfolio</li>
@@ -75,7 +80,7 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
     <li class="nav-item"><a href="<?= APP_URL ?>/cp58" class="nav-link <?= ($activePage??'')==='cp58'?'active':'' ?>"><i class="bi bi-file-earmark-text-fill"></i> CP58</a></li>
     <li class="nav-section">Account</li>
     <li class="nav-item"><a href="<?= APP_URL ?>/subscription" class="nav-link <?= ($activePage??'')==='subscription'?'active':'' ?>"><i class="bi bi-credit-card-fill"></i> Subscription</a></li>
-  </ul>
+  </ul></div><!-- /sidebar-nav -->
   <div class="sidebar-footer">
     <div class="d-flex align-items-center gap-2 mb-2">
       <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center"
