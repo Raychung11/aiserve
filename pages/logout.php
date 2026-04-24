@@ -9,7 +9,7 @@ Auth::start();
 
 if (Auth::check()) {
     $u = Auth::user();
-    ActivityLog::record($u['tenant_id'], $u['id'], 'logout', 'users', $u['id'], 'User signed out');
+    ActivityLog::record('auth.logout', 'User signed out', (int)$u['tenant_id'], (int)$u['id']);
     Auth::logout();
 }
 
