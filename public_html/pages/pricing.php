@@ -7,7 +7,7 @@ require_once __DIR__ . '/../includes/header.php';
   <div class="container text-center">
     <div class="section-label">Plans</div>
     <h1 class="hero-title" style="font-size:clamp(1.8rem,4vw,3rem);"><?= t('pricing_title') ?></h1>
-    <p class="hero-subtitle mx-auto" style="max-width:520px;">Choose the plan that fits your journey. Upgrade anytime.</p>
+    <p class="hero-subtitle on-dark mx-auto" style="max-width:520px;">Choose the plan that fits your journey. Upgrade anytime.</p>
   </div>
 </section>
 

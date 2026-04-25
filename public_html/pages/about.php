@@ -7,7 +7,7 @@ require_once __DIR__ . '/../includes/header.php';
   <div class="container">
     <div class="section-label"><?= t('nav_about') ?></div>
     <h1 class="hero-title" style="font-size:clamp(1.8rem,4vw,3rem);"><?= t('about_title') ?></h1>
-    <p class="hero-subtitle"><?= t('about_desc') ?></p>
+    <p class="hero-subtitle on-dark"><?= t('about_desc') ?></p>
   </div>
 </section>
 

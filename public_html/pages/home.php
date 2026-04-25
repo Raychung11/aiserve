@@ -53,6 +53,7 @@ require_once __DIR__ . '/../includes/header.php';
                 ['bi-graph-up-arrow', 'Investment'],
                 ['bi-people', 'Network'],
               ];
+              // Feature grid labels are shown in white via inline style below
               foreach ($features as [$icon, $label]):
               ?>
               <div class="col-4">
@@ -145,10 +146,10 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="section-label"><?= t('ai_title') ?></div>
         <h2 class="section-title text-white"><?= t('ai_title') ?></h2>
         <div class="divider-gold" style="margin:1rem 0 1.5rem;"></div>
-        <p class="text-muted mb-3">Answer a few quick questions and our AI concierge will assess your MM2H eligibility instantly.</p>
+        <p class="on-dark mb-3">Answer a few quick questions and our AI concierge will assess your MM2H eligibility instantly.</p>
         <ul class="list-unstyled">
           <?php foreach (['Instant result', 'No registration required', 'Personalised document list', 'Next-step guidance'] as $pt): ?>
-          <li class="mb-2 text-muted"><i class="bi bi-check-circle-fill text-gold me-2"></i><?= $pt ?></li>
+          <li class="mb-2 on-dark"><i class="bi bi-check-circle-fill text-gold me-2"></i><?= $pt ?></li>
           <?php endforeach; ?>
         </ul>
       </div>

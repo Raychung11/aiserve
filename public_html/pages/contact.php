@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="container">
     <div class="section-label"><?= t('nav_contact') ?></div>
     <h1 class="hero-title" style="font-size:clamp(1.8rem,4vw,3rem);"><?= t('contact_title') ?></h1>
-    <p class="hero-subtitle">Our team speaks English, Mandarin, and Cantonese. We'll respond within 24 hours.</p>
+    <p class="hero-subtitle on-dark">Our team speaks English, Mandarin, and Cantonese. We'll respond within 24 hours.</p>
   </div>
 </section>
 

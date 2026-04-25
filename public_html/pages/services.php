@@ -7,7 +7,7 @@ require_once __DIR__ . '/../includes/header.php';
   <div class="container">
     <div class="section-label">What We Offer</div>
     <h1 class="hero-title" style="font-size:clamp(1.8rem,4vw,3rem);"><?= t('services_title') ?></h1>
-    <p class="hero-subtitle">A complete concierge system from visa to settlement — and beyond.</p>
+    <p class="hero-subtitle on-dark">A complete concierge system from visa to settlement — and beyond.</p>
   </div>
 </section>
 

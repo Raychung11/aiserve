@@ -230,7 +230,45 @@ h1,h2,h3,h4,h5,h6 { font-weight: 700; color: var(--primary); line-height: 1.3; }
   background: var(--primary);
   color: var(--white);
 }
-.section-dark h2, .section-dark h3, .section-dark h4 { color: var(--white); }
+.section-dark h1,
+.section-dark h2,
+.section-dark h3,
+.section-dark h4,
+.section-dark h5,
+.section-dark h6 { color: var(--white); }
+
+/* ── Dark section text — only affect DIRECT content, never white cards inside ── */
+/* Excludes .mm2h-form-card, .mm2h-card, .auth-card, .pricing-card (white bg) */
+
+.section-dark > .container p,
+.section-dark > .container li,
+.section-dark > .container small { color: rgba(255,255,255,.78); }
+
+.section-dark > .container .text-muted { color: rgba(255,255,255,.55) !important; }
+
+/* Dark-text-on-dark helper class for direct dark section content */
+.on-dark         { color: rgba(255,255,255,.85) !important; }
+.on-dark-muted   { color: rgba(255,255,255,.55) !important; }
+
+/* Hero section — left col text only */
+.hero-subtitle   { color: rgba(255,255,255,.78) !important; }
+.hero-stat-label { color: rgba(255,255,255,.55) !important; }
+.hero-section > .container .text-muted { color: rgba(255,255,255,.55) !important; }
+
+/* Footer dark text overrides */
+.mm2h-footer p,
+.mm2h-footer li,
+.mm2h-footer span:not(.badge) { color: rgba(255,255,255,.65); }
+.mm2h-footer .text-muted { color: rgba(255,255,255,.45) !important; }
+.mm2h-footer h6 { color: var(--secondary) !important; }
+.mm2h-footer strong { color: rgba(255,255,255,.85); }
+.mm2h-footer small { color: rgba(255,255,255,.5); }
+
+/* Sidebar — dark bg text */
+.sidebar p,
+.sidebar small,
+.sidebar span:not(.badge) { color: rgba(255,255,255,.6); }
+
 .section-label {
   color: var(--secondary);
   font-size: .8rem;
@@ -582,6 +620,15 @@ h1,h2,h3,h4,h5,h6 { font-weight: 700; color: var(--primary); line-height: 1.3; }
 .lang-switcher-footer a { color: rgba(255,255,255,.4); text-decoration: none; }
 .lang-switcher-footer a:hover { color: var(--secondary); }
 .lang-switcher-footer span { color: rgba(255,255,255,.15); }
+
+/* ── Dark page-header banners (admin/member section-dark banners) ──────────── */
+.section-dark .page-title-sub,
+[class*="section-dark"] p.hero-subtitle,
+[class*="section-dark"] p.on-dark { color: rgba(255,255,255,.8) !important; }
+
+/* Disclaimer box inside dark footer */
+.footer-disclaimer p,
+.footer-disclaimer strong { color: rgba(255,255,255,.65) !important; }
 
 /* ── Utilities ─────────────────────────────────────────────────────────────── */
 .min-vh-75 { min-height: 75vh; }
