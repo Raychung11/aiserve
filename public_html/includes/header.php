@@ -57,6 +57,7 @@ $current_lang = current_lang();
         <li class="nav-item"><a class="nav-link" href="<?= APP_URL ?>/about"><?= t('nav_about') ?></a></li>
         <li class="nav-item"><a class="nav-link" href="<?= APP_URL ?>/services"><?= t('nav_services') ?></a></li>
         <li class="nav-item"><a class="nav-link" href="<?= APP_URL ?>/pricing"><?= t('nav_pricing') ?></a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= APP_URL ?>/mm2h-guide">MM2H Guide</a></li>
         <li class="nav-item"><a class="nav-link" href="<?= APP_URL ?>/contact"><?= t('nav_contact') ?></a></li>
       </ul>
 

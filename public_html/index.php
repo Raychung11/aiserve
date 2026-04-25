@@ -22,6 +22,7 @@ $routes = [
     'services'  => 'pages/services.php',
     'pricing'   => 'pages/pricing.php',
     'contact'   => 'pages/contact.php',
+    'mm2h-guide'=> 'pages/mm2h_guide.php',
     'login'     => 'pages/login.php',
     'register'  => 'pages/register.php',
     'logout'    => 'logout.php',
@@ -67,6 +68,7 @@ if (str_starts_with($route, 'admin')) {
         'properties'  => 'admin/properties.php',
         'banks'       => 'admin/banks.php',
         'services'    => 'admin/services.php',
+        'mm2h-faq'    => 'admin/mm2h_faq.php',
         'settings'    => 'admin/settings.php',
     ];
     if (isset($map[$sub])) {

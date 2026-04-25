@@ -34,6 +34,7 @@
       <div class="col-6 col-lg-2">
         <h6 class="text-gold text-uppercase fw-bold small mb-3">Platform</h6>
         <ul class="list-unstyled small">
+          <li class="mb-1"><a href="<?= APP_URL ?>/mm2h-guide" class="footer-link">MM2H Guide</a></li>
           <li class="mb-1"><a href="<?= APP_URL ?>/about"    class="footer-link"><?= t('nav_about') ?></a></li>
           <li class="mb-1"><a href="<?= APP_URL ?>/pricing"  class="footer-link"><?= t('nav_pricing') ?></a></li>
           <li class="mb-1"><a href="<?= APP_URL ?>/register" class="footer-link"><?= t('nav_register') ?></a></li>

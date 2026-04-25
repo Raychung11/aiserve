@@ -17,6 +17,7 @@ $admin_menu = [
     ['admin/properties',  'bi-buildings',     'Properties'],
     ['admin/banks',       'bi-bank2',         'Banks'],
     ['admin/services',    'bi-grid',          'Services'],
+    ['admin/mm2h-faq',    'bi-question-circle','MM2H FAQ Guide'],
   ]],
   ['System', [
     ['admin/settings',    'bi-gear',          'Settings'],

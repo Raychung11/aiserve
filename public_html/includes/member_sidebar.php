@@ -13,6 +13,9 @@ $member_menu = [
     ['member/bank-support',    'bi-bank2',            'Banking Support'],
     ['member/business-network','bi-people-fill',      'Business Network'],
   ]],
+  ['Resources', [
+    ['mm2h-guide',             'bi-question-circle',  'MM2H Guide & FAQ'],
+  ]],
   ['Account', [
     ['member/profile',         'bi-person-circle',    'My Profile'],
   ]],
