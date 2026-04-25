@@ -1,0 +1,694 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  SUPER_ADMIN
+  ORG_ADMIN
+  PATIENT
+  DOCTOR
+  DISPENSARY_STAFF
+  MOBILE_MEDIC
+}
+
+enum AppointmentType {
+  VISUAL_CONSULTATION
+  ONSITE_APPOINTMENT
+  MOBILE_MEDIC
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  RESERVED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+  REJECTED
+  RESCHEDULED
+}
+
+enum TransactionType {
+  TOPUP
+  DEDUCTION
+  REFUND
+  ADJUSTMENT
+  REVERSAL
+}
+
+enum ServiceCategory {
+  VISUAL_CONSULTATION
+  ONSITE_APPOINTMENT
+  MARKETPLACE
+  MOBILE_MEDIC
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  PACKED
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum RecordingStatus {
+  PENDING
+  PROCESSING
+  AVAILABLE
+  BACKED_UP
+  FAILED
+  DELETED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+}
+
+// ─── Core Identity ────────────────────────────────────────────────────────────
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String
+  name            String
+  phone           String?
+  role            UserRole
+  avatarUrl       String?
+  isActive        Boolean   @default(true)
+  isEmailVerified Boolean   @default(false)
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  doctorProfile   DoctorProfile?
+  patientProfile  PatientProfile?
+  dispensaryStaff DispensaryStaff[]
+  orgAdmin        Organisation?       @relation("OrgAdmin")
+  orgStaff        OrganisationStaff[]
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+}
+
+// ─── Organisation ─────────────────────────────────────────────────────────────
+
+model Organisation {
+  id              String    @id @default(cuid())
+  name            String
+  registrationNo  String?
+  industry        String?
+  address         String?
+  city            String?
+  state           String?
+  country         String    @default("MY")
+  phone           String?
+  email           String?
+  logoUrl         String?
+  adminUserId     String    @unique
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  adminUser User                @relation("OrgAdmin", fields: [adminUserId], references: [id])
+  staff     OrganisationStaff[]
+  wallet    OrganisationWallet?
+
+  @@index([adminUserId])
+  @@index([isActive])
+}
+
+model OrganisationStaff {
+  id             String    @id @default(cuid())
+  organisationId String
+  userId         String
+  employeeId     String?
+  department     String?
+  isEligible     Boolean   @default(true)
+  monthlyLimit   Decimal?  @db.Decimal(12, 2)
+  annualLimit    Decimal?  @db.Decimal(12, 2)
+  joinedAt       DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organisation        Organisation           @relation(fields: [organisationId], references: [id])
+  user                User                   @relation(fields: [userId], references: [id])
+  serviceEligibility  StaffServiceEligibility[]
+
+  @@unique([organisationId, userId])
+  @@index([organisationId])
+  @@index([userId])
+}
+
+model StaffServiceEligibility {
+  id          String          @id @default(cuid())
+  orgStaffId  String
+  service     ServiceCategory
+
+  staff OrganisationStaff @relation(fields: [orgStaffId], references: [id], onDelete: Cascade)
+
+  @@unique([orgStaffId, service])
+  @@index([orgStaffId])
+}
+
+// ─── Wallet / Ledger ──────────────────────────────────────────────────────────
+
+model OrganisationWallet {
+  id                  String   @id @default(cuid())
+  organisationId      String   @unique
+  balance             Decimal  @default(0) @db.Decimal(14, 2)
+  currency            String   @default("MYR")
+  isActive            Boolean  @default(true)
+  lowBalanceThreshold Decimal? @db.Decimal(14, 2)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  organisation Organisation       @relation(fields: [organisationId], references: [id])
+  transactions WalletTransaction[]
+
+  @@index([organisationId])
+}
+
+model WalletTransaction {
+  id              String           @id @default(cuid())
+  walletId        String
+  type            TransactionType
+  amount          Decimal          @db.Decimal(14, 2)
+  balanceBefore   Decimal          @db.Decimal(14, 2)
+  balanceAfter    Decimal          @db.Decimal(14, 2)
+  serviceCategory ServiceCategory?
+  referenceType   String?
+  referenceId     String?
+  staffUserId     String?
+  description     String?
+  performedBy     String?
+  createdAt       DateTime         @default(now())
+
+  wallet OrganisationWallet @relation(fields: [walletId], references: [id])
+
+  @@index([walletId])
+  @@index([referenceId])
+  @@index([staffUserId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ─── Doctor ───────────────────────────────────────────────────────────────────
+
+model DoctorProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  licenseNo         String?
+  bio               String?
+  yearsExperience   Int?
+  consultationFee   Decimal? @db.Decimal(10, 2)
+  isVerified        Boolean  @default(false)
+  isAvailableOnline Boolean  @default(true)
+  isAvailableOnsite Boolean  @default(true)
+  rating            Decimal? @db.Decimal(3, 2)
+  totalReviews      Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user          User              @relation(fields: [userId], references: [id])
+  specialties   DoctorSpecialty[]
+  schedules     DoctorSchedule[]
+  leaves        DoctorLeave[]
+  appointments  Appointment[]
+  prescriptions Prescription[]
+
+  @@index([userId])
+  @@index([isVerified])
+  @@index([isAvailableOnline])
+}
+
+model DoctorSpecialty {
+  id        String  @id @default(cuid())
+  doctorId  String
+  specialty String
+  isPrimary Boolean @default(false)
+
+  doctor DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId])
+}
+
+model DoctorSchedule {
+  id            String   @id @default(cuid())
+  doctorId      String
+  dayOfWeek     Int
+  startTime     String
+  endTime       String
+  slotDuration  Int      @default(30)
+  bufferTime    Int      @default(5)
+  locationId    String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  doctor DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId])
+  @@index([dayOfWeek])
+}
+
+model DoctorLeave {
+  id        String   @id @default(cuid())
+  doctorId  String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([doctorId])
+  @@index([startDate, endDate])
+}
+
+// ─── Patient ──────────────────────────────────────────────────────────────────
+
+model PatientProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  dateOfBirth      DateTime? @db.Date
+  gender           String?
+  bloodGroup       String?
+  allergies        String?
+  medicalNotes     String?
+  emergencyContact String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user                User                 @relation(fields: [userId], references: [id])
+  appointments        Appointment[]
+  orders              Order[]
+  mobileMedicRequests MobileMedicRequest[]
+
+  @@index([userId])
+}
+
+// ─── Appointments / Booking Engine ────────────────────────────────────────────
+
+model Appointment {
+  id               String            @id @default(cuid())
+  bookingRef       String            @unique @default(cuid())
+  patientId        String
+  doctorId         String
+  type             AppointmentType
+  status           AppointmentStatus @default(PENDING)
+  scheduledAt      DateTime
+  durationMinutes  Int               @default(30)
+  locationId       String?
+  notes            String?
+  amount           Decimal?          @db.Decimal(10, 2)
+  walletTxId       String?
+  orgWalletCharged Boolean           @default(false)
+  cancelReason     String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  patient      PatientProfile         @relation(fields: [patientId], references: [id])
+  doctor       DoctorProfile          @relation(fields: [doctorId], references: [id])
+  statusLogs   AppointmentStatusLog[]
+  videoMeeting VideoMeeting?
+  prescription Prescription?
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([type])
+}
+
+model AppointmentStatusLog {
+  id            String            @id @default(cuid())
+  appointmentId String
+  status        AppointmentStatus
+  reason        String?
+  performedBy   String?
+  createdAt     DateTime          @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId])
+}
+
+// ─── Zoom / Video Consultation ────────────────────────────────────────────────
+
+model ZoomHost {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  zoomUserId   String
+  accountId    String
+  clientId     String
+  clientSecret String
+  isActive     Boolean  @default(true)
+  currentLoad  Int      @default(0)
+  maxLoad      Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  meetings VideoMeeting[]
+
+  @@index([isActive])
+}
+
+model VideoMeeting {
+  id              String          @id @default(cuid())
+  appointmentId   String          @unique
+  zoomHostId      String?
+  meetingId       String          @unique
+  hostUrl         String?
+  joinUrl         String
+  password        String?
+  startTime       DateTime
+  durationMinutes Int
+  status          String          @default("scheduled")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  appointment Appointment            @relation(fields: [appointmentId], references: [id])
+  zoomHost    ZoomHost?              @relation(fields: [zoomHostId], references: [id])
+  recording   ConsultationRecording?
+
+  @@index([appointmentId])
+  @@index([meetingId])
+}
+
+model ConsultationRecording {
+  id              String          @id @default(cuid())
+  videoMeetingId  String          @unique
+  appointmentId   String
+  provider        String          @default("zoom")
+  providerFileId  String?
+  recordingUrl    String?
+  backupUrl       String?
+  fileSize        BigInt?
+  durationSeconds Int?
+  status          RecordingStatus @default(PENDING)
+  retentionDate   DateTime?
+  downloadedAt    DateTime?
+  backedUpAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  videoMeeting VideoMeeting         @relation(fields: [videoMeetingId], references: [id])
+  accessLogs   RecordingAccessLog[]
+
+  @@index([appointmentId])
+  @@index([status])
+}
+
+model RecordingAccessLog {
+  id           String   @id @default(cuid())
+  recordingId  String
+  accessedBy   String
+  accessReason String?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+
+  recording ConsultationRecording @relation(fields: [recordingId], references: [id])
+
+  @@index([recordingId])
+  @@index([accessedBy])
+}
+
+// ─── Dispensary ───────────────────────────────────────────────────────────────
+
+model Dispensary {
+  id        String    @id @default(cuid())
+  name      String
+  address   String?
+  phone     String?
+  email     String?
+  logoUrl   String?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  staff    DispensaryStaff[]
+  products Product[]
+  orders   Order[]
+
+  @@index([isActive])
+}
+
+model DispensaryStaff {
+  id           String   @id @default(cuid())
+  dispensaryId String
+  userId       String
+  role         String   @default("staff")
+  createdAt    DateTime @default(now())
+
+  dispensary Dispensary @relation(fields: [dispensaryId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@unique([dispensaryId, userId])
+  @@index([dispensaryId])
+  @@index([userId])
+}
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  parentId    String?
+  description String?
+  imageUrl    String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  parent   ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children ProductCategory[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([slug])
+  @@index([parentId])
+}
+
+model Product {
+  id                   String    @id @default(cuid())
+  dispensaryId         String
+  categoryId           String?
+  sku                  String    @unique
+  name                 String
+  description          String?
+  imageUrl             String?
+  price                Decimal   @db.Decimal(10, 2)
+  stockQuantity        Int       @default(0)
+  requiresPrescription Boolean   @default(false)
+  isActive             Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
+
+  dispensary        Dispensary       @relation(fields: [dispensaryId], references: [id])
+  category          ProductCategory? @relation(fields: [categoryId], references: [id])
+  orderItems        OrderItem[]
+  prescriptionItems PrescriptionItem[]
+
+  @@index([sku])
+  @@index([dispensaryId])
+  @@index([categoryId])
+  @@index([requiresPrescription])
+  @@index([isActive])
+}
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+
+model Order {
+  id              String      @id @default(cuid())
+  orderRef        String      @unique @default(cuid())
+  patientId       String
+  dispensaryId    String
+  prescriptionId  String?
+  status          OrderStatus @default(PENDING)
+  subtotal        Decimal     @db.Decimal(12, 2)
+  deliveryFee     Decimal     @default(0) @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(12, 2)
+  walletTxId      String?
+  paymentMethod   String      @default("wallet")
+  deliveryAddress String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  patient      PatientProfile   @relation(fields: [patientId], references: [id])
+  dispensary   Dispensary       @relation(fields: [dispensaryId], references: [id])
+  prescription Prescription?    @relation(fields: [prescriptionId], references: [id])
+  items        OrderItem[]
+  statusLogs   OrderStatusLog[]
+
+  @@index([patientId])
+  @@index([dispensaryId])
+  @@index([status])
+  @@index([prescriptionId])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  unitPrice Decimal  @db.Decimal(10, 2)
+  subtotal  Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderStatusLog {
+  id          String      @id @default(cuid())
+  orderId     String
+  status      OrderStatus
+  note        String?
+  performedBy String?
+  createdAt   DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+// ─── Prescription ─────────────────────────────────────────────────────────────
+
+model Prescription {
+  id            String    @id @default(cuid())
+  appointmentId String    @unique
+  doctorId      String
+  patientUserId String
+  diagnosis     String?
+  notes         String?
+  isDispensed   Boolean   @default(false)
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  appointment Appointment        @relation(fields: [appointmentId], references: [id])
+  doctor      DoctorProfile      @relation(fields: [doctorId], references: [id])
+  items       PrescriptionItem[]
+  orders      Order[]
+
+  @@index([doctorId])
+  @@index([patientUserId])
+}
+
+model PrescriptionItem {
+  id             String    @id @default(cuid())
+  prescriptionId String
+  productId      String?
+  medicationName String
+  dosage         String?
+  frequency      String?
+  duration       String?
+  quantity       Int?
+  instructions   String?
+  createdAt      DateTime  @default(now())
+
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  product      Product?     @relation(fields: [productId], references: [id])
+
+  @@index([prescriptionId])
+}
+
+// ─── Mobile Medic ─────────────────────────────────────────────────────────────
+
+model MobileMedicRequest {
+  id          String    @id @default(cuid())
+  patientId   String
+  providerId  String?
+  scheduledAt DateTime?
+  address     String
+  serviceType String
+  status      String    @default("pending")
+  notes       String?
+  amount      Decimal?  @db.Decimal(10, 2)
+  walletTxId  String?
+  completedAt DateTime?
+  reportNotes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  patient PatientProfile @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  channel   NotificationChannel @default(IN_APP)
+  isRead    Boolean             @default(false)
+  readAt    DateTime?
+  metadata  Json?
+  createdAt DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  oldValue   Json?
+  newValue   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([resource])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ─── Platform Settings ────────────────────────────────────────────────────────
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  category  String   @default("general")
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
