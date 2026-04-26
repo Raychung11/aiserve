@@ -1,4 +1,4 @@
-import type { NextConfig } from 'next';
+/** @type {import('next').NextConfig} */
 
 const securityHeaders = [
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
@@ -24,7 +24,7 @@ const securityHeaders = [
   },
 ];
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.amazonaws.com' },
