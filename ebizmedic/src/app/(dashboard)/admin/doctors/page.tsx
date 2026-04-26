@@ -72,7 +72,7 @@ async function DoctorTable({ search, page }: { search: string; page: number }) {
                 <td className="px-4 py-3 text-gray-500">
                   {doc.specialties[0]?.specialty ?? '—'}
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-gray-500">{doc.licenseNumber}</td>
+                <td className="px-4 py-3 font-mono text-xs text-gray-500">{doc.licenseNo ?? '—'}</td>
                 <td className="px-4 py-3 text-gray-500">{doc._count.appointments}</td>
                 <td className="px-4 py-3 text-gray-500">{formatDate(doc.createdAt)}</td>
                 <td className="px-4 py-3">
