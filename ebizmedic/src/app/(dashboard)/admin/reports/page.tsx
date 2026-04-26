@@ -9,8 +9,27 @@ export default async function AdminReportsPage() {
 
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+  // Top doctors: group appointments by doctorId, then fetch profiles for top 5
+  const topDoctorCounts = await prisma.appointment.groupBy({
+    by: ['doctorId'],
+    _count: { id: true },
+    orderBy: { _count: { id: 'desc' } },
+    take: 5,
+  });
+  const topDoctorIds = topDoctorCounts.map(d => d.doctorId);
+  const topDoctorProfiles = await prisma.doctorProfile.findMany({
+    where: { id: { in: topDoctorIds } },
+    select: {
+      id: true,
+      user: { select: { name: true } },
+      specialties: { where: { isPrimary: true }, take: 1 },
+    },
+  });
+  const topDoctors = topDoctorCounts.map(d => ({
+    count: d._count.id,
+    ...topDoctorProfiles.find(p => p.id === d.doctorId)!,
+  })).filter(d => d.user);
 
   const [
     totalOrgs,
@@ -25,7 +44,6 @@ export default async function AdminReportsPage() {
     ordersThisMonth,
     recentTransactions,
     bookingsByType,
-    topDoctors,
   ] = await Promise.all([
     prisma.organisation.count({ where: { deletedAt: null } }),
     prisma.organisation.count({ where: { deletedAt: null, isActive: true } }),
@@ -46,15 +64,6 @@ export default async function AdminReportsPage() {
       by: ['type'],
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } },
-    }),
-    prisma.doctorProfile.findMany({
-      orderBy: { _count: { appointments: 'desc' } },
-      take: 5,
-      select: {
-        user: { select: { name: true } },
-        specialties: { where: { isPrimary: true }, take: 1 },
-        _count: { select: { appointments: true } },
-      },
     }),
   ]);
 
@@ -137,7 +146,7 @@ export default async function AdminReportsPage() {
                   <p className="text-sm font-medium text-gray-900">Dr. {doc.user.name}</p>
                   <p className="text-xs text-gray-400">{doc.specialties[0]?.specialty ?? 'General'}</p>
                 </div>
-                <span className="text-sm font-semibold text-gray-900">{doc._count.appointments} bookings</span>
+                <span className="text-sm font-semibold text-gray-900">{doc.count} bookings</span>
               </div>
             ))}
             {topDoctors.length === 0 && (
