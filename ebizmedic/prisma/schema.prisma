@@ -275,6 +275,8 @@ model DoctorLeave {
   reason    String?
   createdAt DateTime @default(now())
 
+  doctor DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
   @@index([doctorId])
   @@index([startDate, endDate])
 }
