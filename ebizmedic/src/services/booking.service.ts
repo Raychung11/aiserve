@@ -48,13 +48,9 @@ export class BookingService {
       // For visual consultation, ensure Zoom host is available
       let zoomHostId: string | undefined;
       if (params.type === 'VISUAL_CONSULTATION') {
-        const host = await tx.zoomHost.findFirst({
-          where: { isActive: true, currentLoad: { lt: tx.zoomHost.fields.maxLoad } },
-        });
-
-        // Fallback: find any active host not at capacity
-        const availableHost = await tx.$queryRaw<Array<{ id: string; current_load: number; max_load: number }>>`
-          SELECT id, current_load, max_load
+        // Row-level lock to safely claim a host slot under concurrent requests
+        const availableHost = await tx.$queryRaw<Array<{ id: string }>>`
+          SELECT id
           FROM "ZoomHost"
           WHERE is_active = true AND current_load < max_load
           LIMIT 1
@@ -62,7 +58,7 @@ export class BookingService {
         `;
 
         if (availableHost.length === 0) {
-          throw new Error('No video consultation host available. Please choose a different time.');
+          throw new Error('No video consultation host available at this time. Please choose a different time slot.');
         }
         zoomHostId = availableHost[0].id;
       }

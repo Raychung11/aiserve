@@ -4,11 +4,19 @@ import { prisma } from '@/lib/db';
 import { signToken } from '@/lib/jwt';
 import { loginSchema } from '@/lib/validations';
 import { fail } from '@/lib/utils';
+import { rateLimit } from '@/lib/rate-limit';
 import { getDashboardPath } from '@/types/roles';
 import type { UserRole } from '@/types';
 
 export async function POST(req: NextRequest) {
   try {
+    // 10 login attempts per 15 minutes per IP
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+    const limit = rateLimit(`login:${ip}`, { windowMs: 15 * 60 * 1000, max: 10 });
+    if (!limit.allowed) {
+      return fail('Too many login attempts. Please try again in 15 minutes.', 429);
+    }
+
     const body = await req.json();
     const { email, password } = loginSchema.parse(body);
 
