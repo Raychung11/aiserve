@@ -193,14 +193,14 @@ export class WalletService {
 
   // Row-level lock to prevent race conditions
   private async lockWallet(tx: TxClient, walletId: string) {
-    const wallets = await tx.$queryRaw<Array<{ id: string; balance: Prisma.Decimal; is_active: boolean }>>`
-      SELECT id, balance, is_active
+    const wallets = await tx.$queryRaw<Array<{ id: string; balance: Prisma.Decimal; isActive: boolean }>>`
+      SELECT id, balance, "isActive"
       FROM "OrganisationWallet"
       WHERE id = ${walletId}
       FOR UPDATE
     `;
     if (wallets.length === 0) throw new Error('Wallet not found');
-    return { ...wallets[0], isActive: wallets[0].is_active };
+    return wallets[0];
   }
 }
 

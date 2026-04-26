@@ -52,7 +52,7 @@ export class BookingService {
         const availableHost = await tx.$queryRaw<Array<{ id: string }>>`
           SELECT id
           FROM "ZoomHost"
-          WHERE is_active = true AND current_load < max_load
+          WHERE "isActive" = true AND "currentLoad" < "maxLoad"
           LIMIT 1
           FOR UPDATE SKIP LOCKED
         `;
