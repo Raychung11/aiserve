@@ -44,10 +44,22 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
 
     const { name, registrationNo, industry, address, city, state, phone, email, logoUrl } = body as Record<string, string>;
+    const isActive = 'isActive' in body ? (body.isActive as boolean) : undefined;
 
     const updated = await prisma.organisation.update({
       where: { id: params.id },
-      data: { name, registrationNo, industry, address, city, state, phone, email, logoUrl },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(registrationNo !== undefined && { registrationNo }),
+        ...(industry !== undefined && { industry }),
+        ...(address !== undefined && { address }),
+        ...(city !== undefined && { city }),
+        ...(state !== undefined && { state }),
+        ...(phone !== undefined && { phone }),
+        ...(email !== undefined && { email }),
+        ...(logoUrl !== undefined && { logoUrl }),
+        ...(isActive !== undefined && { isActive }),
+      },
     });
 
     await auditLog({

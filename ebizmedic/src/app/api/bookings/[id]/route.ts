@@ -40,7 +40,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const user = await requireAuth();
-    const body = await req.json() as { action: string; reason?: string };
+    const body = await req.json() as { action?: string; status?: string; reason?: string };
+
+    // Support direct status mapping
+    if (!body.action && body.status) {
+      const map: Record<string, string> = {
+        CONFIRMED: 'confirm',
+        COMPLETED: 'complete',
+        CANCELLED: 'cancel',
+        NO_SHOW: 'no_show',
+      };
+      body.action = map[body.status] ?? body.status.toLowerCase();
+    }
 
     if (body.action === 'cancel') {
       const appointment = await bookingService.cancel({
@@ -70,6 +81,18 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         appointmentId: params.id,
         status: 'COMPLETED',
         performedBy: user.id,
+      });
+      return ok(appointment);
+    }
+
+    if (body.action === 'no_show') {
+      await requireAuth(['SUPER_ADMIN', 'DOCTOR']);
+      const appointment = await prisma.appointment.update({
+        where: { id: params.id },
+        data: { status: 'NO_SHOW' },
+      });
+      await prisma.appointmentStatusLog.create({
+        data: { appointmentId: params.id, status: 'NO_SHOW', performedBy: user.id },
       });
       return ok(appointment);
     }
