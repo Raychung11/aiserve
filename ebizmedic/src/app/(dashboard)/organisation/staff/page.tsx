@@ -23,7 +23,7 @@ export default async function StaffPage() {
     include: {
       user: { select: { id: true, name: true, email: true, phone: true } },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { joinedAt: 'desc' },
   });
 
   return (

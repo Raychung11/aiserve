@@ -25,7 +25,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     const staff = await prisma.organisationStaff.findMany({
       where: { organisationId: params.id, user: { deletedAt: null } },
       include: { user: { select: { id: true, name: true, email: true, phone: true, avatarUrl: true } } },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { joinedAt: 'desc' },
     });
 
     return ok(staff);
