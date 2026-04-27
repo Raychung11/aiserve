@@ -1,43 +1,43 @@
-# AiServe ESG OS — Apache URL Rewriting
-# Upload to public_html/ on Hostinger
-# Enables clean URLs: /dashboard instead of /index.php?page=dashboard
-
 Options -Indexes
-Options +FollowSymLinks
 
+# Block direct access to sensitive directories
 RewriteEngine On
 
-# Base path — update if installed in a subdirectory
-# e.g. if installed at yourdomain.com/esg/ use: RewriteBase /esg/
-RewriteBase /
+# Protect config, src, db, includes directories
+RewriteRule ^config/ - [F,L]
+RewriteRule ^src/ - [F,L]
+RewriteRule ^db/ - [F,L]
+RewriteRule ^includes/ - [F,L]
 
-# Route everything to index.php EXCEPT real files and directories (CSS, JS, images, etc.)
+# Block direct access to uploaded documents (served via PHP download handler)
+RewriteRule ^uploads/documents/ - [F,L]
+
+# Allow direct access to real files and directories (assets)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Route everything else through index.php
+RewriteRule ^ index.php [QSA,L]
 
 # Security headers
 <IfModule mod_headers.c>
-  Header always set X-Content-Type-Options nosniff
-  Header always set X-Frame-Options SAMEORIGIN
-  Header always set X-XSS-Protection "1; mode=block"
-  Header always set Referrer-Policy strict-origin-when-cross-origin
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# Protect sensitive files from direct browser access
-<FilesMatch "\.(sql|log|env|lock)$">
-  Require all denied
+# Deny access to hidden files (e.g. .env, .git)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
 </FilesMatch>
 
-# Block direct access to backend directories
-RewriteRule ^(config|src|includes|db)(/|$) - [F,L]
-
-# PHP settings for Hostinger
-<IfModule mod_php8.c>
-  php_value upload_max_filesize 20M
-  php_value post_max_size 20M
-  php_value max_execution_time 60
-  php_value memory_limit 256M
-  php_flag display_errors Off
-  php_flag log_errors On
+# PHP settings for shared hosting
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 60
+    php_value session.cookie_httponly 1
+    php_value session.use_strict_mode 1
 </IfModule>

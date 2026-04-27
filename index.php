@@ -1,102 +1,69 @@
 <?php
-/**
- * AiServe ESG OS — Main Router
- * Handles all page routing for Hostinger deployment
- *
- * URL format: /?page=dashboard (query-string mode — no .htaccess needed)
- * With .htaccess: /dashboard (clean URLs)
- */
+define('ROOT_PATH', __DIR__);
 
-require_once __DIR__ . '/config/app.php';
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/src/Database.php';
-require_once __DIR__ . '/src/Auth.php';
+require_once ROOT_PATH.'/config/app.php';
+require_once ROOT_PATH.'/config/database.php';
+require_once ROOT_PATH.'/config/billplz.php';
+require_once ROOT_PATH.'/src/Database.php';
+require_once ROOT_PATH.'/src/Auth.php';
+require_once ROOT_PATH.'/src/ActivityLog.php';
+require_once ROOT_PATH.'/src/ComplianceEngine.php';
+require_once ROOT_PATH.'/src/ROIEngine.php';
+require_once ROOT_PATH.'/src/StrategyEngine.php';
+require_once ROOT_PATH.'/src/BillplzService.php';
 
-Auth::startSession();
+Auth::start();
 
-// Determine the requested page from URL
-// Supports both /page-name (via .htaccess rewrite) and /?page=name
-$requestUri   = $_SERVER['REQUEST_URI'] ?? '/';
-$scriptName   = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
-$basePath     = rtrim(dirname($scriptName), '/');
-$path         = str_replace($basePath, '', parse_url($requestUri, PHP_URL_PATH) ?? '/');
-$path         = '/' . trim($path, '/');
-
-// Extract page name from path or query string
-if ($path !== '/' && $path !== '') {
-    $page = ltrim($path, '/');
-    // Convert path params: /data-entry?cat=environment → data-entry
-    $page = explode('/', $page)[0];
-} else {
-    $page = $_GET['page'] ?? '';
-}
-
-// Normalize page name: replace hyphens and map aliases
-$page = strtolower(preg_replace('/[^a-z0-9_-]/', '', $page));
-
-// Route table: page slug → file path
+// Parse path
+$requestUri  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$scriptDir   = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+$path        = substr($requestUri, strlen($scriptDir));
+$path        = trim($path, '/');
+// Route map: URL segment => page file
 $routes = [
-    ''             => 'pages/dashboard.php',
-    'dashboard'    => 'pages/dashboard.php',
-    'login'        => 'pages/login.php',
-    'register'     => 'pages/register.php',
-    'logout'       => null, // handled below
-    'onboarding'   => 'pages/onboarding.php',
-    'data-entry'   => 'pages/data_entry.php',
-    'data_entry'   => 'pages/data_entry.php',
-    'gap-analysis' => 'pages/gap_analysis.php',
-    'gap_analysis' => 'pages/gap_analysis.php',
-    'reports'      => 'pages/reports.php',
-    'companies'    => 'pages/companies.php',
+    ''               => 'pages/landing.php',
+    'dashboard'      => 'pages/dashboard.php',
+    'login'          => 'pages/login.php',
+    'register'       => 'pages/register.php',
+    'logout'         => 'pages/logout.php',
+    'properties'     => 'pages/properties.php',
+    'revenue'        => 'pages/revenue.php',
+    'tenancies'      => 'pages/tenancies.php',
+    'agents'         => 'pages/agents.php',
+    'investment'              => 'pages/investment.php',
+    'subscription'            => 'pages/subscription.php',
+    'roi-calculator'          => 'pages/roi_calculator.php',
+    'owners'                  => 'pages/owners.php',
+    'owner-portal'            => 'pages/owner_portal.php',
+    'owner-documents'         => 'pages/owner_documents.php',
+    'owner-document-download' => 'pages/owner_document_download.php',
+    'renters'                 => 'pages/renters.php',
+    'rent-payments'           => 'pages/rent_payments.php',
+    'einvoice'                => 'pages/einvoice.php',
+    'cp58'                    => 'pages/cp58.php',
+    'str-report'              => 'pages/str_report.php',
 ];
 
-// Handle logout
-if ($page === 'logout') {
-    require_once __DIR__ . '/src/Company.php';
-    require_once __DIR__ . '/src/ESGDataManager.php';
-    require_once __DIR__ . '/src/GapAnalyzer.php';
-    require_once __DIR__ . '/src/ReportGenerator.php';
-    Auth::logout();
-    header('Location: ' . APP_URL . '/login');
-    exit;
-}
+$page = $routes[$path] ?? null;
 
-// Resolve file
-if (isset($routes[$page])) {
-    $file = __DIR__ . '/' . $routes[$page];
-    if (file_exists($file)) {
-        require_once $file;
-        exit;
-    }
+if ($page && file_exists(ROOT_PATH.'/'.$page)) {
+    require_once ROOT_PATH.'/'.$page;
+} else {
+    http_response_code(404);
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head><meta charset="UTF-8"><title>404 — Roomee</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    </head>
+    <body class="d-flex align-items-center justify-content-center" style="min-height:100vh;background:#f8fafc;">
+    <div class="text-center">
+      <div style="font-size:4rem;">🏠</div>
+      <h2 class="fw-bold mt-3">Page Not Found</h2>
+      <p class="text-muted">The page you're looking for doesn't exist.</p>
+      <a href="<?= APP_URL ?>/dashboard" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+    </body>
+    </html>
+    <?php
 }
-
-// Redirect root to dashboard or login
-if ($page === '' || $page === 'index') {
-    if (Auth::check()) {
-        header('Location: ' . APP_URL . '/dashboard');
-    } else {
-        header('Location: ' . APP_URL . '/login');
-    }
-    exit;
-}
-
-// 404
-http_response_code(404);
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 — AiServe ESG OS</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-  <div class="text-center">
-    <div style="font-size:60px">🌿</div>
-    <h1 class="fw-bold mt-3">Page Not Found</h1>
-    <p class="text-muted">The page "<?= htmlspecialchars($page) ?>" doesn't exist.</p>
-    <a href="<?= APP_URL ?>/dashboard" class="btn btn-success mt-2">Go to Dashboard</a>
-  </div>
-</body>
-</html>

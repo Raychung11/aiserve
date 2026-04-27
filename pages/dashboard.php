@@ -1,325 +1,162 @@
 <?php
 require_once __DIR__ . '/../includes/auth_check.php';
-$pageTitle = 'Dashboard';
+$pageTitle    = 'Dashboard';
+$pageSubtitle = 'Portfolio overview for ' . date('F Y');
+$activePage   = 'dashboard';
+$period       = date('Y-m');
 
-// Redirect to onboarding if no active company
-if (!$activeCompany) {
-    header('Location: ' . APP_URL . '/onboarding');
-    exit;
-}
+// KPIs
+$totalRevenue  = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND period=? AND type="income"',  [$_tenantId, $period])['s'] ?? 0);
+$totalExpenses = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND period=? AND type="expense"', [$_tenantId, $period])['s'] ?? 0);
+$netProfit     = $totalRevenue - $totalExpenses;
 
-$framework  = $activeCompany['framework'];
-$period     = $activeCompany['reporting_year'];
-$stats      = ESGDataManager::getCompletionStats($activeCompanyId, $framework, $period);
-$overall    = ESGDataManager::calcOverallScore($stats);
-$scoreInfo  = ESGDataManager::scoreLabel($overall);
+$properties      = Database::fetchAll('SELECT * FROM properties WHERE tenant_id=? AND deleted_at IS NULL', [$_tenantId]);
+$activeProps     = count(array_filter($properties, fn($p) => $p['listing_status'] === 'active'));
 
-// Get or generate gap analysis (use cached if < 1 hour old)
-$gapResult  = GapAnalyzer::loadCached($activeCompanyId, $framework, $period);
-if (!$gapResult) {
-    $gapResult = GapAnalyzer::analyze($activeCompanyId, $framework, $period);
-}
+$complianceSummary = ['green'=>0,'amber'=>0,'red'=>0];
+foreach ($properties as $p) { $complianceSummary[$p['compliance_status']] = ($complianceSummary[$p['compliance_status']] ?? 0) + 1; }
 
-$criticalGaps = count(array_filter($gapResult['gaps'] ?? [], fn($g) => $g['priority'] === 'critical'));
-$highGaps     = count(array_filter($gapResult['gaps'] ?? [], fn($g) => $g['priority'] === 'high'));
-$quickWins    = array_slice($gapResult['quick_wins'] ?? [], 0, 5);
-$finOps       = $gapResult['financing_ops'] ?? [];
-
-// Recent reports
-$recentReports = Database::fetchAll(
-    'SELECT * FROM reports WHERE company_id = ? ORDER BY generated_at DESC LIMIT 3',
-    [$activeCompanyId]
+// Expiring leases (within 30 days)
+$expiringLeases = Database::fetchAll(
+    'SELECT t.*, p.name AS property_name FROM tenancies t
+     LEFT JOIN properties p ON p.id = t.property_id
+     WHERE t.tenant_id=? AND t.status="active"
+       AND t.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+       AND t.deleted_at IS NULL
+     ORDER BY t.end_date ASC LIMIT 5',
+    [$_tenantId]
 );
 
-include __DIR__ . '/../includes/header.php';
+// Recent entries
+$recentEntries = Database::fetchAll(
+    'SELECT r.*, p.name AS property_name FROM revenue_entries r
+     LEFT JOIN properties p ON p.id = r.property_id
+     WHERE r.tenant_id=? ORDER BY r.created_at DESC LIMIT 5',
+    [$_tenantId]
+);
+
+// 6-month chart data
+$chartLabels = $chartIncome = $chartExpense = [];
+for ($i = 5; $i >= 0; $i--) {
+    $p   = date('Y-m', strtotime("-$i months"));
+    $lbl = date('M Y', strtotime("-$i months"));
+    $inc = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND period=? AND type="income"',  [$_tenantId,$p])['s'] ?? 0);
+    $exp = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND period=? AND type="expense"', [$_tenantId,$p])['s'] ?? 0);
+    $chartLabels[]  = $lbl;
+    $chartIncome[]  = $inc;
+    $chartExpense[] = $exp;
+}
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="app-layout">
-  <?php include __DIR__ . '/../includes/sidebar.php'; ?>
-
-  <div class="main-content">
-    <!-- Top bar -->
-    <div class="topbar">
-      <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
-      <div class="topbar-title">
-        <h1><?= htmlspecialchars($activeCompany['name']) ?></h1>
-        <span class="topbar-subtitle">ESG Dashboard — <?= $period ?></span>
+<div class="row g-3 mb-4">
+  <?php foreach([
+    ['Monthly Revenue','RM '.number_format($totalRevenue,0),'bi-cash-stack','#dbeafe','#2563eb',''],
+    ['Net Profit','RM '.number_format(abs($netProfit),0),'bi-graph-up-arrow',$netProfit>=0?'#dcfce7':'#fee2e2',$netProfit>=0?'#16a34a':'#dc2626',$netProfit<0?' text-danger':' text-success'],
+    ['Active Units',$activeProps.' / '.count($properties),'bi-buildings','#ede9fe','#7c3aed',''],
+    ['Expiry Alerts',count($expiringLeases),'bi-bell-fill','#fef9c3','#ca8a04',count($expiringLeases)>0?' text-warning':''],
+  ] as [$lbl,$val,$icon,$bg,$color,$cls]): ?>
+  <div class="col-sm-6 col-xl-3">
+    <div class="card-box">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="stat-label"><?= $lbl ?></span>
+        <div style="width:42px;height:42px;border-radius:10px;background:<?= $bg ?>;color:<?= $color ?>;display:flex;align-items:center;justify-content:center;font-size:1.25rem;">
+          <i class="bi <?= $icon ?>"></i>
+        </div>
       </div>
-      <div class="topbar-actions">
-        <span class="framework-pill"><?= $framework === 'BURSA_SEDG' ? 'Bursa SEDG' : ($framework === 'GRI' ? 'GRI' : 'SEDG + GRI') ?></span>
-        <a href="<?= url('reports') ?>?action=generate" class="btn btn-primary btn-sm">
-          <i class="bi bi-file-earmark-plus me-1"></i>Generate Report
-        </a>
-      </div>
+      <div class="stat-value<?= $cls ?>"><?= $val ?></div>
+      <div class="text-muted" style="font-size:.75rem;"><?= $lbl === 'Monthly Revenue' ? $period : '' ?></div>
     </div>
-
-    <?php if (isset($_GET['welcome'])): ?>
-    <div class="alert alert-success alert-dismissible fade show mx-4 mt-3" role="alert">
-      <i class="bi bi-party-popper-fill me-2"></i>
-      <strong>Welcome to AiServe ESG OS!</strong> Your dashboard is ready. Start by entering your ESG data below.
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    <?php endif; ?>
-
-    <div class="content-body">
-
-      <!-- ESG Score Cards Row -->
-      <div class="row g-3 mb-4">
-        <!-- Overall Score -->
-        <div class="col-lg-3 col-md-6">
-          <div class="score-card score-overall" style="--score-color: <?= $scoreInfo['color'] ?>">
-            <div class="score-card-icon"><i class="bi bi-award"></i></div>
-            <div class="score-card-body">
-              <div class="score-num"><?= $overall ?>%</div>
-              <div class="score-label">Overall ESG Score</div>
-              <div class="score-rating"><?= $scoreInfo['label'] ?></div>
-            </div>
-            <div class="score-donut">
-              <canvas id="overallDonut" width="60" height="60"></canvas>
-            </div>
-          </div>
-        </div>
-        <!-- Environment -->
-        <div class="col-lg-3 col-md-6">
-          <div class="score-card score-env">
-            <div class="score-card-icon"><i class="bi bi-tree"></i></div>
-            <div class="score-card-body">
-              <div class="score-num text-success"><?= $stats['ENVIRONMENT']['score'] ?>%</div>
-              <div class="score-label">Environment</div>
-              <div class="score-sub"><?= $stats['ENVIRONMENT']['completed'] ?>/<?= $stats['ENVIRONMENT']['total'] ?> indicators</div>
-            </div>
-            <div class="score-bar-wrap">
-              <div class="score-bar"><div class="score-bar-fill bg-success" style="width:<?= $stats['ENVIRONMENT']['score'] ?>%"></div></div>
-            </div>
-          </div>
-        </div>
-        <!-- Social -->
-        <div class="col-lg-3 col-md-6">
-          <div class="score-card score-social">
-            <div class="score-card-icon"><i class="bi bi-people"></i></div>
-            <div class="score-card-body">
-              <div class="score-num text-info"><?= $stats['SOCIAL']['score'] ?>%</div>
-              <div class="score-label">Social</div>
-              <div class="score-sub"><?= $stats['SOCIAL']['completed'] ?>/<?= $stats['SOCIAL']['total'] ?> indicators</div>
-            </div>
-            <div class="score-bar-wrap">
-              <div class="score-bar"><div class="score-bar-fill bg-info" style="width:<?= $stats['SOCIAL']['score'] ?>%"></div></div>
-            </div>
-          </div>
-        </div>
-        <!-- Governance -->
-        <div class="col-lg-3 col-md-6">
-          <div class="score-card score-gov">
-            <div class="score-card-icon"><i class="bi bi-shield-check"></i></div>
-            <div class="score-card-body">
-              <div class="score-num text-purple"><?= $stats['GOVERNANCE']['score'] ?>%</div>
-              <div class="score-label">Governance</div>
-              <div class="score-sub"><?= $stats['GOVERNANCE']['completed'] ?>/<?= $stats['GOVERNANCE']['total'] ?> indicators</div>
-            </div>
-            <div class="score-bar-wrap">
-              <div class="score-bar"><div class="score-bar-fill bg-purple" style="width:<?= $stats['GOVERNANCE']['score'] ?>%"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Charts + Gap Summary Row -->
-      <div class="row g-3 mb-4">
-        <!-- Radar chart -->
-        <div class="col-lg-4">
-          <div class="card h-100">
-            <div class="card-header">
-              <h5 class="card-title"><i class="bi bi-radar me-2 text-success"></i>ESG Profile</h5>
-            </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <canvas id="esgRadar" width="280" height="280"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gap summary -->
-        <div class="col-lg-4">
-          <div class="card h-100">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="card-title mb-0"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Gap Summary</h5>
-              <a href="<?= url('gap-analysis') ?>" class="btn btn-sm btn-outline-primary">View All</a>
-            </div>
-            <div class="card-body">
-              <div class="gap-stat gap-critical">
-                <div class="gap-count"><?= $criticalGaps ?></div>
-                <div class="gap-label">Critical Gaps</div>
-              </div>
-              <div class="gap-stat gap-high">
-                <div class="gap-count"><?= $highGaps ?></div>
-                <div class="gap-label">High Priority</div>
-              </div>
-              <div class="gap-stat gap-total">
-                <div class="gap-count"><?= $gapResult['gaps_count'] ?? 0 ?></div>
-                <div class="gap-label">Total Gaps</div>
-              </div>
-              <div class="mt-3">
-                <div class="d-flex justify-content-between small mb-1">
-                  <span>Completion Progress</span>
-                  <strong><?= $gapResult['completed'] ?? 0 ?>/<?= $gapResult['total_indicators'] ?? 0 ?></strong>
-                </div>
-                <div class="progress" style="height:12px">
-                  <div class="progress-bar bg-success" style="width:<?= $overall ?>%" title="<?= $overall ?>%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick wins -->
-        <div class="col-lg-4">
-          <div class="card h-100">
-            <div class="card-header">
-              <h5 class="card-title"><i class="bi bi-lightning-fill me-2 text-warning"></i>Quick Wins</h5>
-            </div>
-            <div class="card-body p-0">
-              <?php if (empty($quickWins)): ?>
-              <div class="text-center py-4 text-success">
-                <i class="bi bi-check-circle-fill fs-2"></i>
-                <p class="mt-2 mb-0">All quick wins completed!</p>
-              </div>
-              <?php else: ?>
-              <ul class="quick-win-list">
-                <?php foreach ($quickWins as $qw): ?>
-                <li class="quick-win-item">
-                  <div class="qw-code"><?= htmlspecialchars($qw['indicator']['code']) ?></div>
-                  <div class="qw-body">
-                    <div class="qw-name"><?= htmlspecialchars($qw['indicator']['name']) ?></div>
-                    <div class="qw-effort"><i class="bi bi-clock me-1"></i><?= $qw['effort'] ?></div>
-                  </div>
-                  <a href="<?= url('data-entry') ?>?cat=<?= strtolower($qw['indicator']['category']) ?>&focus=<?= $qw['indicator']['indicator_id'] ?>"
-                     class="btn btn-xs btn-outline-success">Fix</a>
-                </li>
-                <?php endforeach; ?>
-              </ul>
-              <?php endif; ?>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Financing Opportunities -->
-      <div class="row g-3 mb-4">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="card-title"><i class="bi bi-currency-dollar me-2 text-success"></i>Green Financing Opportunities</h5>
-            </div>
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                  <thead>
-                    <tr>
-                      <th>Programme</th>
-                      <th>Benefit</th>
-                      <th>Status</th>
-                      <th>Action Required</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php foreach ($finOps as $op): ?>
-                    <tr>
-                      <td><strong><?= htmlspecialchars($op['name']) ?></strong></td>
-                      <td><?= htmlspecialchars($op['benefit']) ?></td>
-                      <td>
-                        <?php if ($op['status'] === 'eligible'): ?>
-                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Eligible Now</span>
-                        <?php else: ?>
-                        <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>Action Required</span>
-                        <?php endif; ?>
-                      </td>
-                      <td class="text-muted small"><?= htmlspecialchars($op['requirement']) ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Data Entry shortcuts -->
-      <div class="row g-3 mb-4">
-        <div class="col-12">
-          <h6 class="text-muted fw-semibold mb-3">CONTINUE DATA ENTRY</h6>
-        </div>
-        <?php
-        $cats = [
-            'environment' => ['label' => 'Environment', 'icon' => 'bi-tree', 'color' => 'success', 'stat' => $stats['ENVIRONMENT']],
-            'social'      => ['label' => 'Social',       'icon' => 'bi-people', 'color' => 'info',   'stat' => $stats['SOCIAL']],
-            'governance'  => ['label' => 'Governance',   'icon' => 'bi-shield-check', 'color' => 'purple', 'stat' => $stats['GOVERNANCE']],
-        ];
-        foreach ($cats as $catKey => $cat):
-            $pct = $cat['stat']['score'];
-        ?>
-        <div class="col-md-4">
-          <a href="<?= url('data-entry') ?>?cat=<?= $catKey ?>" class="data-entry-card">
-            <div class="de-icon text-<?= $cat['color'] ?>"><i class="bi <?= $cat['icon'] ?>"></i></div>
-            <div class="de-body">
-              <div class="de-title"><?= $cat['label'] ?></div>
-              <div class="de-progress">
-                <div class="progress" style="height:6px">
-                  <div class="progress-bar bg-<?= $cat['color'] ?>" style="width:<?= $pct ?>%"></div>
-                </div>
-                <span><?= $cat['stat']['completed'] ?>/<?= $cat['stat']['total'] ?> done</span>
-              </div>
-            </div>
-            <i class="bi bi-chevron-right de-arrow"></i>
-          </a>
-        </div>
-        <?php endforeach; ?>
-      </div>
-
-    </div><!-- /content-body -->
-  </div><!-- /main-content -->
+  </div>
+  <?php endforeach; ?>
 </div>
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="card-box">
+      <h6 class="fw-semibold mb-3">Revenue vs Expenses (Last 6 Months)</h6>
+      <canvas id="revenueChart" height="100"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card-box h-100">
+      <h6 class="fw-semibold mb-3">Compliance Status</h6>
+      <?php foreach([['green','🟢 STR Allowed'],['amber','🟡 Verify Required'],['red','🔴 Not Suitable']] as [$s,$l]): ?>
+      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+        <span style="font-size:.875rem;"><?= $l ?></span>
+        <strong><?= $complianceSummary[$s] ?></strong>
+      </div>
+      <?php endforeach; ?>
+      <div class="d-flex justify-content-between align-items-center py-2">
+        <span class="text-muted" style="font-size:.875rem;">Total</span>
+        <strong><?= count($properties) ?></strong>
+      </div>
+      <a href="<?= APP_URL ?>/properties" class="btn btn-sm btn-outline-secondary w-100 mt-2">View All Properties</a>
+    </div>
+  </div>
+</div>
 
-<script>
-// Radar chart
-const radarCtx = document.getElementById('esgRadar').getContext('2d');
-new Chart(radarCtx, {
-  type: 'radar',
-  data: {
-    labels: ['Environment', 'Social', 'Governance'],
-    datasets: [{
-      label: 'ESG Score (%)',
-      data: [<?= $stats['ENVIRONMENT']['score'] ?>, <?= $stats['SOCIAL']['score'] ?>, <?= $stats['GOVERNANCE']['score'] ?>],
-      backgroundColor: 'rgba(22, 163, 74, 0.15)',
-      borderColor: '#16a34a',
-      pointBackgroundColor: '#16a34a',
-      borderWidth: 2,
-      pointRadius: 5,
-    }]
-  },
-  options: {
-    scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, font: { size: 10 } } } },
-    plugins: { legend: { display: false } },
-    animation: { duration: 800 }
-  }
-});
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card-box">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="fw-semibold mb-0">Expiring Leases</h6>
+        <a href="<?= APP_URL ?>/tenancies" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <?php if(!$expiringLeases): ?>
+        <div class="text-center text-muted py-4"><i class="bi bi-check-circle" style="font-size:1.5rem;"></i><div class="mt-1" style="font-size:.85rem;">No leases expiring soon</div></div>
+      <?php else: foreach($expiringLeases as $l): ?>
+        <?php $daysLeft = (int)((strtotime($l['end_date']) - time()) / 86400); ?>
+        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+          <div>
+            <div class="fw-semibold" style="font-size:.875rem;"><?= htmlspecialchars($l['tenant_name']) ?></div>
+            <div class="text-muted" style="font-size:.75rem;"><?= htmlspecialchars($l['property_name']??'—') ?></div>
+          </div>
+          <div class="text-end">
+            <span class="badge-amber"><?= $daysLeft ?>d left</span>
+            <div class="text-muted" style="font-size:.7rem;"><?= date('d M Y', strtotime($l['end_date'])) ?></div>
+          </div>
+        </div>
+      <?php endforeach; endif; ?>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card-box">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h6 class="fw-semibold mb-0">Recent Transactions</h6>
+        <a href="<?= APP_URL ?>/revenue?action=create" class="btn btn-sm btn-primary">+ Add</a>
+      </div>
+      <?php if(!$recentEntries): ?>
+        <div class="text-center text-muted py-4"><i class="bi bi-inbox" style="font-size:1.5rem;"></i><div class="mt-1" style="font-size:.85rem;">No entries yet</div></div>
+      <?php else: foreach($recentEntries as $e): ?>
+        <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+          <div>
+            <div class="fw-semibold" style="font-size:.875rem;"><?= ucfirst(str_replace('_',' ',$e['category'])) ?></div>
+            <div class="text-muted" style="font-size:.75rem;"><?= htmlspecialchars($e['property_name']??'—') ?> · <?= $e['period'] ?></div>
+          </div>
+          <span class="fw-semibold <?= $e['type']==='income'?'text-success':'text-danger' ?>">
+            <?= $e['type']==='income'?'+':'-' ?>RM <?= number_format($e['amount'],0) ?>
+          </span>
+        </div>
+      <?php endforeach; endif; ?>
+    </div>
+  </div>
+</div>
 
-// Overall donut
-const donutCtx = document.getElementById('overallDonut').getContext('2d');
-new Chart(donutCtx, {
-  type: 'doughnut',
-  data: {
-    datasets: [{
-      data: [<?= $overall ?>, <?= 100 - $overall ?>],
-      backgroundColor: ['<?= $scoreInfo['color'] ?>', '#e2e8f0'],
-      borderWidth: 0,
-    }]
+<?php
+$extraJs = '<script>
+new Chart(document.getElementById("revenueChart"),{
+  type:"bar",
+  data:{
+    labels:' . json_encode($chartLabels) . ',
+    datasets:[
+      {label:"Income",data:' . json_encode($chartIncome) . ',backgroundColor:"#6366f1",borderRadius:4},
+      {label:"Expenses",data:' . json_encode($chartExpense) . ',backgroundColor:"#e2e8f0",borderRadius:4}
+    ]
   },
-  options: {
-    cutout: '72%',
-    plugins: { legend: { display: false }, tooltip: { enabled: false } },
-    animation: { duration: 1000 }
-  }
+  options:{responsive:true,plugins:{legend:{position:"top"}},
+    scales:{y:{beginAtZero:true,ticks:{callback:v=>"RM "+v.toLocaleString()}}}}
 });
-</script>
+</script>';
+require_once __DIR__ . '/../includes/footer.php';

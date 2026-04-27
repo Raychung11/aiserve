@@ -1,182 +1,141 @@
 <?php
-/**
- * Authentication class
- * Handles login, register, session management
- */
 class Auth {
-
-    /**
-     * Start session if not already started
-     */
-    public static function startSession(): void {
+    public static function start(): void {
         if (session_status() === PHP_SESSION_NONE) {
-            session_name(SESSION_NAME);
-            session_set_cookie_params([
-                'lifetime' => SESSION_LIFETIME,
-                'path'     => '/',
-                'secure'   => false, // Set true in production with HTTPS
-                'httponly' => true,
-                'samesite' => 'Lax',
-            ]);
             session_start();
         }
     }
 
-    /**
-     * Register a new user
-     */
-    public static function register(string $name, string $email, string $password, string $role = 'sme_owner'): array {
-        // Validate
-        if (empty($name) || empty($email) || empty($password)) {
-            return ['success' => false, 'message' => 'All fields are required.'];
-        }
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['success' => false, 'message' => 'Invalid email address.'];
-        }
-        if (strlen($password) < 8) {
-            return ['success' => false, 'message' => 'Password must be at least 8 characters.'];
-        }
-        if (!in_array($role, ['admin', 'consultant', 'sme_owner'])) {
-            $role = 'sme_owner';
-        }
-
-        // Check existing
-        $existing = Database::fetchOne('SELECT id FROM users WHERE email = ?', [$email]);
-        if ($existing) {
-            return ['success' => false, 'message' => 'Email already registered.'];
-        }
-
-        $userId = Database::insert('users', [
-            'name'     => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
-            'email'    => strtolower(trim($email)),
-            'password' => password_hash($password, PASSWORD_BCRYPT),
-            'role'     => $role,
-        ]);
-
-        return ['success' => true, 'user_id' => $userId, 'message' => 'Registration successful.'];
-    }
-
-    /**
-     * Login user
-     */
-    public static function login(string $email, string $password): array {
-        $user = Database::fetchOne('SELECT * FROM users WHERE email = ? AND is_active = 1', [strtolower(trim($email))]);
-
-        if (!$user || !password_verify($password, $user['password'])) {
-            return ['success' => false, 'message' => 'Invalid email or password.'];
-        }
-
-        self::startSession();
-        $_SESSION['user_id']   = $user['id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_email']= $user['email'];
-        $_SESSION['user_role'] = $user['role'];
-        $_SESSION['logged_in'] = true;
-
-        // Set active company for SME owners
-        if ($user['role'] === 'sme_owner') {
-            $company = Database::fetchOne(
-                'SELECT c.id FROM companies c
-                 JOIN user_companies uc ON c.id = uc.company_id
-                 WHERE uc.user_id = ? LIMIT 1',
-                [$user['id']]
-            );
-            if ($company) {
-                $_SESSION['active_company_id'] = $company['id'];
-            }
-        }
-
-        Database::insert('activity_log', [
-            'user_id'     => $user['id'],
-            'action'      => 'LOGIN',
-            'description' => 'User logged in',
-            'ip_address'  => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
-        ]);
-
-        return ['success' => true, 'user' => $user, 'message' => 'Login successful.'];
-    }
-
-    /**
-     * Logout user
-     */
-    public static function logout(): void {
-        self::startSession();
-        $userId = $_SESSION['user_id'] ?? null;
-        if ($userId) {
-            Database::insert('activity_log', [
-                'user_id'     => $userId,
-                'action'      => 'LOGOUT',
-                'description' => 'User logged out',
-                'ip_address'  => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
-            ]);
-        }
-        session_unset();
-        session_destroy();
-    }
-
-    /**
-     * Check if user is logged in
-     */
     public static function check(): bool {
-        self::startSession();
-        return !empty($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+        return !empty($_SESSION['user_id']);
     }
 
-    /**
-     * Require authentication — redirect to login if not authenticated
-     */
-    public static function requireAuth(): void {
+    public static function user(): ?array {
+        if (!self::check()) return null;
+        if (!isset($_SESSION['_user_cache'])) {
+            $_SESSION['_user_cache'] = Database::fetchOne(
+                'SELECT u.*, t.name AS tenant_name, t.status AS tenant_status,
+                        t.plan, t.max_properties, t.trial_ends_at, t.subscription_ends_at
+                 FROM users u
+                 LEFT JOIN tenants t ON t.id = u.tenant_id
+                 WHERE u.id = ? AND u.is_active = 1',
+                [$_SESSION['user_id']]
+            );
+        }
+        return $_SESSION['_user_cache'] ?: null;
+    }
+
+    public static function tenantId(): int {
+        return (int) (self::user()['tenant_id'] ?? 0);
+    }
+
+    public static function require(): void {
+        self::start();
         if (!self::check()) {
             header('Location: ' . APP_URL . '/login');
             exit;
         }
+        $user = self::user();
+        if (!$user) {
+            self::logout();
+            header('Location: ' . APP_URL . '/login');
+            exit;
+        }
+        // Check tenant is active
+        if (!in_array($user['tenant_status'], ['active', 'trial'])) {
+            header('Location: ' . APP_URL . '/subscription');
+            exit;
+        }
     }
 
-    /**
-     * Get current user data
-     */
-    public static function user(): ?array {
-        if (!self::check()) return null;
-        return [
-            'id'    => $_SESSION['user_id'],
-            'name'  => $_SESSION['user_name'],
-            'email' => $_SESSION['user_email'],
-            'role'  => $_SESSION['user_role'],
-        ];
+    public static function login(string $email, string $password): array {
+        $user = Database::fetchOne(
+            'SELECT u.*, t.status AS tenant_status FROM users u
+             LEFT JOIN tenants t ON t.id = u.tenant_id
+             WHERE u.email = ? AND u.is_active = 1',
+            [strtolower(trim($email))]
+        );
+        if (!$user || !password_verify($password, $user['password_hash'])) {
+            return ['success' => false, 'error' => 'Invalid email or password.'];
+        }
+        self::start();
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $user['id'];
+        unset($_SESSION['_user_cache']);
+        ActivityLog::record('auth.login', 'User logged in', $user['tenant_id'], $user['id']);
+        $redirect = ($user['role'] ?? 'admin') === 'owner' ? '/owner-portal' : '/dashboard';
+        return ['success' => true, 'redirect' => $redirect];
     }
 
-    /**
-     * Get active company ID from session
-     */
-    public static function activeCompanyId(): ?int {
-        self::startSession();
-        return isset($_SESSION['active_company_id']) ? (int)$_SESSION['active_company_id'] : null;
+    public static function register(array $data): array {
+        $email = strtolower(trim($data['email']));
+        if (Database::count('users', 'email = ?', [$email])) {
+            return ['success' => false, 'error' => 'Email already registered.'];
+        }
+        $plan = $data['plan'] ?? 'starter';
+        $limits = PLAN_LIMITS[$plan] ?? PLAN_LIMITS['starter'];
+        $tenantId = Database::insert('tenants', [
+            'name'             => trim($data['company_name']),
+            'email'            => $email,
+            'phone'            => trim($data['phone'] ?? ''),
+            'plan'             => $plan,
+            'status'           => 'trial',
+            'max_properties'   => $limits['properties'],
+            'trial_ends_at'    => date('Y-m-d H:i:s', strtotime('+' . TRIAL_DAYS . ' days')),
+            'created_at'       => date('Y-m-d H:i:s'),
+            'updated_at'       => date('Y-m-d H:i:s'),
+        ]);
+        $userId = Database::insert('users', [
+            'tenant_id'     => $tenantId,
+            'name'          => trim($data['name']),
+            'email'         => $email,
+            'phone'         => trim($data['phone'] ?? ''),
+            'password_hash' => password_hash($data['password'], PASSWORD_BCRYPT),
+            'role'          => 'admin',
+            'is_active'     => 1,
+            'created_at'    => date('Y-m-d H:i:s'),
+            'updated_at'    => date('Y-m-d H:i:s'),
+        ]);
+        self::start();
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $userId;
+        unset($_SESSION['_user_cache']);
+        ActivityLog::record('auth.register', 'New tenant registered: ' . $data['company_name'], $tenantId, $userId);
+        return ['success' => true];
     }
 
-    /**
-     * Set active company in session
-     */
-    public static function setActiveCompany(int $companyId): void {
-        self::startSession();
-        $_SESSION['active_company_id'] = $companyId;
+    public static function logout(): void {
+        self::start();
+        $user = self::user();
+        if ($user) {
+            ActivityLog::record('auth.logout', 'User logged out', $user['tenant_id'], $user['id']);
+        }
+        session_destroy();
+        session_start();
+        session_regenerate_id(true);
     }
 
-    /**
-     * Generate CSRF token
-     */
+    public static function isAdmin(): bool {
+        return in_array(self::user()['role'] ?? '', ['admin', 'super_admin']);
+    }
+
+    public static function isOwner(): bool {
+        return (self::user()['role'] ?? '') === 'owner';
+    }
+
     public static function csrfToken(): string {
-        self::startSession();
+        self::start();
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
         return $_SESSION['csrf_token'];
     }
 
-    /**
-     * Verify CSRF token
-     */
-    public static function verifyCsrf(string $token): bool {
-        self::startSession();
-        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    public static function verifyCsrf(): void {
+        $token = $_POST['_token'] ?? '';
+        if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+            http_response_code(403);
+            die('Invalid CSRF token.');
+        }
     }
 }
