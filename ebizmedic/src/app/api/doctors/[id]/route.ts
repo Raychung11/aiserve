@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     const user = await requireAuth(['SUPER_ADMIN']);
     const body = await req.json();
 
-    const allowedFields = ['isVerified', 'isAvailable', 'consultationFee', 'bio'];
+    const allowedFields = ['isVerified', 'isAvailableOnline', 'isAvailableOnsite', 'consultationFee', 'bio'];
     const data: Record<string, unknown> = {};
     for (const key of allowedFields) {
       if (key in body) data[key] = body[key];

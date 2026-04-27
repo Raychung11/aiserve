@@ -76,8 +76,8 @@ async function DoctorTable({ search, page }: { search: string; page: number }) {
                 <td className="px-4 py-3 text-gray-500">{doc._count.appointments}</td>
                 <td className="px-4 py-3 text-gray-500">{formatDate(doc.createdAt)}</td>
                 <td className="px-4 py-3">
-                  <Badge variant={doc.isAvailable ? 'success' : 'warning'}>
-                    {doc.isAvailable ? 'Available' : 'Unavailable'}
+                  <Badge variant={doc.isAvailableOnline || doc.isAvailableOnsite ? 'success' : 'warning'}>
+                    {doc.isAvailableOnline && doc.isAvailableOnsite ? 'Online & Onsite' : doc.isAvailableOnline ? 'Online' : doc.isAvailableOnsite ? 'Onsite' : 'Unavailable'}
                   </Badge>
                 </td>
                 <td className="px-4 py-3">
