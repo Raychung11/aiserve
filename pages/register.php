@@ -42,7 +42,7 @@ $selectedPlan = $old['plan'] ?? 'growth';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Account — STRHub AI</title>
+<title>Create Account — Roomee</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
@@ -91,7 +91,7 @@ body { background:#f1f5f9; font-family:'Segoe UI',sans-serif; min-height:100vh; 
         <div class="d-flex align-items-center gap-3 mb-4">
           <div class="brand-icon"><i class="bi bi-house-heart-fill" style="color:#a5b4fc;"></i></div>
           <div>
-            <div class="text-white fw-bold" style="font-size:1.1rem;">STRHub AI</div>
+            <div class="text-white fw-bold" style="font-size:1.1rem;">Roomee</div>
             <div style="color:#64748b;font-size:.75rem;">Property Management Platform</div>
           </div>
         </div>

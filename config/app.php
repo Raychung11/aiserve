@@ -1,5 +1,5 @@
 <?php
-define('APP_NAME',     'STRHub AI');
+define('APP_NAME',     'Roomee');
 define('APP_VERSION',  '1.0.0');
 define('APP_CURRENCY', 'RM');
 define('APP_TIMEZONE', 'Asia/Kuala_Lumpur');
@@ -19,14 +19,8 @@ define('PLAN_LIMITS', [
     'enterprise' => ['properties' => 9999, 'agents' => 9999, 'price_monthly' => 4000, 'price_annual' => 40000],
 ]);
 
-// Auto-detect app URL (works on Hostinger)
-if (!defined('APP_URL')) {
-    $scheme   = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $base     = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-    define('APP_URL', $scheme . '://' . $host . $base);
-}
+define('APP_URL', 'https://roomee.my');
 
-// Error display — set 0 in production
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// Production — disable error output
+ini_set('display_errors', 0);
+error_reporting(0);

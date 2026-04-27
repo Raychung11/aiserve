@@ -53,7 +53,7 @@ if ($page && file_exists(ROOT_PATH.'/'.$page)) {
     ?>
     <!DOCTYPE html>
     <html lang="en">
-    <head><meta charset="UTF-8"><title>404 — STRHub AI</title>
+    <head><meta charset="UTF-8"><title>404 — Roomee</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     </head>
     <body class="d-flex align-items-center justify-content-center" style="min-height:100vh;background:#f8fafc;">

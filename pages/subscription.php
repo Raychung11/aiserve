@@ -95,7 +95,7 @@ include __DIR__.'/../includes/header.php';
 <div class="d-flex align-items-center justify-content-between mb-4">
   <div>
     <h4 class="fw-bold mb-0">Subscription & Billing</h4>
-    <p class="text-muted mb-0" style="font-size:.875rem;">Manage your STRHub AI plan</p>
+    <p class="text-muted mb-0" style="font-size:.875rem;">Manage your Roomee plan</p>
   </div>
   <?php if ($isOnTrial): ?>
   <span class="badge bg-warning text-dark px-3 py-2" style="font-size:.85rem;">Trial — <?= $trialDays ?> days left</span>

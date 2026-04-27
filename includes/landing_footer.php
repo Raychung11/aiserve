@@ -6,7 +6,7 @@
       <div class="col-lg-4">
         <div class="d-flex align-items-center gap-2 mb-3">
           <i class="bi bi-house-heart-fill" style="color:#6366f1;font-size:1.4rem;"></i>
-          <span class="text-white fw-bold" style="font-size:1.1rem;">STRHub AI</span>
+          <span class="text-white fw-bold" style="font-size:1.1rem;">Roomee</span>
         </div>
         <p style="font-size:.875rem;line-height:1.7;color:#64748b;">
           Malaysia's intelligent property management platform for STR, mid-term,
@@ -51,7 +51,7 @@
     <div class="border-top d-flex flex-column flex-md-row align-items-center justify-content-between pt-3 gap-2"
          style="border-color:rgba(255,255,255,.07)!important;">
       <div style="font-size:.78rem;color:#334155;">
-        &copy; <?= date('Y') ?> STRHub AI. All rights reserved.
+        &copy; <?= date('Y') ?> Roomee. All rights reserved.
       </div>
       <div style="font-size:.78rem;color:#334155;">
         Built for Malaysian property managers 🇲🇾

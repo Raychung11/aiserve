@@ -162,7 +162,7 @@ if (isset($_GET['print'])) {
     </div>
 
     <h2>STR <?= strtoupper($periodLabel) ?></h2>
-    <p style="font-size:10px;color:#666;margin:.25rem 0 .75rem;">Generated <?= date('d M Y H:i') ?> · STRHub AI</p>
+    <p style="font-size:10px;color:#666;margin:.25rem 0 .75rem;">Generated <?= date('d M Y H:i') ?> · Roomee</p>
 
     <table>
       <thead>

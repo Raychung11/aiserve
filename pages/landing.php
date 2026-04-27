@@ -11,7 +11,7 @@ if (Auth::check()) {
     header('Location: ' . APP_URL . $dest); exit;
 }
 
-$pageTitle = 'STRHub AI — Malaysia\'s Smart Property Management Platform';
+$pageTitle = 'Roomee — Malaysia\'s Smart Property Management Platform';
 include __DIR__ . '/../includes/landing_header.php';
 ?>
 
@@ -107,7 +107,7 @@ include __DIR__ . '/../includes/landing_header.php';
           <span>Maximise Every Ringgit.</span>
         </h1>
         <p class="section-sub mb-4">
-          STRHub AI is the all-in-one platform for property managers handling STR, mid-term,
+          Roomee is the all-in-one platform for property managers handling STR, mid-term,
           sublet and corporate leases — with compliance tracking, ROI analytics and
           an owner portal, all in one place.
         </p>
@@ -133,7 +133,7 @@ include __DIR__ . '/../includes/landing_header.php';
             <div class="mockup-dot" style="background:#ef4444;"></div>
             <div class="mockup-dot" style="background:#f59e0b;"></div>
             <div class="mockup-dot" style="background:#10b981;"></div>
-            <span style="color:#475569;font-size:.7rem;margin-left:.5rem;">STRHub AI — Dashboard</span>
+            <span style="color:#475569;font-size:.7rem;margin-left:.5rem;">Roomee — Dashboard</span>
           </div>
           <div class="mockup-content">
             <!-- KPI row -->
@@ -404,7 +404,7 @@ include __DIR__ . '/../includes/landing_header.php';
       <?php
       $testimonials = [
         ['SR','Sarah R.','Property Manager, KL','Growth',
-         '"STRHub AI replaced 3 separate spreadsheets for us. The owner portal alone saved me hours of weekly reporting."'],
+         '"Roomee replaced 3 separate spreadsheets for us. The owner portal alone saved me hours of weekly reporting."'],
         ['AM','Ahmad M.','STR Operator, Johor Bahru','Starter',
          '"The compliance engine flagged an issue with one of my Airbnb units before my owner even noticed. Incredibly useful."'],
         ['LH','Lim H.','Agency Director, Penang','Enterprise',
@@ -445,7 +445,7 @@ include __DIR__ . '/../includes/landing_header.php';
       Ready to manage smarter?
     </h2>
     <p style="color:rgba(255,255,255,.75);font-size:1rem;max-width:480px;margin:0 auto 2rem;line-height:1.7;">
-      Join property managers across Malaysia who use STRHub AI to save time, reduce errors, and grow their portfolios.
+      Join property managers across Malaysia who use Roomee to save time, reduce errors, and grow their portfolios.
     </p>
     <div class="d-flex flex-wrap justify-content-center gap-3">
       <a href="<?= APP_URL ?>/register"

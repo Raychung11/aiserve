@@ -47,7 +47,7 @@ class BillplzService {
             'phone'        => $user['phone'] ?? '',
             'name'         => $user['name'],
             'amount'       => $amount,
-            'description'  => 'STRHub AI — ' . ucfirst($plan) . ' Plan Subscription',
+            'description'  => 'Roomee — ' . ucfirst($plan) . ' Plan Subscription',
             'ref_label'    => 'Tenant ID',
             'reference'    => 'TENANT-' . $tenant['id'],
             'redirect_url' => APP_URL . '/subscription?paid=1&plan=' . $plan,

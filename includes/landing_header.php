@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= htmlspecialchars($pageTitle ?? 'STRHub AI — Malaysia\'s Smart Property Management Platform') ?></title>
-<meta name="description" content="STRHub AI helps property managers track STR, mid-term, sublet and corporate leases — with built-in compliance, ROI engine, owner portal and rent payment tracking.">
+<title><?= htmlspecialchars($pageTitle ?? 'Roomee — Malaysia\'s Smart Property Management Platform') ?></title>
+<meta name="description" content="Roomee helps property managers track STR, mid-term, sublet and corporate leases — with built-in compliance, ROI engine, owner portal and rent payment tracking.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
@@ -44,7 +44,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; color:var(--dark); backgroun
     <div class="d-flex align-items-center justify-content-between">
       <!-- Brand -->
       <a href="<?= APP_URL ?>/" class="nav-brand">
-        <i class="bi bi-house-heart-fill"></i> STRHub AI
+        <i class="bi bi-house-heart-fill"></i> Roomee
       </a>
 
       <!-- Desktop nav -->
