@@ -48,6 +48,10 @@ $routes = [
     'gap_analysis' => 'pages/gap_analysis.php',
     'reports'      => 'pages/reports.php',
     'companies'    => 'pages/companies.php',
+    'carbon'       => 'pages/carbon.php',
+    'benchmarking' => 'pages/benchmarking.php',
+    'benchmark'    => 'pages/benchmarking.php',
+    'admin'        => 'pages/admin.php',
 ];
 
 // Handle logout

@@ -1,5 +1,8 @@
 <?php
-$currentPage = $_GET['page'] ?? 'dashboard';
+// Detect current page from clean URL path or query string
+$_sPath = trim(str_replace(rtrim(dirname($_SERVER['SCRIPT_NAME']), '/'), '', parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/'), '/');
+$currentPage = $_sPath ?: ($_GET['page'] ?? 'dashboard');
+$currentPage = strtolower(preg_replace('/[^a-z0-9_-]/', '', explode('/', $currentPage)[0]));
 $userRole    = $currentUser['role'] ?? 'sme_owner';
 ?>
 <div class="sidebar" id="sidebar">
@@ -87,11 +90,29 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
       <span>Reports</span>
     </a>
 
+    <div class="nav-section-label">Tools</div>
+    <a href="<?= url('carbon') ?>" class="nav-item <?= $currentPage === 'carbon' ? 'active' : '' ?>">
+      <i class="bi bi-calculator"></i>
+      <span>Carbon Calculator</span>
+    </a>
+    <a href="<?= url('benchmarking') ?>" class="nav-item <?= $currentPage === 'benchmarking' ? 'active' : '' ?>">
+      <i class="bi bi-bar-chart-line"></i>
+      <span>Benchmarking</span>
+    </a>
+
     <?php if ($userRole === 'consultant' || $userRole === 'admin'): ?>
     <div class="nav-section-label">Consultant</div>
     <a href="<?= url('companies') ?>" class="nav-item <?= $currentPage === 'companies' ? 'active' : '' ?>">
       <i class="bi bi-buildings"></i>
       <span>My Companies</span>
+    </a>
+    <?php endif; ?>
+
+    <?php if ($userRole === 'admin'): ?>
+    <div class="nav-section-label">System</div>
+    <a href="<?= url('admin') ?>" class="nav-item <?= $currentPage === 'admin' ? 'active' : '' ?>">
+      <i class="bi bi-shield-lock"></i>
+      <span>Admin Panel</span>
     </a>
     <?php endif; ?>
   </nav>
