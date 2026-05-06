@@ -121,49 +121,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <!-- Step 3: Framework selection -->
       <div class="onboarding-section">
         <div class="section-label"><span class="step-badge">3</span> ESG Reporting Framework</div>
-        <p class="text-muted small mb-3">Your consultant can change this anytime. We recommend starting with Bursa SEDG for Malaysian companies.</p>
-        <div class="framework-selector">
-          <?php
-          $frameworks = [
-              'BURSA_SEDG' => [
-                  'label' => 'Bursa Malaysia SEDG',
-                  'desc'  => 'Mandatory for Bursa-listed companies. Best for Malaysian market.',
-                  'icon'  => 'bi-graph-up',
-                  'badge' => 'Recommended for Malaysia',
-                  'indicators' => '41 indicators',
-              ],
-              'GRI' => [
-                  'label' => 'GRI Standards',
-                  'desc'  => 'Global standard. Best for international supply chains and investors.',
-                  'icon'  => 'bi-globe',
-                  'badge' => 'International Standard',
-                  'indicators' => '33 indicators',
-              ],
-              'BOTH' => [
-                  'label' => 'Bursa SEDG + GRI',
-                  'desc'  => 'Comprehensive coverage. Best for pre-IPO and export-oriented companies.',
-                  'icon'  => 'bi-layers',
-                  'badge' => 'Most Comprehensive',
-                  'indicators' => '60+ indicators',
-              ],
-          ];
-          foreach ($frameworks as $val => $fw):
-          ?>
-          <label class="framework-option <?= ($_POST['framework'] ?? 'BURSA_SEDG') === $val ? 'selected' : '' ?>">
-            <input type="radio" name="framework" value="<?= $val ?>"
-                   <?= ($_POST['framework'] ?? 'BURSA_SEDG') === $val ? 'checked' : '' ?> required>
-            <div class="fw-header">
-              <i class="bi <?= $fw['icon'] ?>"></i>
-              <div>
-                <strong><?= $fw['label'] ?></strong>
-                <span class="fw-badge"><?= $fw['badge'] ?></span>
-              </div>
-              <span class="fw-count"><?= $fw['indicators'] ?></span>
+        <p class="text-muted small mb-3">
+          Select the standard your company needs to report against. Consultants can assign a different framework per client.
+          <strong>Not sure?</strong> Start with Bursa SEDG — you can add more later.
+        </p>
+
+        <?php
+        $allFrameworks    = Company::getAllFrameworks();
+        $groupedFrameworks= Company::getFrameworksByCategory();
+        $selectedFw       = $_POST['framework'] ?? 'BURSA_SEDG';
+        ?>
+
+        <?php foreach ($groupedFrameworks as $groupLabel => $fwList): ?>
+        <div class="fw-group-label"><?= htmlspecialchars($groupLabel) ?></div>
+        <div class="framework-selector-grid">
+          <?php foreach ($fwList as $fw): ?>
+          <label class="framework-option-card <?= $selectedFw === $fw['id'] ? 'selected' : '' ?>"
+                 style="--fw-color: <?= $fw['color'] ?>">
+            <input type="radio" name="framework" value="<?= $fw['id'] ?>"
+                   <?= $selectedFw === $fw['id'] ? 'checked' : '' ?> required>
+            <div class="fwc-top">
+              <i class="bi <?= $fw['icon'] ?>" style="color:<?= $fw['color'] ?>"></i>
+              <span class="fwc-badge" style="background:<?= $fw['color'] ?>20;color:<?= $fw['color'] ?>"><?= htmlspecialchars($fw['badge']) ?></span>
             </div>
-            <p class="fw-desc"><?= $fw['desc'] ?></p>
+            <div class="fwc-name"><?= htmlspecialchars($fw['name']) ?></div>
+            <div class="fwc-desc"><?= htmlspecialchars($fw['description']) ?></div>
+            <div class="fwc-footer">
+              <span class="fwc-indicators"><i class="bi bi-list-check me-1"></i><?= $fw['indicators'] ?> indicators</span>
+              <span class="fwc-region"><i class="bi bi-geo-alt me-1"></i><?= $fw['region'] ?></span>
+            </div>
+            <?php if (!empty($fw['mandatory_for'])): ?>
+            <div class="fwc-mandatory"><i class="bi bi-info-circle me-1"></i><?= htmlspecialchars($fw['mandatory_for']) ?></div>
+            <?php endif; ?>
           </label>
           <?php endforeach; ?>
         </div>
+        <?php endforeach; ?>
       </div>
 
       <div class="d-grid mt-4">

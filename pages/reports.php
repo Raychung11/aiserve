@@ -95,9 +95,11 @@ include __DIR__ . '/../includes/header.php';
             <div class="col-md-4 mb-3">
               <label class="form-label fw-semibold">Framework</label>
               <select class="form-select" name="framework">
-                <option value="BURSA_SEDG" <?= $activeCompany['framework'] === 'BURSA_SEDG' ? 'selected' : '' ?>>Bursa Malaysia SEDG</option>
-                <option value="GRI"        <?= $activeCompany['framework'] === 'GRI'        ? 'selected' : '' ?>>GRI Standards</option>
-                <option value="BOTH"       <?= $activeCompany['framework'] === 'BOTH'       ? 'selected' : '' ?>>Bursa SEDG + GRI</option>
+                <?php foreach (Company::getAllFrameworks() as $fw): ?>
+                <option value="<?= $fw['id'] ?>" <?= $activeCompany['framework'] === $fw['id'] ? 'selected' : '' ?>>
+                  <?= htmlspecialchars($fw['short']) ?> — <?= htmlspecialchars($fw['name']) ?>
+                </option>
+                <?php endforeach; ?>
               </select>
             </div>
             <div class="col-md-4 mb-3">
