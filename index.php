@@ -52,6 +52,8 @@ $routes = [
     'benchmarking' => 'pages/benchmarking.php',
     'benchmark'    => 'pages/benchmarking.php',
     'admin'        => 'pages/admin.php',
+    'pricing'      => 'pages/pricing.php',
+    'billing'      => 'pages/billing.php',
 ];
 
 // Handle logout

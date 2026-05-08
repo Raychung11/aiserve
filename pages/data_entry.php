@@ -121,19 +121,19 @@ include __DIR__ . '/../includes/header.php';
         <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
 
         <?php
-        function renderIndicatorField(array $ind, array $savedData, ?string $focusId): void {
-            $id      = $ind['indicator_id'];
-            $saved   = $savedData[$id] ?? null;
-            $val     = $saved['value'] ?? '';
-            $notes   = $saved['notes'] ?? '';
-            $source  = $saved['data_source'] ?? '';
-            $verified= $saved['verified'] ?? 0;
-            $isFocus = $focusId === $id;
-            $hasVal  = $val !== '' && $val !== null;
-            $statusClass = $hasVal ? 'status-filled' : ($ind['required'] ? 'status-required' : 'status-optional');
-            $statusIcon  = $hasVal ? 'bi-check-circle-fill text-success' : ($ind['required'] ? 'bi-exclamation-circle-fill text-danger' : 'bi-circle text-muted');
+        function renderIndicatorField(array $ind, array $savedData, ?string $focusId, array|string $unlockedIds = 'all'): void {
+            $id       = $ind['indicator_id'];
+            $isLocked = $unlockedIds !== 'all' && !in_array($id, (array)$unlockedIds, true);
+            $saved    = $savedData[$id] ?? null;
+            $val      = $saved['value'] ?? '';
+            $isFocus  = $focusId === $id;
+            $hasVal   = $val !== '' && $val !== null;
+            $statusIcon = $isLocked ? 'bi-lock-fill text-muted'
+                : ($hasVal ? 'bi-check-circle-fill text-success'
+                : ($ind['required'] ? 'bi-exclamation-circle-fill text-danger' : 'bi-circle text-muted'));
         ?>
-        <div class="indicator-card <?= $isFocus ? 'highlight-focus' : '' ?>" id="field-<?= $id ?>" data-indicator="<?= $id ?>">
+        <div class="indicator-card <?= $isFocus ? 'highlight-focus' : '' ?> <?= $isLocked ? 'indicator-locked' : '' ?>"
+             id="field-<?= $id ?>" data-indicator="<?= $id ?>">
           <div class="ind-header">
             <div class="ind-code"><?= htmlspecialchars($ind['code']) ?></div>
             <div class="ind-title-wrap">
@@ -147,6 +147,17 @@ include __DIR__ . '/../includes/header.php';
             <i class="bi <?= $statusIcon ?> ind-status-icon"></i>
           </div>
           <p class="ind-desc"><?= htmlspecialchars($ind['description']) ?></p>
+          <?php if ($isLocked): ?>
+          <div class="ind-lock-overlay">
+            <i class="bi bi-lock-fill"></i>
+            <strong>Indicator locked</strong>
+            <p class="mb-2 small">Upgrade your plan or add an Indicator Collection to unlock this disclosure.</p>
+            <a href="<?= APP_URL ?>/billing" class="btn btn-sm btn-primary">
+              <i class="bi bi-arrow-up-circle me-1"></i>Upgrade Plan
+            </a>
+            <a href="<?= APP_URL ?>/pricing" class="btn btn-sm btn-outline-secondary ms-1" target="_blank">View Pricing</a>
+          </div>
+          <?php endif; ?>
           <div class="ind-guidance"><i class="bi bi-lightbulb me-1 text-warning"></i><?= htmlspecialchars($ind['guidance']) ?></div>
 
           <div class="row mt-3">
@@ -218,7 +229,7 @@ include __DIR__ . '/../includes/header.php';
           <span><i class="bi bi-exclamation-circle-fill text-danger me-2"></i>Required Disclosures (<?= count($required) ?>)</span>
         </div>
         <?php foreach ($required as $ind): ?>
-          <?php renderIndicatorField($ind, $savedData, $focusId); ?>
+          <?php renderIndicatorField($ind, $savedData, $focusId, $unlockedIds); ?>
         <?php endforeach; ?>
 
         <!-- Recommended Indicators -->
@@ -231,7 +242,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
         <div id="recommendedSection">
           <?php foreach ($recommended as $ind): ?>
-            <?php renderIndicatorField($ind, $savedData, $focusId); ?>
+            <?php renderIndicatorField($ind, $savedData, $focusId, $unlockedIds); ?>
           <?php endforeach; ?>
         </div>
         <?php endif; ?>

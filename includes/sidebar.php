@@ -119,6 +119,27 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
 
   <!-- Sidebar Footer -->
   <div class="sidebar-footer">
+    <!-- Plan badge -->
+    <?php if ($activeCompanyId): ?>
+    <?php
+    $sp = $activePlan ?? Subscription::getAllPlans()['starter'];
+    $planSrc = $sp['_source'] ?? 'free';
+    ?>
+    <a href="<?= url('billing') ?>" class="sidebar-plan-badge"
+       style="--plan-color:<?= $sp['color'] ?>">
+      <span class="spb-name"><?= $sp['name'] ?></span>
+      <span class="spb-label">
+        <?php if ($planSrc === 'trial'): ?>
+        <i class="bi bi-hourglass-split"></i> <?= ($sp['_days_left'] ?? 0) ?>d trial
+        <?php elseif ($planSrc === 'subscription'): ?>
+        <i class="bi bi-check-circle-fill"></i> Active
+        <?php else: ?>
+        <i class="bi bi-arrow-up-circle"></i> Upgrade
+        <?php endif; ?>
+      </span>
+    </a>
+    <?php endif; ?>
+
     <div class="user-info">
       <div class="user-avatar"><?= strtoupper(substr($currentUser['name'], 0, 1)) ?></div>
       <div class="user-detail">
