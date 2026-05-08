@@ -125,7 +125,10 @@ include __DIR__ . '/../includes/header.php';
             $id       = $ind['indicator_id'];
             $isLocked = $unlockedIds !== 'all' && !in_array($id, (array)$unlockedIds, true);
             $saved    = $savedData[$id] ?? null;
-            $val      = $saved['value'] ?? '';
+            $val      = $saved['value']       ?? '';
+            $source   = $saved['data_source'] ?? '';
+            $notes    = $saved['notes']        ?? '';
+            $verified = !empty($saved['verified']);
             $isFocus  = $focusId === $id;
             $hasVal   = $val !== '' && $val !== null;
             $statusIcon = $isLocked ? 'bi-lock-fill text-muted'
