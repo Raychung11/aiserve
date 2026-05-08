@@ -54,6 +54,7 @@ $routes = [
     'admin'        => 'pages/admin.php',
     'pricing'      => 'pages/pricing.php',
     'billing'      => 'pages/billing.php',
+    'team'         => 'pages/team.php',
 ];
 
 // Handle logout

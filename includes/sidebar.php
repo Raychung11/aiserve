@@ -100,11 +100,23 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
       <span>Benchmarking</span>
     </a>
 
-    <?php if ($userRole === 'consultant' || $userRole === 'admin'): ?>
-    <div class="nav-section-label">Consultant</div>
+    <?php if (in_array($userRole, ['consultant', 'admin', 'associate', 'manager', 'sme_owner'])): ?>
+    <div class="nav-section-label">Portfolio</div>
     <a href="<?= url('companies') ?>" class="nav-item <?= $currentPage === 'companies' ? 'active' : '' ?>">
       <i class="bi bi-buildings"></i>
       <span>My Companies</span>
+    </a>
+    <?php endif; ?>
+
+    <?php if (in_array($userRole, ['principal', 'associate'])): ?>
+    <div class="nav-section-label">Team</div>
+    <a href="<?= url('team') ?>" class="nav-item <?= $currentPage === 'team' ? 'active' : '' ?>">
+      <i class="bi bi-people-fill"></i>
+      <span><?= $userRole === 'principal' ? 'My Associates' : 'My Managers' ?></span>
+    </a>
+    <a href="<?= url('companies') ?>" class="nav-item <?= $currentPage === 'companies' ? 'active' : '' ?>">
+      <i class="bi bi-buildings"></i>
+      <span>All Clients</span>
     </a>
     <?php endif; ?>
 

@@ -80,21 +80,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Role selection -->
         <div class="mb-3">
           <label class="form-label">I am a</label>
-          <div class="role-selector">
-            <label class="role-option <?= ($_POST['role'] ?? '') === 'sme_owner' || empty($_POST['role']) ? 'selected' : '' ?>">
+          <div class="role-selector role-selector-grid">
+            <label class="role-option <?= in_array($_POST['role'] ?? '', ['sme_owner','']) ? 'selected' : '' ?>">
               <input type="radio" name="role" value="sme_owner" <?= ($_POST['role'] ?? 'sme_owner') === 'sme_owner' ? 'checked' : '' ?>>
               <i class="bi bi-building"></i>
               <div>
-                <strong>SME Owner / Finance</strong>
-                <small>Manage one company, track ESG data</small>
+                <strong>SME Owner</strong>
+                <small>Track your own company ESG</small>
               </div>
             </label>
-            <label class="role-option <?= ($_POST['role'] ?? '') === 'consultant' ? 'selected' : '' ?>">
-              <input type="radio" name="role" value="consultant" <?= ($_POST['role'] ?? '') === 'consultant' ? 'checked' : '' ?>>
-              <i class="bi bi-briefcase"></i>
+            <label class="role-option <?= ($_POST['role'] ?? '') === 'principal' ? 'selected' : '' ?>">
+              <input type="radio" name="role" value="principal" <?= ($_POST['role'] ?? '') === 'principal' ? 'checked' : '' ?>>
+              <i class="bi bi-diagram-3-fill"></i>
               <div>
-                <strong>ESG Consultant</strong>
-                <small>Manage multiple client companies</small>
+                <strong>Principal</strong>
+                <small>Firm owner managing associates &amp; clients</small>
+              </div>
+            </label>
+            <label class="role-option <?= ($_POST['role'] ?? '') === 'associate' ? 'selected' : '' ?>">
+              <input type="radio" name="role" value="associate" <?= ($_POST['role'] ?? '') === 'associate' ? 'checked' : '' ?>>
+              <i class="bi bi-briefcase-fill"></i>
+              <div>
+                <strong>Associate</strong>
+                <small>Accounting / COSEC firm, client portfolio</small>
+              </div>
+            </label>
+            <label class="role-option <?= ($_POST['role'] ?? '') === 'manager' ? 'selected' : '' ?>">
+              <input type="radio" name="role" value="manager" <?= ($_POST['role'] ?? '') === 'manager' ? 'checked' : '' ?>>
+              <i class="bi bi-person-workspace"></i>
+              <div>
+                <strong>Manager</strong>
+                <small>Staff analyst handling assigned clients</small>
               </div>
             </label>
           </div>

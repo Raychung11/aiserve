@@ -1,8 +1,27 @@
 <?php
 require_once __DIR__ . '/../includes/auth_check.php';
 $pageTitle = 'Dashboard';
+$role      = $currentUser['role'];
 
-// Redirect to onboarding if no active company
+// ── Hierarchy roles: no active-company required ──────────────────
+if (in_array($role, ['principal', 'associate', 'manager'])) {
+    include __DIR__ . '/../includes/header.php';
+    echo '<div class="app-layout">';
+    include __DIR__ . '/../includes/sidebar.php';
+    echo '<div class="main-content">';
+
+    switch ($role) {
+        case 'principal': include __DIR__ . '/dashboard_principal.php'; break;
+        case 'associate': include __DIR__ . '/dashboard_associate.php'; break;
+        case 'manager':   include __DIR__ . '/dashboard_manager.php';   break;
+    }
+
+    echo '</div></div>';
+    include __DIR__ . '/../includes/footer.php';
+    exit;
+}
+
+// ── Legacy roles: sme_owner / consultant / admin ─────────────────
 if (!$activeCompany) {
     header('Location: ' . APP_URL . '/onboarding');
     exit;
@@ -14,7 +33,6 @@ $stats      = ESGDataManager::getCompletionStats($activeCompanyId, $framework, $
 $overall    = ESGDataManager::calcOverallScore($stats);
 $scoreInfo  = ESGDataManager::scoreLabel($overall);
 
-// Get or generate gap analysis (use cached if < 1 hour old)
 $gapResult  = GapAnalyzer::loadCached($activeCompanyId, $framework, $period);
 if (!$gapResult) {
     $gapResult = GapAnalyzer::analyze($activeCompanyId, $framework, $period);
@@ -25,7 +43,6 @@ $highGaps     = count(array_filter($gapResult['gaps'] ?? [], fn($g) => $g['prior
 $quickWins    = array_slice($gapResult['quick_wins'] ?? [], 0, 5);
 $finOps       = $gapResult['financing_ops'] ?? [];
 
-// Recent reports
 $recentReports = Database::fetchAll(
     'SELECT * FROM reports WHERE company_id = ? ORDER BY generated_at DESC LIMIT 3',
     [$activeCompanyId]
@@ -38,7 +55,6 @@ include __DIR__ . '/../includes/header.php';
   <?php include __DIR__ . '/../includes/sidebar.php'; ?>
 
   <div class="main-content">
-    <!-- Top bar -->
     <div class="topbar">
       <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
       <div class="topbar-title">
@@ -56,16 +72,14 @@ include __DIR__ . '/../includes/header.php';
     <?php if (isset($_GET['welcome'])): ?>
     <div class="alert alert-success alert-dismissible fade show mx-4 mt-3" role="alert">
       <i class="bi bi-party-popper-fill me-2"></i>
-      <strong>Welcome to AiServe ESG OS!</strong> Your dashboard is ready. Start by entering your ESG data below.
+      <strong>Welcome to AiServe ESG OS!</strong> Your dashboard is ready.
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     <?php endif; ?>
 
     <div class="content-body">
 
-      <!-- ESG Score Cards Row -->
       <div class="row g-3 mb-4">
-        <!-- Overall Score -->
         <div class="col-lg-3 col-md-6">
           <div class="score-card score-overall" style="--score-color: <?= $scoreInfo['color'] ?>">
             <div class="score-card-icon"><i class="bi bi-award"></i></div>
@@ -79,7 +93,6 @@ include __DIR__ . '/../includes/header.php';
             </div>
           </div>
         </div>
-        <!-- Environment -->
         <div class="col-lg-3 col-md-6">
           <div class="score-card score-env">
             <div class="score-card-icon"><i class="bi bi-tree"></i></div>
@@ -93,7 +106,6 @@ include __DIR__ . '/../includes/header.php';
             </div>
           </div>
         </div>
-        <!-- Social -->
         <div class="col-lg-3 col-md-6">
           <div class="score-card score-social">
             <div class="score-card-icon"><i class="bi bi-people"></i></div>
@@ -107,7 +119,6 @@ include __DIR__ . '/../includes/header.php';
             </div>
           </div>
         </div>
-        <!-- Governance -->
         <div class="col-lg-3 col-md-6">
           <div class="score-card score-gov">
             <div class="score-card-icon"><i class="bi bi-shield-check"></i></div>
@@ -123,9 +134,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
       </div>
 
-      <!-- Charts + Gap Summary Row -->
       <div class="row g-3 mb-4">
-        <!-- Radar chart -->
         <div class="col-lg-4">
           <div class="card h-100">
             <div class="card-header">
@@ -137,7 +146,6 @@ include __DIR__ . '/../includes/header.php';
           </div>
         </div>
 
-        <!-- Gap summary -->
         <div class="col-lg-4">
           <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -163,14 +171,13 @@ include __DIR__ . '/../includes/header.php';
                   <strong><?= $gapResult['completed'] ?? 0 ?>/<?= $gapResult['total_indicators'] ?? 0 ?></strong>
                 </div>
                 <div class="progress" style="height:12px">
-                  <div class="progress-bar bg-success" style="width:<?= $overall ?>%" title="<?= $overall ?>%"></div>
+                  <div class="progress-bar bg-success" style="width:<?= $overall ?>%"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Quick wins -->
         <div class="col-lg-4">
           <div class="card h-100">
             <div class="card-header">
@@ -202,7 +209,6 @@ include __DIR__ . '/../includes/header.php';
         </div>
       </div>
 
-      <!-- Financing Opportunities -->
       <div class="row g-3 mb-4">
         <div class="col-12">
           <div class="card">
@@ -213,12 +219,7 @@ include __DIR__ . '/../includes/header.php';
               <div class="table-responsive">
                 <table class="table table-hover mb-0">
                   <thead>
-                    <tr>
-                      <th>Programme</th>
-                      <th>Benefit</th>
-                      <th>Status</th>
-                      <th>Action Required</th>
-                    </tr>
+                    <tr><th>Programme</th><th>Benefit</th><th>Status</th><th>Action Required</th></tr>
                   </thead>
                   <tbody>
                     <?php foreach ($finOps as $op): ?>
@@ -243,16 +244,15 @@ include __DIR__ . '/../includes/header.php';
         </div>
       </div>
 
-      <!-- Data Entry shortcuts -->
       <div class="row g-3 mb-4">
         <div class="col-12">
           <h6 class="text-muted fw-semibold mb-3">CONTINUE DATA ENTRY</h6>
         </div>
         <?php
         $cats = [
-            'environment' => ['label' => 'Environment', 'icon' => 'bi-tree', 'color' => 'success', 'stat' => $stats['ENVIRONMENT']],
-            'social'      => ['label' => 'Social',       'icon' => 'bi-people', 'color' => 'info',   'stat' => $stats['SOCIAL']],
-            'governance'  => ['label' => 'Governance',   'icon' => 'bi-shield-check', 'color' => 'purple', 'stat' => $stats['GOVERNANCE']],
+            'environment' => ['label' => 'Environment', 'icon' => 'bi-tree',         'color' => 'success', 'stat' => $stats['ENVIRONMENT']],
+            'social'      => ['label' => 'Social',       'icon' => 'bi-people',       'color' => 'info',    'stat' => $stats['SOCIAL']],
+            'governance'  => ['label' => 'Governance',   'icon' => 'bi-shield-check', 'color' => 'purple',  'stat' => $stats['GOVERNANCE']],
         ];
         foreach ($cats as $catKey => $cat):
             $pct = $cat['stat']['score'];
@@ -275,14 +275,12 @@ include __DIR__ . '/../includes/header.php';
         <?php endforeach; ?>
       </div>
 
-    </div><!-- /content-body -->
-  </div><!-- /main-content -->
+    </div>
+  </div>
 </div>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
-
 <script>
-// Radar chart
 const radarCtx = document.getElementById('esgRadar').getContext('2d');
 new Chart(radarCtx, {
   type: 'radar',
@@ -291,30 +289,21 @@ new Chart(radarCtx, {
     datasets: [{
       label: 'ESG Score (%)',
       data: [<?= $stats['ENVIRONMENT']['score'] ?>, <?= $stats['SOCIAL']['score'] ?>, <?= $stats['GOVERNANCE']['score'] ?>],
-      backgroundColor: 'rgba(22, 163, 74, 0.15)',
-      borderColor: '#16a34a',
-      pointBackgroundColor: '#16a34a',
-      borderWidth: 2,
-      pointRadius: 5,
+      backgroundColor: 'rgba(22,163,74,0.15)', borderColor: '#16a34a',
+      pointBackgroundColor: '#16a34a', borderWidth: 2, pointRadius: 5,
     }]
   },
   options: {
     scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, font: { size: 10 } } } },
-    plugins: { legend: { display: false } },
-    animation: { duration: 800 }
+    plugins: { legend: { display: false } }, animation: { duration: 800 }
   }
 });
-
-// Overall donut
 const donutCtx = document.getElementById('overallDonut').getContext('2d');
 new Chart(donutCtx, {
   type: 'doughnut',
   data: {
-    datasets: [{
-      data: [<?= $overall ?>, <?= 100 - $overall ?>],
-      backgroundColor: ['<?= $scoreInfo['color'] ?>', '#e2e8f0'],
-      borderWidth: 0,
-    }]
+    datasets: [{ data: [<?= $overall ?>, <?= 100 - $overall ?>],
+      backgroundColor: ['<?= $scoreInfo['color'] ?>', '#e2e8f0'], borderWidth: 0 }]
   },
   options: {
     cutout: '72%',

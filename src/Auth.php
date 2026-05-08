@@ -36,7 +36,7 @@ class Auth {
         if (strlen($password) < 8) {
             return ['success' => false, 'message' => 'Password must be at least 8 characters.'];
         }
-        if (!in_array($role, ['admin', 'consultant', 'sme_owner'])) {
+        if (!in_array($role, ['admin', 'consultant', 'sme_owner', 'principal', 'associate', 'manager'])) {
             $role = 'sme_owner';
         }
 
