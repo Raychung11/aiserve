@@ -36,7 +36,8 @@ $page = strtolower(preg_replace('/[^a-z0-9_-]/', '', $page));
 
 // Route table: page slug → file path
 $routes = [
-    ''             => 'pages/dashboard.php',
+    ''             => 'pages/landing.php',
+    'landing'      => 'pages/landing.php',
     'dashboard'    => 'pages/dashboard.php',
     'login'        => 'pages/login.php',
     'register'     => 'pages/register.php',
@@ -75,16 +76,6 @@ if (isset($routes[$page])) {
         require_once $file;
         exit;
     }
-}
-
-// Redirect root to dashboard or login
-if ($page === '' || $page === 'index') {
-    if (Auth::check()) {
-        header('Location: ' . APP_URL . '/dashboard');
-    } else {
-        header('Location: ' . APP_URL . '/login');
-    }
-    exit;
 }
 
 // 404
