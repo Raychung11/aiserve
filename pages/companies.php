@@ -1,35 +1,52 @@
 <?php
 require_once __DIR__ . '/../includes/auth_check.php';
 
-// Only consultants and admins
-if (!in_array($currentUser['role'], ['consultant', 'admin'])) {
-    header('Location: ' . APP_URL . '/dashboard');
+// Admins go to admin panel companies tab
+if ($currentUser['role'] === 'admin') {
+    header('Location: ' . APP_URL . '/admin?tab=companies');
     exit;
 }
 
-$pageTitle = 'My Companies';
-$success   = $error = '';
+$pageTitle   = 'My Companies';
+$success     = $error = '';
+$role        = $currentUser['role'];
+$isHierarchy = in_array($role, ['principal', 'associate', 'manager']);
 
-// Handle company switch
+// Handle company switch / open
 if (isset($_GET['switch']) && (int)$_GET['switch'] > 0) {
     $switchId = (int)$_GET['switch'];
-    $co = Company::getById($switchId, $currentUser['id'], $currentUser['role']);
-    if ($co) {
-        Auth::setActiveCompany($switchId);
-        $activeCompanyId = $switchId;
-        $activeCompany   = $co;
-        $success = 'Switched to ' . htmlspecialchars($co['name']);
+    // Hierarchy roles: verify access via Hierarchy
+    if ($isHierarchy) {
+        $accessible = Hierarchy::getAccessibleCompanies($currentUser['id'], $role);
+        $found = array_filter($accessible, fn($c) => (int)$c['id'] === $switchId);
+        if ($found) {
+            Auth::setActiveCompany($switchId);
+            $activeCompanyId = $switchId;
+            $activeCompany   = Company::getById($switchId, $currentUser['id'], $role);
+            $success = 'Switched to ' . htmlspecialchars($activeCompany['name'] ?? '');
+        }
+    } else {
+        $co = Company::getById($switchId, $currentUser['id'], $role);
+        if ($co) {
+            Auth::setActiveCompany($switchId);
+            $activeCompanyId = $switchId;
+            $activeCompany   = $co;
+            $success = 'Switched to ' . htmlspecialchars($co['name']);
+        }
     }
 }
 
-// Handle delete
+// Handle delete (owner only)
 if (isset($_GET['delete']) && (int)$_GET['delete'] > 0 && Auth::verifyCsrf($_GET['token'] ?? '')) {
     $delId = (int)$_GET['delete'];
     Database::query('DELETE FROM companies WHERE id = ? AND created_by = ?', [$delId, $currentUser['id']]);
     $success = 'Company removed.';
 }
 
-$companies = Company::getForUser($currentUser['id'], $currentUser['role']);
+// Load companies based on role
+$companies = $isHierarchy
+    ? Hierarchy::getAccessibleCompanies($currentUser['id'], $role)
+    : Company::getForUser($currentUser['id'], $role);
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -41,13 +58,15 @@ include __DIR__ . '/../includes/header.php';
     <div class="topbar">
       <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
       <div class="topbar-title">
-        <h1><i class="bi bi-buildings me-2 text-primary"></i>My Companies</h1>
-        <span class="topbar-subtitle">Consultant Dashboard</span>
+        <h1><i class="bi bi-buildings me-2 text-primary"></i><?= $isHierarchy ? 'All Client Companies' : 'My Companies' ?></h1>
+        <span class="topbar-subtitle"><?= ucfirst(str_replace('_',' ',$role)) ?> portfolio view &mdash; <?= count($companies) ?> companies</span>
       </div>
       <div class="topbar-actions">
+        <?php if (!$isHierarchy): ?>
         <a href="<?= url('onboarding') ?>" class="btn btn-primary btn-sm">
           <i class="bi bi-building-add me-1"></i>Add New Company
         </a>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -99,10 +118,14 @@ include __DIR__ . '/../includes/header.php';
       <div class="empty-state">
         <i class="bi bi-buildings fs-1 text-muted"></i>
         <h3 class="mt-3">No companies yet</h3>
+        <?php if ($isHierarchy): ?>
+        <p class="text-muted">No client companies are assigned to your portfolio yet.</p>
+        <?php else: ?>
         <p class="text-muted">Add your first client company to get started.</p>
         <a href="<?= url('onboarding') ?>" class="btn btn-primary mt-2">
           <i class="bi bi-building-add me-2"></i>Add First Company
         </a>
+        <?php endif; ?>
       </div>
       <?php else: ?>
       <div class="row g-3">
@@ -184,7 +207,8 @@ include __DIR__ . '/../includes/header.php';
         </div>
         <?php endforeach; ?>
 
-        <!-- Add new card -->
+        <!-- Add new card (consultant/sme_owner only) -->
+        <?php if (!$isHierarchy): ?>
         <div class="col-md-6 col-xl-4">
           <a href="<?= url('onboarding') ?>" class="add-company-card">
             <i class="bi bi-building-add fs-1"></i>
@@ -192,6 +216,7 @@ include __DIR__ . '/../includes/header.php';
             <small class="text-muted">Set up another client</small>
           </a>
         </div>
+        <?php endif; ?>
       </div>
       <?php endif; ?>
 
