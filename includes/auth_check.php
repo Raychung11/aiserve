@@ -12,6 +12,7 @@ require_once __DIR__ . '/../src/Company.php';
 require_once __DIR__ . '/../src/ESGDataManager.php';
 require_once __DIR__ . '/../src/GapAnalyzer.php';
 require_once __DIR__ . '/../src/ReportGenerator.php';
+require_once __DIR__ . '/../src/Benchmarker.php';
 require_once __DIR__ . '/../src/Subscription.php';
 require_once __DIR__ . '/../src/Hierarchy.php';
 

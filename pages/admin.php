@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../includes/auth_check.php';
-require_once __DIR__ . '/../src/Benchmarker.php';
 
 if ($currentUser['role'] !== 'admin') {
     header('Location: ' . APP_URL . '/dashboard');
