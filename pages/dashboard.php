@@ -3,6 +3,12 @@ require_once __DIR__ . '/../includes/auth_check.php';
 $pageTitle = 'Dashboard';
 $role      = $currentUser['role'];
 
+// ── Admin: send straight to admin panel ──────────────────────────
+if ($role === 'admin') {
+    header('Location: ' . APP_URL . '/admin');
+    exit;
+}
+
 // ── Hierarchy roles: no active-company required ──────────────────
 if (in_array($role, ['principal', 'associate', 'manager'])) {
     include __DIR__ . '/../includes/header.php';
