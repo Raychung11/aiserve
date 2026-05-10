@@ -22,7 +22,211 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <?php include __DIR__ . '/../includes/header.php'; ?>
 <style>
-.onboarding-wrap { max-width: 860px; margin: 0 auto; }
+/* ── Onboarding layout ── */
+.onboarding-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* ── Section cards ── */
+.onboarding-section {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Revenue selector ── */
+.revenue-selector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.revenue-option {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+
+.revenue-option input[type="radio"] { display: none; }
+
+.revenue-option i {
+  font-size: 28px;
+  color: #6c757d;
+  flex-shrink: 0;
+  transition: color .15s;
+}
+
+.revenue-option div strong {
+  display: block;
+  font-size: 14px;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.revenue-option div small {
+  display: block;
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.revenue-option:hover {
+  border-color: #0d6efd;
+  background: #f0f6ff;
+}
+
+.revenue-option.selected {
+  border-color: #0d6efd;
+  background: #e8f0fe;
+  box-shadow: 0 0 0 3px rgba(13,110,253,.12);
+}
+
+.revenue-option.selected i { color: #0d6efd; }
+
+/* ── Framework selector ── */
+.fw-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #6c757d;
+  margin: 16px 0 10px;
+}
+
+.framework-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.framework-option-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  position: relative;
+}
+
+.framework-option-card input[type="radio"] { display: none; }
+
+.framework-option-card:hover {
+  border-color: var(--fw-color, #0d6efd);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.framework-option-card.selected {
+  border-color: var(--fw-color, #0d6efd);
+  background: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fw-color, #0d6efd) 15%, transparent);
+}
+
+.fwc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.fwc-top i { font-size: 22px; }
+
+.fwc-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: .04em;
+}
+
+.fwc-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 4px;
+}
+
+.fwc-desc {
+  font-size: 11px;
+  color: #6c757d;
+  line-height: 1.5;
+  flex: 1;
+  margin-bottom: 12px;
+}
+
+.fwc-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6c757d;
+  border-top: 1px solid #f0f2f5;
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+.fwc-indicators, .fwc-region {
+  display: flex;
+  align-items: center;
+}
+
+.fwc-mandatory {
+  font-size: 10px;
+  color: #dc3545;
+  background: #fff3f3;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-top: 8px;
+}
+
+/* ── Submit button area ── */
+.ob-submit {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
 </style>
 
 <div class="app-layout">
@@ -173,12 +377,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endforeach; ?>
       </div>
 
-      <div class="d-grid mt-4">
-        <button type="submit" class="btn btn-primary btn-lg">
-          <i class="bi bi-rocket-takeoff me-2"></i>Launch My ESG Dashboard
-        </button>
+      <div class="ob-submit">
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-rocket-takeoff me-2"></i>Launch My ESG Dashboard
+          </button>
+        </div>
+        <p class="text-center text-muted small mt-3 mb-0">You can add more companies or change the framework later.</p>
       </div>
-      <p class="text-center text-muted small mt-2">You can add more companies or change the framework later.</p>
     </form>
 
       </div><!-- /.onboarding-wrap -->
