@@ -21,15 +21,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <?php include __DIR__ . '/../includes/header.php'; ?>
+<style>
+.onboarding-wrap { max-width: 860px; margin: 0 auto; }
+</style>
 
-<div class="onboarding-container">
-  <div class="onboarding-box">
+<div class="app-layout">
+  <?php include __DIR__ . '/../includes/sidebar.php'; ?>
 
-    <div class="onboarding-header">
-      <div class="onboarding-logo"><i class="bi bi-leaf-fill"></i></div>
-      <h2>Set Up Your Company</h2>
-      <p class="text-muted">Takes about 3 minutes. You can edit everything later.</p>
+  <div class="main-content">
+    <div class="topbar">
+      <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+      <div class="topbar-title">
+        <h1><i class="bi bi-building-add me-2 text-primary"></i>Add New Company</h1>
+        <span class="topbar-subtitle">Complete the form to create a new ESG profile</span>
+      </div>
+      <div class="topbar-actions">
+        <a href="<?= url('companies') ?>" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i>Back to Companies
+        </a>
+      </div>
     </div>
+
+    <div class="content-body">
+      <div class="onboarding-wrap">
 
     <?php if ($error): ?>
     <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i><?= htmlspecialchars($error) ?></div>
@@ -166,8 +180,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       <p class="text-center text-muted small mt-2">You can add more companies or change the framework later.</p>
     </form>
-  </div>
-</div>
+
+      </div><!-- /.onboarding-wrap -->
+    </div><!-- /.content-body -->
+  </div><!-- /.main-content -->
+</div><!-- /.app-layout -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
