@@ -1,6 +1,6 @@
 # TERM SHEET
 ## Strategic Collaboration — SLV Group & Adcellent Sdn Bhd
-### ESG Reporting Platform (AiServe ESG OS)
+### AiServe ESG OS Platform
 
 ---
 
@@ -14,26 +14,32 @@
 | Party | Role |
 |---|---|
 | **SLV Group** | IT Solutions & Platform Development Provider |
-| **Adcellent Sdn Bhd** | Go-to-Market Partner & Associate Network Manager |
+| **Adcellent Sdn Bhd** | Go-to-Market Partner & Associate/Referral Network Manager |
 
 ---
 
-## 2. Scope of Collaboration
+## 2. Scope
 
-SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, and ongoing development). Adcellent leads market outreach, recruits and manages Associate Partners, and delivers ESG reporting services to end clients.
+SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, ongoing development). Adcellent leads market outreach, recruits and manages Associate Partners and Referral Partners, and delivers ESG reporting and subscription services to end clients.
 
 ---
 
-## 3. Commercial Terms
+## 3. Revenue Streams
 
-### 3.1 Report Pricing Structure
+This collaboration covers two primary revenue streams:
 
-| Level | Price (RM) | Margin |
-|---|---|---|
-| Client pays Associate | RM 15,000 | — |
-| Associate pays Adcellent | RM 8,000 | Associate keeps RM 7,000 |
+| Stream | Description |
+|---|---|
+| **ESG Reports** | One-time engagement fee per ESG report delivered by an Associate Partner to a Client |
+| **Platform Subscriptions** | Annual recurring subscription to the AiServe ESG OS platform (Standard / Professional) |
 
-### 3.2 Revenue Allocation (on RM 8,000 base per report)
+---
+
+## 4. Revenue Allocation
+
+### 4.1 ESG Report Revenue (Base Price: RM 8,000 per report)
+
+Associates purchase at RM 8,000 and sell to clients at a recommended price of **RM 15,000**, retaining the difference as their own margin.
 
 | Recipient | Allocation | Amount (RM) |
 |---|---|---|
@@ -42,83 +48,88 @@ SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, an
 | **Adcellent** — Operations & Growth | 55% | RM 4,400 |
 | **Total** | 100% | RM 8,000 |
 
-> Associate partners sell independently at their own price. The recommended retail price is **RM 15,000** per ESG report, giving associates a gross margin of **RM 7,000 per engagement**.
+### 4.2 Subscription Revenue
+
+Annual subscription plans available to all clients directly through the platform:
+
+| Plan | Annual Fee | SLV 15% | Consultant 30% | Referral 15%* | Adcellent 40%* |
+|---|---|---|---|---|---|
+| Standard | RM 1,500 | RM 225 | RM 450 | RM 225 | RM 600 |
+| Professional | RM 3,500 | RM 525 | RM 1,050 | RM 525 | RM 1,400 |
+
+> \* The Referral Fee of 15% is applicable **only when a qualifying Referral Partner** (accountant, lawyer, or other professional) has introduced the subscriber. Where no referral applies, the 15% reverts to Adcellent, restoring Adcellent's share to 55%.
 
 ---
 
-## 4. Associate Partner Programme
+## 5. Associate Partner Programme
 
-- Associates are recruited and managed by **Adcellent**
-- Associate cost price: **RM 8,000 per report** (payable to Adcellent)
-- Associates set their own final client price (recommended: RM 15,000)
-- Associates access AiServe ESG OS platform via login credentials issued by Adcellent
-- Training, onboarding, and support are the responsibility of **Adcellent**
+| | |
+|---|---|
+| **Associate cost price** | RM 8,000 per ESG report |
+| **Recommended client price** | RM 15,000 per ESG report |
+| **Associate gross margin** | RM 7,000 per report |
 
----
-
-## 5. SLV Group Obligations
-
-- Maintain and develop the AiServe ESG OS platform
-- Provide uptime and technical support to Adcellent
-- Implement new features and framework updates as agreed
-- Issue platform access credentials for all active associates
+Associates are recruited, trained, and managed by Adcellent. They access the platform via credentials issued by Adcellent.
 
 ---
 
-## 6. Adcellent Obligations
+## 6. Referral Partner Programme
 
-- Recruit, train, and manage Associate Partners
-- Drive go-to-market activities and client acquisition
-- Collect associate fees and remit SLV Group's share monthly
-- Maintain accurate records of reports delivered per associate
+To accelerate subscriber acquisition through trusted professional networks:
+
+| | |
+|---|---|
+| **Eligible Referrers** | Accountants, auditors, lawyers, company secretaries, bankers |
+| **Referral Fee** | 10% – 15% of the subscription value |
+| **Recommended Rate** | **15%** (Standard: RM 225 / Professional: RM 525 per annum) |
+| **Paid by** | Adcellent, from Adcellent's revenue share |
+| **Trigger** | Successful subscription activation by the referred client |
+| **Recurring** | Referral fee payable annually for each subscription renewal |
+
+> Referral fees are paid annually for as long as the referred subscriber remains active.
 
 ---
 
-## 7. Payment Terms
+## 7. Cashflow Summary (per month, illustrative)
 
-- Adcellent remits SLV Group's **15% share (RM 1,200 per report)** within **30 days** of each report being delivered
-- Payment via bank transfer to SLV Group's designated account
-- Monthly statement reconciliation required
+| Scenario | Monthly Reports | Subscriptions | SLV Monthly | Adcellent Monthly |
+|---|---|---|---|---|
+| Early Stage | 5 reports | 10 Standard | RM 8,250 | RM 28,000 |
+| Growth | 15 reports | 30 Standard + 10 Pro | RM 24,075 | RM 82,000 |
+| Scale | 40 reports | 100 Standard + 30 Pro | RM 63,450 | RM 216,400 |
 
 ---
 
 ## 8. IPO Share Conversion Rights
 
-Upon a qualifying Initial Public Offering (IPO) or Bursa listing by either party or a jointly held entity arising from this collaboration:
+Upon a qualifying IPO by either Party or a jointly held entity:
 
-- **SLV Group** is entitled to **share conversion rights equivalent to 50% of the market value** of its cumulative contribution at the time of IPO
-- Market value to be determined by the IPO prospectus valuation or an agreed independent valuation
-- Conversion rights vest from the date of this agreement and are non-dilutable below the agreed percentage without written consent of both parties
-- Both parties agree to negotiate in good faith the precise share structure prior to any IPO filing
-
----
-
-## 9. Intellectual Property
-
-- **AiServe ESG OS platform** (codebase, design, data) remains the intellectual property of **SLV Group**
-- **Client relationships, associate network, and go-to-market assets** remain with **Adcellent**
-- Neither party may sub-license the other's IP without written consent
+- **SLV Group** is entitled to share conversion rights equivalent to **50% of the market value** of its cumulative platform contribution at the time of IPO
+- Market value determined by IPO prospectus valuation or independent valuer
+- Conversion rights are non-dilutable without SLV's written consent
+- Both Parties to negotiate share structure in good faith no later than 6 months prior to any IPO filing
+- Rights survive termination for **5 years** should an IPO occur within that period
 
 ---
 
-## 10. Exclusivity & Non-Compete
+## 9. Payment Terms
 
-- Adcellent shall not deploy a competing ESG platform developed by a third party for the duration of this agreement
-- SLV Group shall not appoint a competing go-to-market partner in Malaysia targeting the same associate model without Adcellent's written consent
-
----
-
-## 11. Term & Termination
-
-- Initial term: **2 years** from signing date
-- Auto-renewal for successive 1-year periods unless terminated with **90 days' written notice**
-- Either party may terminate for material breach with **30 days' cure period**
+- Adcellent remits SLV's share of all revenue **monthly**, within 30 days of month-end
+- Monthly reconciliation statement required by the 5th of each month
+- Referral Partner fees paid by Adcellent directly — SLV has no obligation thereto
 
 ---
 
-## 12. Governing Law
+## 10. Term
 
-This agreement is governed by the laws of **Malaysia**. Disputes shall first be resolved through good-faith negotiation, then mediation before the **Asian International Arbitration Centre (AIAC)** if unresolved within 60 days.
+- Initial term: **2 years**, auto-renewing annually
+- Termination on **90 days' written notice**
+
+---
+
+## 11. Governing Law
+
+Laws of **Malaysia**. Disputes via AIAC mediation/arbitration.
 
 ---
 
@@ -133,4 +144,4 @@ This agreement is governed by the laws of **Malaysia**. Disputes shall first be 
 | **Company Stamp** | | |
 
 ---
-*This Term Sheet is a summary of key commercial terms. A formal Collaboration Agreement incorporating these terms will be executed by both parties.*
+*This Term Sheet is a summary of key commercial terms. A formal Collaboration Agreement will be executed separately.*
