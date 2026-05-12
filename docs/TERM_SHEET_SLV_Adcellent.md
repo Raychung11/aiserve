@@ -24,56 +24,57 @@ SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, on
 
 ---
 
-## 3. IT Monthly Maintenance & Platform Retainer
+## 3. Revenue Streams
 
-SLV Group shall provide ongoing platform maintenance, development, and technical support in exchange for a fixed monthly retainer:
+| Stream | Description |
+|---|---|
+| **ESG Reports** | One-time fee per ESG report — Associate cost price RM 8,000, recommended sell price RM 15,000 |
+| **Platform Subscriptions** | Annual recurring — Standard RM 1,500/year, Professional RM 3,500/year |
+
+---
+
+## 4. Profit Waterfall Model
+
+All revenue collected flows through the following waterfall before profit is distributed:
+
+```
+GROSS REVENUE (Reports + Subscriptions)
+  Less:  Consultant Fees          30% of gross revenue
+  Less:  Referral Fees            15% of subscription revenue (where referral applies)
+  Less:  IT Monthly Retainer      RM 3,500 / month (deducted from revenue pool)
+  Less:  Operational Costs        Adcellent's agreed operating expenses
+                                  ─────────────────────────────────────────
+                           =      NET DISTRIBUTABLE PROFIT
+                                  ─────────────────────────────────────────
+         SLV Group                30% of net profit
+         Adcellent                70% of net profit
+```
+
+### 4.1 Illustrative Monthly Profit Calculation
+
+| Item | Early Stage | Growth | Scale |
+|---|---|---|---|
+| ESG Reports | 5 × RM 8,000 = **RM 40,000** | 15 × RM 8,000 = **RM 120,000** | 40 × RM 8,000 = **RM 320,000** |
+| Subscriptions (new/renewals) | 2 × RM 1,500 = **RM 3,000** | 10 × RM 1,500 + 3 × RM 3,500 = **RM 25,500** | 20 × RM 1,500 + 10 × RM 3,500 = **RM 65,000** |
+| **Gross Revenue** | **RM 43,000** | **RM 145,500** | **RM 385,000** |
+| Less: Consultant (30%) | – RM 12,900 | – RM 43,650 | – RM 115,500 |
+| Less: Referral (15% est.) | – RM 450 | – RM 1,875 | – RM 4,875 |
+| Less: IT Retainer | – RM 3,500 | – RM 3,500 | – RM 3,500 |
+| Less: Ops (est.) | – RM 3,000 | – RM 7,000 | – RM 15,000 |
+| **Net Profit** | **RM 23,150** | **RM 89,475** | **RM 246,125** |
+| **SLV 30%** | **RM 6,945** | **RM 26,843** | **RM 73,838** |
+| **Adcellent 70%** | **RM 16,205** | **RM 62,633** | **RM 172,288** |
+
+---
+
+## 5. IT Monthly Maintenance Retainer
 
 | | |
 |---|---|
 | **Monthly Retainer** | RM 3,500 per month |
-| **Paid by** | Adcellent to SLV Group |
-| **Grace Period** | Months 1 & 2 from agreement signing date — **waived** (goodwill for initiative start) |
-| **First Payment Due** | Month 3 from signing date, and monthly thereafter |
-| **Payment Day** | By the **15th of each month** |
-
-> Months 1 and 2 are waived in full as goodwill. No deferral or accumulation — these months are not payable at any later date. Regular payment of RM 3,500/month commences from Month 3 and is independent of transaction revenue.
-
----
-
-## 4. Revenue Streams
-
-This collaboration covers two primary revenue streams:
-
-| Stream | Description |
-|---|---|
-| **ESG Reports** | One-time engagement fee per ESG report delivered by an Associate Partner to a Client |
-| **Platform Subscriptions** | Annual recurring subscription to the AiServe ESG OS platform (Standard / Professional) |
-
----
-
-## 5. Revenue Allocation
-
-### 5.1 ESG Report Revenue (Base Price: RM 8,000 per report)
-
-Associates purchase at RM 8,000 and sell to clients at a recommended price of **RM 15,000**, retaining the difference as their own margin.
-
-| Recipient | Allocation | Amount (RM) |
-|---|---|---|
-| **SLV Group** — IT Solutions & Development | 15% | RM 1,200 |
-| **Consultant Fees** | 30% | RM 2,400 |
-| **Adcellent** — Operations & Growth | 55% | RM 4,400 |
-| **Total** | 100% | RM 8,000 |
-
-### 5.2 Subscription Revenue
-
-Annual subscription plans available to all clients directly through the platform:
-
-| Plan | Annual Fee | SLV 15% | Consultant 30% | Referral 15%* | Adcellent 40%* |
-|---|---|---|---|---|---|
-| Standard | RM 1,500 | RM 225 | RM 450 | RM 225 | RM 600 |
-| Professional | RM 3,500 | RM 525 | RM 1,050 | RM 525 | RM 1,400 |
-
-> \* The Referral Fee of 15% is applicable **only when a qualifying Referral Partner** (accountant, lawyer, or other professional) has introduced the subscriber. Where no referral applies, the 15% reverts to Adcellent, restoring Adcellent's share to 55%.
+| **Treatment** | Deducted from the monthly revenue pool before profit distribution |
+| **Grace Period** | Months 1 & 2 — **fully waived** (goodwill for initiative start, not deferred) |
+| **Commences** | Month 3 from the agreement signing date |
 
 ---
 
@@ -85,68 +86,56 @@ Annual subscription plans available to all clients directly through the platform
 | **Recommended client price** | RM 15,000 per ESG report |
 | **Associate gross margin** | RM 7,000 per report |
 
-Associates are recruited, trained, and managed by Adcellent. They access the platform via credentials issued by Adcellent.
+Associates are recruited, trained, and managed by Adcellent. Platform access issued by Adcellent.
 
 ---
 
 ## 7. Referral Partner Programme
 
-To accelerate subscriber acquisition through trusted professional networks:
-
 | | |
 |---|---|
 | **Eligible Referrers** | Accountants, auditors, lawyers, company secretaries, bankers |
-| **Referral Fee** | 10% – 15% of the subscription value |
-| **Recommended Rate** | **15%** (Standard: RM 225 / Professional: RM 525 per annum) |
-| **Paid by** | Adcellent, from Adcellent's revenue share |
-| **Trigger** | Successful subscription activation by the referred client |
-| **Recurring** | Referral fee payable annually for each subscription renewal |
+| **Referral Fee** | 10% – 15% of subscription value (recommended: **15%**) |
+| **Trigger** | Successful subscription activation by referred client |
+| **Recurring** | Payable annually on each renewal while subscriber remains active |
 
-> Referral fees are paid annually for as long as the referred subscriber remains active.
+> Referral fees apply to **subscriptions only**, not ESG reports. They are deducted from gross revenue before the profit split.
 
 ---
 
-## 8. Cashflow Summary (per month, illustrative)
+## 8. IPO Share Conversion Rights
 
-> Retainer of RM 3,500/month included in SLV total from Month 3 onwards. Adcellent figures shown net of SLV share and retainer.
+Upon a qualifying IPO by either Party or a jointly established entity:
 
-| Scenario | Reports | Subscriptions | SLV (revenue share) | SLV Retainer | SLV Total | Adcellent Net |
-|---|---|---|---|---|---|---|
-| Month 1–2 (grace) | 5 reports | 10 Standard | RM 8,250 | — | RM 8,250 | RM 28,000 |
-| Month 3+ Early | 5 reports | 10 Standard | RM 8,250 | RM 3,500 | RM 11,750 | RM 24,500 |
-| Growth | 15 reports | 30 Standard + 10 Pro | RM 24,075 | RM 3,500 | RM 27,575 | RM 78,500 |
-| Scale | 40 reports | 100 Standard + 30 Pro | RM 63,450 | RM 3,500 | RM 66,950 | RM 212,900 |
+| Party | Share Conversion Right |
+|---|---|
+| **SLV Group** | **30%** of IPO market value of the collaboration entity |
+| **Adcellent** | **70%** of IPO market value of the collaboration entity |
 
----
-
-## 9. IPO Share Conversion Rights
-
-Upon a qualifying IPO by either Party or a jointly held entity:
-
-- **SLV Group** is entitled to share conversion rights equivalent to **50% of the market value** of its cumulative platform contribution at the time of IPO
 - Market value determined by IPO prospectus valuation or independent valuer
-- Conversion rights are non-dilutable without SLV's written consent
-- Both Parties to negotiate share structure in good faith no later than 6 months prior to any IPO filing
+- Rights are non-dilutable without both Parties' written consent
+- Share structure to be negotiated in good faith no later than 6 months prior to IPO filing
 - Rights survive termination for **5 years** should an IPO occur within that period
 
 ---
 
-## 10. Payment Terms
+## 9. Payment & Reconciliation
 
-- Adcellent remits SLV's share of all revenue **monthly**, within 30 days of month-end
-- Monthly reconciliation statement required by the 5th of each month
-- Referral Partner fees paid by Adcellent directly — SLV has no obligation thereto
+- Monthly profit statement prepared by Adcellent by the **5th of each month**
+- Statement to show: gross revenue, each cost deduction, net profit, SLV 30% share
+- SLV's profit share remitted within **30 days** of month-end
+- IT retainer deducted from revenue pool — no separate retainer payment required
 
 ---
 
-## 11. Term
+## 10. Term
 
 - Initial term: **2 years**, auto-renewing annually
-- Termination on **90 days' written notice**
+- Termination on **90 days'** written notice
 
 ---
 
-## 12. Governing Law
+## 11. Governing Law
 
 Laws of **Malaysia**. Disputes via AIAC mediation/arbitration.
 

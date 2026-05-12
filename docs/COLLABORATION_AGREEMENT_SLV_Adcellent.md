@@ -25,7 +25,7 @@ A. SLV has developed and owns the **AiServe ESG OS** platform, a software-as-a-s
 
 B. Adcellent is engaged in business development and consulting services and maintains an established network for recruiting Associate Partners and Referral Partners in the professional services market.
 
-C. The Parties wish to collaborate to commercialise the Platform through two primary revenue streams: ESG Report engagements and Platform Subscription fees, on the terms and conditions set out herein.
+C. The Parties wish to collaborate to commercialise the Platform and share the net profits arising therefrom, after deduction of all agreed costs, on the terms and conditions set out herein.
 
 ---
 
@@ -36,15 +36,19 @@ C. The Parties wish to collaborate to commercialise the Platform through two pri
 - **"Associate Partner"** means any individual or entity recruited by Adcellent to deliver ESG Reports to Clients using the Platform.
 - **"Base Report Price"** means **RM 8,000** per ESG Report, being the cost price charged by Adcellent to Associate Partners.
 - **"Client"** means any end-customer who engages an Associate Partner for ESG reporting or subscribes to the Platform.
-- **"Consultant Fee"** means 30% of the applicable Revenue Base as described in Clause 5.
+- **"Consultant Fee"** means **30% of Gross Revenue** as described in Clause 5.
 - **"ESG Report"** means a completed ESG sustainability report prepared for a Client using the Platform.
+- **"Gross Revenue"** means total revenue collected by Adcellent from all Revenue Streams in a given month.
 - **"IPO"** means an Initial Public Offering of shares on Bursa Malaysia or any other recognised securities exchange.
+- **"IT Monthly Retainer"** means the fixed sum of **RM 3,500 per month** deducted from Gross Revenue for platform maintenance and development, commencing Month 3.
+- **"Net Distributable Profit"** means Gross Revenue less all Permitted Deductions as defined in Clause 5.
+- **"Operational Costs"** means Adcellent's agreed monthly operating expenses directly attributable to the collaboration, as evidenced by receipts or invoices.
+- **"Permitted Deductions"** means Consultant Fees, Referral Fees, the IT Monthly Retainer, and Operational Costs.
 - **"Platform"** means the AiServe ESG OS software, including all features, databases, infrastructure, and branding operated by SLV.
 - **"Professional Plan"** means the annual platform subscription priced at **RM 3,500 per annum**.
 - **"Referral Fee"** means 10%–15% of a Subscription Value payable to a qualifying Referral Partner.
 - **"Referral Partner"** means an accountant, auditor, lawyer, company secretary, banker, or other qualifying professional who introduces a Subscriber to the Platform.
-- **"Monthly Retainer"** means the fixed monthly fee of **RM 3,500** payable by Adcellent to SLV for platform maintenance and development, commencing from Month 3 of this Agreement.
-- **"SLV Fee"** means 15% of the applicable Revenue Base as described in Clause 5.
+- **"Revenue Streams"** means ESG Report revenue and Subscription revenue collectively.
 - **"Standard Plan"** means the annual platform subscription priced at **RM 1,500 per annum**.
 - **"Subscriber"** means a Client who has activated a Standard or Professional subscription to the Platform.
 - **"Subscription Value"** means the annual subscription fee paid by a Subscriber.
@@ -56,29 +60,31 @@ C. The Parties wish to collaborate to commercialise the Platform through two pri
 **2.1 SLV shall:**
   (a) Provide, maintain, and develop the Platform for Adcellent and all authorised users;
   (b) Update the Platform for new ESG framework requirements and regulatory changes;
-  (c) Provide technical support to Adcellent on platform operations;
-  (d) Issue and manage platform login credentials as directed by Adcellent;
+  (c) Provide technical support to Adcellent for platform-related issues;
+  (d) Issue and manage platform login credentials for Associate Partners as directed by Adcellent;
   (e) Ensure platform uptime and data security in accordance with reasonable industry standards.
 
 **2.2 Adcellent shall:**
   (a) Lead all go-to-market, sales, and marketing activities for the Platform in Malaysia;
   (b) Recruit, onboard, train, and manage Associate Partners and Referral Partners;
-  (c) Collect all fees from Associate Partners and Subscribers;
-  (d) Remit SLV's revenue share in accordance with Clause 5;
+  (c) Collect all Revenue Stream fees from Associate Partners and Subscribers;
+  (d) Prepare monthly profit statements and remit SLV's share in accordance with Clause 5;
   (e) Manage the Referral Partner Programme in accordance with Clause 7;
-  (f) Provide monthly revenue reconciliation statements to SLV.
+  (f) Maintain accurate books of account for all revenue and costs under this Agreement.
 
 ---
 
 ## PART 3 — REVENUE STREAMS
 
-**3.1** This Agreement covers the following revenue streams, to which the revenue allocation in Clause 5 applies:
+**3.1** This Agreement covers the following Revenue Streams:
 
   (a) **ESG Report Revenue** — fees collected from Associate Partners at the Base Report Price of RM 8,000 per completed ESG Report;
 
-  (b) **Subscription Revenue** — annual platform subscription fees collected from Subscribers for Standard (RM 1,500/year) and Professional (RM 3,500/year) plans.
+  (b) **Subscription Revenue** — annual platform subscription fees collected from Subscribers:
+  - Standard Plan: RM 1,500 per annum
+  - Professional Plan: RM 3,500 per annum
 
-**3.2** Both revenue streams share the same base allocation percentages, subject to the Referral Fee adjustment described in Clause 7.
+**3.2** All Revenue Streams flow into a single monthly revenue pool from which Permitted Deductions are made before profit distribution.
 
 ---
 
@@ -86,74 +92,75 @@ C. The Parties wish to collaborate to commercialise the Platform through two pri
 
 **4.1** Adcellent shall operate the Associate Partner Programme on the following terms:
 
-| Pricing Level | Amount |
+| Level | Price |
 |---|---|
 | Associate cost price (pays Adcellent) | RM 8,000 per ESG Report |
 | Recommended client-facing price | RM 15,000 per ESG Report |
 | Associate gross margin | RM 7,000 per ESG Report |
 
-**4.2** Associate Partners may set their own client prices. The RM 15,000 recommendation is a guideline only.
+**4.2** Associate Partners may set their own client prices. The RM 15,000 recommendation is a guideline.
 
 **4.3** Adcellent is solely responsible for the recruitment, vetting, training, and commercial conduct of Associate Partners.
 
 ---
 
-## PART 5 — REVENUE ALLOCATION
+## PART 5 — PROFIT WATERFALL & DISTRIBUTION
 
-### 5.1 Standard Allocation (No Referral)
+### 5.1 Monthly Profit Calculation
 
-The following percentages apply to each revenue transaction where no Referral Partner is involved:
+The Net Distributable Profit for each calendar month shall be calculated as follows:
 
-| Recipient | Percentage | Per Report (RM 8,000) | Standard Plan (RM 1,500) | Professional Plan (RM 3,500) |
-|---|---|---|---|---|
-| **SLV Group** | 15% | RM 1,200 | RM 225 | RM 525 |
-| **Consultant Fees** | 30% | RM 2,400 | RM 450 | RM 1,050 |
-| **Adcellent** | 55% | RM 4,400 | RM 825 | RM 1,925 |
-| **Total** | 100% | RM 8,000 | RM 1,500 | RM 3,500 |
+```
+  Gross Revenue (all Revenue Streams)
+  Less:  Consultant Fees          (30% of Gross Revenue)
+  Less:  Referral Fees            (15% of Subscription Revenue where referral applies)
+  Less:  IT Monthly Retainer      (RM 3,500/month from Month 3; nil for Months 1–2)
+  Less:  Operational Costs        (Adcellent's agreed monthly operating expenses)
+  ─────────────────────────────────────────────────────────
+  =      NET DISTRIBUTABLE PROFIT
+  ─────────────────────────────────────────────────────────
+         SLV Group                30% of Net Distributable Profit
+         Adcellent                70% of Net Distributable Profit
+```
 
-### 5.2 Allocation with Referral Partner
+### 5.2 Consultant Fees
 
-Where a qualifying Referral Partner has introduced a Subscriber, the Referral Fee is carved from Adcellent's 55% share:
+  (a) 30% of Gross Revenue shall be set aside as Consultant Fees in each month;
+  (b) Adcellent shall distribute these fees to its designated consultants per its internal remuneration policy;
+  (c) SLV has no obligation in respect of consultant remuneration.
 
-| Recipient | Percentage | Standard Plan (RM 1,500) | Professional Plan (RM 3,500) |
-|---|---|---|---|
-| **SLV Group** | 15% | RM 225 | RM 525 |
-| **Consultant Fees** | 30% | RM 450 | RM 1,050 |
-| **Referral Partner** | 15% | RM 225 | RM 525 |
-| **Adcellent** (net) | 40% | RM 600 | RM 1,400 |
-| **Total** | 100% | RM 1,500 | RM 3,500 |
+### 5.3 IT Monthly Retainer as a Cost Deduction
 
-> Referral Fees do **not** apply to ESG Report revenue — only to Platform Subscriptions.
+  (a) The IT Monthly Retainer of **RM 3,500 per month** shall be treated as an operating cost and deducted from the monthly revenue pool before profit distribution;
+  (b) This deduction is in lieu of a separate retainer payment — Adcellent shall not make a separate cash transfer to SLV for the retainer; it is accounted for in the monthly profit statement as a cost to the collaboration;
+  (c) **Grace Period:** The IT Monthly Retainer is **waived for Months 1 and 2** from the signing date as goodwill for the initiative start. These months are waived in full and not deferred or payable at any later date. The retainer deduction commences from **Month 3**.
 
-### 5.3 Consultant Fee Distribution
+### 5.4 Operational Costs
 
-The Consultant Fee of 30% shall be distributed by Adcellent to its designated consultants in accordance with Adcellent's internal remuneration policy. SLV has no obligation in respect of consultant remuneration.
+  (a) Adcellent's operating costs directly attributable to this collaboration (including but not limited to associate onboarding costs, marketing spend, events, and referral partner management) are deductible as Operational Costs;
+  (b) Operational Costs must be supported by invoices or receipts and agreed by both Parties in advance for recurring items;
+  (c) Any disputed Operational Cost shall be excluded from the deduction until resolved.
 
----
+### 5.5 Profit Split
 
-## PART 5A — MONTHLY IT MAINTENANCE RETAINER
+After all Permitted Deductions, the Net Distributable Profit shall be shared:
 
-**5A.1** In addition to the transaction-based revenue share in Clause 5, Adcellent shall pay SLV a fixed **Monthly Retainer of RM 3,500** to cover ongoing platform maintenance, infrastructure costs, technical support, and development activities.
+| Party | Share |
+|---|---|
+| **SLV Group** | **30%** |
+| **Adcellent** | **70%** |
 
-**5A.2 Grace Period:** In recognition that this collaboration is at an initiative stage, the Monthly Retainer for **Months 1 and 2** from the signing date of this Agreement is **fully waived**. These two months are waived as goodwill and shall not be accumulated, deferred, or payable at any later date.
+### 5.6 Deficit Month
 
-**5A.3 Commencement:** The Monthly Retainer shall first become payable on the **first day of Month 3** from the signing date, and shall continue monthly thereafter for the duration of this Agreement.
-
-**5A.4 Payment:** The Monthly Retainer shall be paid by Adcellent to SLV by the **15th of each calendar month** via bank transfer.
-
-**5A.5** The Monthly Retainer is a fixed obligation independent of the volume of reports delivered or subscriptions activated in any given month. It is payable regardless of whether any transactions occurred in that month.
-
-**5A.6 Suspension:** In the event that the Platform experiences a total service outage exceeding **7 consecutive days** due to SLV's fault, Adcellent may withhold the Monthly Retainer for that month until service is restored.
-
-**5A.7 Escalation:** The Monthly Retainer amount may be reviewed by mutual written agreement annually. Any increase shall not exceed **10% per annum** without Adcellent's prior written consent.
+If in any month the Permitted Deductions exceed Gross Revenue (resulting in a negative Net Distributable Profit), no profit is distributed. The deficit shall not be carried forward or offset against future months unless both Parties agree in writing.
 
 ---
 
 ## PART 6 — PLATFORM ACCESS & LICENCING
 
-**6.1** SLV grants Adcellent and its authorised Associate Partners a **non-exclusive, non-transferable licence** to access and use the Platform solely for preparing ESG Reports for Clients and delivering subscription services under this Agreement.
+**6.1** SLV grants Adcellent and its authorised Associate Partners a **non-exclusive, non-transferable licence** to access and use the Platform solely for delivering ESG Reports and subscription services under this Agreement.
 
-**6.2** Platform users shall not share login credentials, reverse-engineer the Platform, or use it for any purpose outside Client ESG reporting and subscription services.
+**6.2** Platform users shall not share login credentials, reverse-engineer the Platform, or use it for any purpose outside Client ESG reporting and subscriptions.
 
 **6.3** SLV retains all rights, title, and interest in the Platform, including all intellectual property, source code, data models, and ESG indicator databases.
 
@@ -163,66 +170,69 @@ The Consultant Fee of 30% shall be distributed by Adcellent to its designated co
 
 **7.1** Adcellent shall establish and manage a Referral Partner Programme to grow the Platform's subscriber base through professional referral networks.
 
-**7.2 Eligible Referral Partners** include but are not limited to:
-  - Licensed accountants and audit firms
-  - Solicitors and legal advisers
-  - Company secretaries
-  - Licensed financial planners and bankers
-  - Business advisers and chambers of commerce affiliates
+**7.2 Eligible Referral Partners** include:
+- Licensed accountants and audit firms
+- Solicitors and legal advisers
+- Company secretaries
+- Licensed financial planners and bankers
+- Business advisers and chambers of commerce affiliates
 
 **7.3 Referral Fee Terms:**
 
-  (a) The Referral Fee shall be **15%** of the Subscription Value for each qualifying referral (minimum 10%, at Adcellent's discretion);
+  (a) The Referral Fee shall be **15%** of the Subscription Value per qualifying referral (minimum 10%, at Adcellent's discretion);
 
-  (b) The Referral Fee is payable by **Adcellent** from its own revenue share — SLV and consultants' shares are unaffected;
+  (b) Referral Fees are **deducted from Gross Revenue** as a Permitted Deduction before the profit split — they are not paid by SLV;
 
-  (c) The Referral Fee is triggered upon the **successful activation** of a subscription by the referred Client;
+  (c) The Referral Fee is triggered upon **successful subscription activation** by the referred Client;
 
-  (d) The Referral Fee is **recurring annually** — payable for each renewal year that the referred Subscriber remains active on the same plan;
+  (d) The Referral Fee is **recurring annually** — payable for each renewal year the referred Subscriber remains active;
 
-  (e) If a referred Subscriber upgrades from Standard to Professional, the Referral Fee for the renewal year shall be calculated at 15% of the Professional Plan price;
+  (e) Referral fees apply to **Subscriptions only** — not ESG Report revenue;
 
-  (f) Referral fees are forfeited if the Referral Partner's agreement with Adcellent is terminated.
+  (f) If a referred Subscriber upgrades plans, the Referral Fee for the renewal year is calculated at 15% of the new plan price.
 
-**7.4** Adcellent shall maintain a register of all Referral Partners and their referred Subscribers, and make this available to SLV upon request for audit purposes.
+**7.4** Adcellent shall maintain a register of all Referral Partners and referred Subscribers, available to SLV upon request.
 
-**7.5** SLV shall implement a referral tracking mechanism within the Platform to record referral source at the point of subscription activation.
+**7.5** SLV shall implement referral tracking within the Platform to record referral source at subscription activation.
 
 ---
 
-## PART 8 — PAYMENT TERMS
+## PART 8 — PAYMENT & RECONCILIATION
 
-**8.1** Adcellent shall remit SLV's revenue share for all completed transactions monthly, **within thirty (30) days** of each month-end.
+**8.1 Monthly Profit Statement:** Adcellent shall prepare and provide SLV with a monthly profit statement no later than the **5th day of each calendar month**, itemising for the preceding month:
+  (a) Total Gross Revenue (by stream: reports and subscriptions);
+  (b) Consultant Fees deducted (30%);
+  (c) Referral Fees deducted (by subscriber, if any);
+  (d) IT Monthly Retainer deducted (RM 3,500 from Month 3; RM 0 for Months 1–2);
+  (e) Operational Costs deducted (with supporting documentation);
+  (f) Net Distributable Profit;
+  (g) SLV's 30% share due;
+  (h) Adcellent's 70% share.
 
-**8.2** The Monthly Retainer of RM 3,500 shall be paid separately by the **15th of each month**, commencing Month 3. Both the revenue share remittance and the Monthly Retainer may be combined into a single payment where convenient, provided the reconciliation statement itemises them separately.
+**8.2 Remittance:** SLV's 30% profit share shall be remitted by Adcellent within **thirty (30) days** of month-end via bank transfer to SLV's designated account.
 
-**8.3** Adcellent shall provide SLV with a monthly reconciliation statement no later than the **5th day of each calendar month**, itemising:
-  (a) Number of ESG Reports delivered in the preceding month;
-  (b) Number of new Subscribers activated, by plan;
-  (c) Number of Subscriptions renewed, by plan;
-  (d) Number of referral-sourced subscriptions (Standard and Professional);
-  (e) Total SLV revenue share due;
-  (f) Monthly Retainer amount due (RM 0 for Months 1–2; RM 3,500 from Month 3).
+**8.3 Audit Right:** SLV shall have the right, upon **14 days' written notice**, to audit Adcellent's books of account relating to this Agreement, at SLV's cost, no more than once per calendar year.
 
-**8.4** All payments shall be made by bank transfer to SLV's designated account.
-
-**8.5** Late payments shall attract interest at **1.5% per month** on the overdue amount from the due date.
+**8.4 Late Payment:** Outstanding profit shares attract interest at **1.5% per month** from the due date.
 
 ---
 
 ## PART 9 — IPO SHARE CONVERSION RIGHTS
 
-**9.1** In recognition of SLV's platform contribution and ongoing development commitment, SLV shall be entitled to **Share Conversion Rights** upon a qualifying IPO:
+**9.1** In recognition of both Parties' contributions to this collaboration, the following Share Conversion Rights apply upon a qualifying IPO:
 
-  (a) Upon a qualifying IPO by either Party, or a jointly established entity incorporating the commercial activities under this Agreement, SLV shall be entitled to convert its cumulative platform contribution into shares equivalent to **50% of the market value** of such contribution at the time of IPO;
+| Party | IPO Share Conversion Right |
+|---|---|
+| **SLV Group** | **30%** of the IPO market value of the collaboration entity |
+| **Adcellent** | **70%** of the IPO market value of the collaboration entity |
 
-  (b) "Market value of SLV's contribution" shall be determined by the IPO prospectus valuation or, failing agreement, by an independent valuer mutually appointed by the Parties;
+**9.2** "IPO market value of the collaboration entity" shall be determined by the IPO prospectus valuation or, failing agreement, by an independent valuer mutually appointed by the Parties.
 
-  (c) The share conversion right is **non-dilutable** below the agreed percentage without SLV's prior written consent;
+**9.3** These conversion rights are **non-dilutable** below the agreed 30/70 split without both Parties' prior written consent.
 
-  (d) Both Parties commit to negotiate in good faith the precise share structure, vesting schedule, and lock-up period **no later than six (6) months** prior to any intended IPO filing.
+**9.4** Both Parties commit to negotiate in good faith the precise share structure, vesting schedule, and lock-up period **no later than six (6) months** prior to any intended IPO filing.
 
-**9.2** These rights shall survive termination of this Agreement for a period of **five (5) years**, should an IPO occur within that period following termination.
+**9.5** These rights survive termination of this Agreement for **five (5) years**, should an IPO occur within that period.
 
 ---
 
@@ -232,7 +242,7 @@ The Consultant Fee of 30% shall be distributed by Adcellent to its designated co
 
 **10.2** Confidentiality obligations survive termination for **three (3) years**.
 
-**10.3** Exceptions apply to: (a) publicly available information; (b) information known prior to disclosure; (c) information required by law or regulatory authority.
+**10.3** Exceptions: (a) publicly available information; (b) information known prior to disclosure; (c) information required by law or regulatory authority.
 
 ---
 
@@ -269,14 +279,15 @@ The Consultant Fee of 30% shall be distributed by Adcellent to its designated co
 
 **14.1 Term:** Initial period of **two (2) years** from signing, auto-renewing for successive one-year periods unless either Party gives **ninety (90) days'** written notice of non-renewal.
 
-**14.2 Termination for Breach:** Either Party may terminate on written notice if the other fails to remedy a material breach within **thirty (30) days** of receiving written notice.
+**14.2 Termination for Breach:** Either Party may terminate on written notice if the other fails to remedy a material breach within **thirty (30) days** of receiving notice.
 
 **14.3 Effect of Termination:**
-  (a) All outstanding SLV Fees remitted within 30 days of termination;
-  (b) Adcellent and Associate Partners cease Platform use;
-  (c) SLV preserves Associate Partner and Subscriber data for 90 days to facilitate transition;
-  (d) Active Referral Partner recurring fees cease on termination date;
-  (e) IPO share conversion rights survive as stated in Clause 9.2.
+  (a) Final profit statement prepared within 30 days of termination;
+  (b) All outstanding SLV profit shares remitted within 30 days;
+  (c) Adcellent and Associate Partners cease Platform use;
+  (d) SLV preserves data for 90 days to facilitate transition;
+  (e) Referral Partner recurring fees cease on termination date;
+  (f) IPO share conversion rights survive as stated in Clause 9.5.
 
 ---
 
@@ -284,7 +295,7 @@ The Consultant Fee of 30% shall be distributed by Adcellent to its designated co
 
 **15.1** Neither Party shall be liable for indirect, consequential, or loss-of-profit damages.
 
-**15.2** SLV's total liability in any 12-month period shall not exceed the total SLV Fees received in that period.
+**15.2** SLV's total liability in any 12-month period shall not exceed SLV's total profit share received in that period.
 
 ---
 
@@ -294,7 +305,7 @@ The Consultant Fee of 30% shall be distributed by Adcellent to its designated co
 
 **16.2** Disputes resolved by good-faith negotiation within **30 days** of written notice.
 
-**16.3** Unresolved disputes referred to mediation administered by the **Asian International Arbitration Centre (AIAC)**, Kuala Lumpur.
+**16.3** Unresolved disputes referred to mediation at the **Asian International Arbitration Centre (AIAC)**, Kuala Lumpur.
 
 ---
 
@@ -346,4 +357,4 @@ Company Stamp:
 
 ---
 
-*Both parties are advised to seek independent legal advice before signing. This agreement should be reviewed by a qualified Malaysian solicitor, particularly Clauses 7 (Referral Programme) and 9 (IPO Conversion Rights).*
+*Both parties are advised to seek independent legal advice before signing, particularly regarding Clauses 5 (Profit Waterfall), 8 (Audit Rights), and 9 (IPO Conversion Rights).*
