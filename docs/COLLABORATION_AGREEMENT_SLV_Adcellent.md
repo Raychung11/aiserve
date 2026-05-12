@@ -43,6 +43,7 @@ C. The Parties wish to collaborate to commercialise the Platform through two pri
 - **"Professional Plan"** means the annual platform subscription priced at **RM 3,500 per annum**.
 - **"Referral Fee"** means 10%–15% of a Subscription Value payable to a qualifying Referral Partner.
 - **"Referral Partner"** means an accountant, auditor, lawyer, company secretary, banker, or other qualifying professional who introduces a Subscriber to the Platform.
+- **"Monthly Retainer"** means the fixed monthly fee of **RM 3,500** payable by Adcellent to SLV for platform maintenance and development, commencing from Month 3 of this Agreement.
 - **"SLV Fee"** means 15% of the applicable Revenue Base as described in Clause 5.
 - **"Standard Plan"** means the annual platform subscription priced at **RM 1,500 per annum**.
 - **"Subscriber"** means a Client who has activated a Standard or Professional subscription to the Platform.
@@ -130,6 +131,24 @@ The Consultant Fee of 30% shall be distributed by Adcellent to its designated co
 
 ---
 
+## PART 5A — MONTHLY IT MAINTENANCE RETAINER
+
+**5A.1** In addition to the transaction-based revenue share in Clause 5, Adcellent shall pay SLV a fixed **Monthly Retainer of RM 3,500** to cover ongoing platform maintenance, infrastructure costs, technical support, and development activities.
+
+**5A.2 Grace Period:** In recognition that this collaboration is at an initiative stage, the Monthly Retainer for **Months 1 and 2** from the signing date of this Agreement is **fully waived**. These two months are waived as goodwill and shall not be accumulated, deferred, or payable at any later date.
+
+**5A.3 Commencement:** The Monthly Retainer shall first become payable on the **first day of Month 3** from the signing date, and shall continue monthly thereafter for the duration of this Agreement.
+
+**5A.4 Payment:** The Monthly Retainer shall be paid by Adcellent to SLV by the **15th of each calendar month** via bank transfer.
+
+**5A.5** The Monthly Retainer is a fixed obligation independent of the volume of reports delivered or subscriptions activated in any given month. It is payable regardless of whether any transactions occurred in that month.
+
+**5A.6 Suspension:** In the event that the Platform experiences a total service outage exceeding **7 consecutive days** due to SLV's fault, Adcellent may withhold the Monthly Retainer for that month until service is restored.
+
+**5A.7 Escalation:** The Monthly Retainer amount may be reviewed by mutual written agreement annually. Any increase shall not exceed **10% per annum** without Adcellent's prior written consent.
+
+---
+
 ## PART 6 — PLATFORM ACCESS & LICENCING
 
 **6.1** SLV grants Adcellent and its authorised Associate Partners a **non-exclusive, non-transferable licence** to access and use the Platform solely for preparing ESG Reports for Clients and delivering subscription services under this Agreement.
@@ -175,16 +194,19 @@ The Consultant Fee of 30% shall be distributed by Adcellent to its designated co
 
 **8.1** Adcellent shall remit SLV's revenue share for all completed transactions monthly, **within thirty (30) days** of each month-end.
 
-**8.2** Adcellent shall provide SLV with a monthly reconciliation statement no later than the **5th day of each calendar month**, itemising:
+**8.2** The Monthly Retainer of RM 3,500 shall be paid separately by the **15th of each month**, commencing Month 3. Both the revenue share remittance and the Monthly Retainer may be combined into a single payment where convenient, provided the reconciliation statement itemises them separately.
+
+**8.3** Adcellent shall provide SLV with a monthly reconciliation statement no later than the **5th day of each calendar month**, itemising:
   (a) Number of ESG Reports delivered in the preceding month;
   (b) Number of new Subscribers activated, by plan;
   (c) Number of Subscriptions renewed, by plan;
   (d) Number of referral-sourced subscriptions (Standard and Professional);
-  (e) Total SLV Fees due.
+  (e) Total SLV revenue share due;
+  (f) Monthly Retainer amount due (RM 0 for Months 1–2; RM 3,500 from Month 3).
 
-**8.3** Payments shall be made by bank transfer to SLV's designated account.
+**8.4** All payments shall be made by bank transfer to SLV's designated account.
 
-**8.4** Late payments shall attract interest at **1.5% per month** on the overdue amount from the due date.
+**8.5** Late payments shall attract interest at **1.5% per month** on the overdue amount from the due date.
 
 ---
 

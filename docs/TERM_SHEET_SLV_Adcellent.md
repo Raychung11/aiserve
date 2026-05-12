@@ -24,7 +24,23 @@ SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, on
 
 ---
 
-## 3. Revenue Streams
+## 3. IT Monthly Maintenance & Platform Retainer
+
+SLV Group shall provide ongoing platform maintenance, development, and technical support in exchange for a fixed monthly retainer:
+
+| | |
+|---|---|
+| **Monthly Retainer** | RM 3,500 per month |
+| **Paid by** | Adcellent to SLV Group |
+| **Grace Period** | Months 1 & 2 from agreement signing date — **waived** (goodwill for initiative start) |
+| **First Payment Due** | Month 3 from signing date, and monthly thereafter |
+| **Payment Day** | By the **15th of each month** |
+
+> Months 1 and 2 are waived in full as goodwill. No deferral or accumulation — these months are not payable at any later date. Regular payment of RM 3,500/month commences from Month 3 and is independent of transaction revenue.
+
+---
+
+## 4. Revenue Streams
 
 This collaboration covers two primary revenue streams:
 
@@ -35,9 +51,9 @@ This collaboration covers two primary revenue streams:
 
 ---
 
-## 4. Revenue Allocation
+## 5. Revenue Allocation
 
-### 4.1 ESG Report Revenue (Base Price: RM 8,000 per report)
+### 5.1 ESG Report Revenue (Base Price: RM 8,000 per report)
 
 Associates purchase at RM 8,000 and sell to clients at a recommended price of **RM 15,000**, retaining the difference as their own margin.
 
@@ -48,7 +64,7 @@ Associates purchase at RM 8,000 and sell to clients at a recommended price of **
 | **Adcellent** — Operations & Growth | 55% | RM 4,400 |
 | **Total** | 100% | RM 8,000 |
 
-### 4.2 Subscription Revenue
+### 5.2 Subscription Revenue
 
 Annual subscription plans available to all clients directly through the platform:
 
@@ -61,7 +77,7 @@ Annual subscription plans available to all clients directly through the platform
 
 ---
 
-## 5. Associate Partner Programme
+## 6. Associate Partner Programme
 
 | | |
 |---|---|
@@ -73,7 +89,7 @@ Associates are recruited, trained, and managed by Adcellent. They access the pla
 
 ---
 
-## 6. Referral Partner Programme
+## 7. Referral Partner Programme
 
 To accelerate subscriber acquisition through trusted professional networks:
 
@@ -90,17 +106,20 @@ To accelerate subscriber acquisition through trusted professional networks:
 
 ---
 
-## 7. Cashflow Summary (per month, illustrative)
+## 8. Cashflow Summary (per month, illustrative)
 
-| Scenario | Monthly Reports | Subscriptions | SLV Monthly | Adcellent Monthly |
-|---|---|---|---|---|
-| Early Stage | 5 reports | 10 Standard | RM 8,250 | RM 28,000 |
-| Growth | 15 reports | 30 Standard + 10 Pro | RM 24,075 | RM 82,000 |
-| Scale | 40 reports | 100 Standard + 30 Pro | RM 63,450 | RM 216,400 |
+> Retainer of RM 3,500/month included in SLV total from Month 3 onwards. Adcellent figures shown net of SLV share and retainer.
+
+| Scenario | Reports | Subscriptions | SLV (revenue share) | SLV Retainer | SLV Total | Adcellent Net |
+|---|---|---|---|---|---|---|
+| Month 1–2 (grace) | 5 reports | 10 Standard | RM 8,250 | — | RM 8,250 | RM 28,000 |
+| Month 3+ Early | 5 reports | 10 Standard | RM 8,250 | RM 3,500 | RM 11,750 | RM 24,500 |
+| Growth | 15 reports | 30 Standard + 10 Pro | RM 24,075 | RM 3,500 | RM 27,575 | RM 78,500 |
+| Scale | 40 reports | 100 Standard + 30 Pro | RM 63,450 | RM 3,500 | RM 66,950 | RM 212,900 |
 
 ---
 
-## 8. IPO Share Conversion Rights
+## 9. IPO Share Conversion Rights
 
 Upon a qualifying IPO by either Party or a jointly held entity:
 
@@ -112,7 +131,7 @@ Upon a qualifying IPO by either Party or a jointly held entity:
 
 ---
 
-## 9. Payment Terms
+## 10. Payment Terms
 
 - Adcellent remits SLV's share of all revenue **monthly**, within 30 days of month-end
 - Monthly reconciliation statement required by the 5th of each month
@@ -120,14 +139,14 @@ Upon a qualifying IPO by either Party or a jointly held entity:
 
 ---
 
-## 10. Term
+## 11. Term
 
 - Initial term: **2 years**, auto-renewing annually
 - Termination on **90 days' written notice**
 
 ---
 
-## 11. Governing Law
+## 12. Governing Law
 
 Laws of **Malaysia**. Disputes via AIAC mediation/arbitration.
 
