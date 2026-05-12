@@ -135,7 +135,19 @@ Upon a qualifying IPO by either Party or a jointly established entity:
 
 ---
 
-## 11. Governing Law
+## 11. Intellectual Property
+
+| Asset | Ownership |
+|---|---|
+| Platform source code & design | **SLV exclusive** |
+| ESG data on the platform | **Client exclusive** — neither party owns client data |
+| ESG frameworks (Bursa SEDG, GRI, ISSB, etc.) | Based on international/regulatory standards — not owned by either party. Adcellent responsible for monitoring updates; SLV implements them. |
+| AiServe ESG OS brand & platform identity | **Co-owned equally** by SLV and Adcellent |
+| Adcellent brand, client relationships, associate & referral network | **Adcellent exclusive** |
+
+---
+
+## 12. Governing Law
 
 Laws of **Malaysia**. Disputes via AIAC mediation/arbitration.
 

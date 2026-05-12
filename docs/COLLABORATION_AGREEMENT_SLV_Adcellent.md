@@ -248,11 +248,17 @@ If in any month the Permitted Deductions exceed Gross Revenue (resulting in a ne
 
 ## PART 11 — INTELLECTUAL PROPERTY
 
-**11.1** The Platform (code, design, ESG data, frameworks, branding) is the exclusive property of **SLV**.
+**11.1 SLV Exclusive Property:** The Platform's **source code and design** (including software architecture, UI/UX, and technical infrastructure) are the exclusive intellectual property of SLV. SLV retains full ownership and control over these assets for the duration of and beyond this Agreement.
 
-**11.2** Adcellent's brand, client relationships, associate and referral networks, and go-to-market assets are the exclusive property of **Adcellent**.
+**11.2 Client Data:** All ESG data entered into the Platform by or on behalf of a Client belongs exclusively to that **Client**. Neither SLV nor Adcellent shall claim ownership over, commercialise, or disclose any Client's ESG data without that Client's prior written consent. Both Parties shall handle Client data in compliance with applicable Malaysian data protection laws including the **Personal Data Protection Act 2010 (PDPA)**.
 
-**11.3** Neither Party shall sub-license or assign the other Party's intellectual property without prior written consent.
+**11.3 ESG Frameworks:** The ESG reporting frameworks available on the Platform (including Bursa Malaysia SEDG, GRI, ISSB, ESRS, and others) are based on **international and regulatory standards** that are not owned by either Party. Adcellent shall be responsible for monitoring updates to these standards and notifying SLV of required changes. SLV shall implement such updates on the Platform within a reasonable timeframe.
+
+**11.4 Platform Branding:** The AiServe ESG OS brand, platform name, logo, and associated marketing identity are **co-owned equally** by SLV and Adcellent. Neither Party may rebrand, transfer, or license the platform brand to a third party without the other Party's prior written consent. In the event of termination, both Parties shall negotiate in good faith the future use or assignment of the co-owned brand.
+
+**11.5 Adcellent Exclusive Property:** Adcellent's own corporate brand, client relationships, associate network, referral network, and go-to-market materials and strategies are the exclusive property of **Adcellent**.
+
+**11.6** Neither Party shall sub-license, assign, or transfer the other Party's exclusive intellectual property to any third party without prior written consent.
 
 ---
 
