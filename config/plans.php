@@ -21,23 +21,23 @@ return [
         // All 15 mandatory Bursa SEDG primary indicators
         'indicator_ids' => [
             // Environment — 5 mandatory
-            'SEDG-E01', // Energy intensity
-            'SEDG-E03', // Water intensity
-            'SEDG-E04', // Scope 1 GHG
-            'SEDG-E05', // Scope 2 GHG
-            'SEDG-E07', // Waste generated
+            'SEDG-E01', // Total Energy Consumption
+            'SEDG-E08', // Total Water Consumption
+            'SEDG-E04', // Scope 1 GHG Emissions
+            'SEDG-E05', // Scope 2 GHG Emissions
+            'SEDG-E10', // Total Waste Generated
             // Social — 6 mandatory
-            'SEDG-S01', // Employee headcount by gender
-            'SEDG-S02', // Employee turnover
-            'SEDG-S04', // Average training hours
-            'SEDG-S07', // LTIFR / work injuries
-            'SEDG-S08', // Fatalities
-            'SEDG-S09', // Parental leave
+            'SEDG-S01', // Total Number of Employees
+            'SEDG-S02', // Number of New Employee Hires
+            'SEDG-S04', // % Women in Total Workforce
+            'SEDG-S07', // Work-Related Fatalities
+            'SEDG-S08', // Lost Time Injury Frequency Rate (LTIFR)
+            'SEDG-S14', // Parental Leave Policy
             // Governance — 4 mandatory
-            'SEDG-G01', // Board gender diversity
-            'SEDG-G03', // Board age diversity
-            'SEDG-G07', // Anti-corruption
-            'SEDG-G09', // Community investment
+            'SEDG-G01', // Total Board Members
+            'SEDG-G03', // % Women on Board
+            'SEDG-G07', // Data Privacy / Personal Data Policy
+            'SEDG-G09', // ESG Targets or KPIs Formally Set
         ],
         'features' => [
             'All 15 mandatory Bursa SEDG indicators',

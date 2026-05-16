@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $inputs[$f] = max(0, (float)($_POST[$f] ?? 0));
         }
         $result = CarbonCalculator::calculate($inputs);
-        if (!empty($_POST['save_to_esg'])) {
+        if (!empty($_POST['save_to_esg']) && ($activePlan['code'] ?? 'starter') !== 'starter') {
             CarbonCalculator::saveToESG($activeCompanyId, $result, $activeCompany['framework'], $period, $currentUser['id']);
             $success = 'GHG emission data saved to your ESG indicators (Scope 1, 2 & 3).';
             $saved = true;
@@ -270,9 +270,15 @@ include __DIR__ . '/../includes/header.php';
           <button type="submit" class="btn btn-outline-primary btn-sm fw-700">
             <i class="bi bi-calculator me-1"></i>Calculate
           </button>
+          <?php if (($activePlan['code'] ?? 'starter') !== 'starter'): ?>
           <button type="submit" name="save_to_esg" value="1" class="btn btn-success btn-sm fw-700">
             <i class="bi bi-floppy me-1"></i>Save to ESG
           </button>
+          <?php else: ?>
+          <a href="<?= url('billing') ?>" class="btn btn-outline-secondary btn-sm fw-700">
+            <i class="bi bi-lock me-1"></i>Upgrade to Save
+          </a>
+          <?php endif; ?>
         </div>
       </div>
 
