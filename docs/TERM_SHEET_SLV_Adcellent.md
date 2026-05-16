@@ -26,10 +26,18 @@ SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, on
 
 ## 3. Revenue Streams
 
-| Stream | Description |
-|---|---|
-| **ESG Reports** | One-time fee per ESG report — Associate cost price RM 8,000, recommended sell price RM 15,000 |
-| **Platform Subscriptions** | Annual recurring — Standard RM 1,500/year, Professional RM 3,500/year |
+| Stream | Price | Who Pays |
+|---|---|---|
+| **Platform Subscription** | RM 1,500 / year per company | SME pays directly |
+| **Consultation Service** | RM 8,000 / report | SME pays via Associate |
+| **Free Tier** | RM 0 | — |
+
+### SME Journey
+```
+Step 1 — Free      : SME registers, gets all 15 mandatory Bursa SEDG indicators + basic report (no cost)
+Step 2 — Subscribe : SME pays RM 1,500/year for full data collection OS + all indicators + full report generation
+Step 3 — Consult   : SME engages a consultant for professional report review & submission guidance at RM 8,000/report
+```
 
 ---
 
@@ -38,10 +46,12 @@ SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, on
 All revenue collected flows through the following waterfall before profit is distributed:
 
 ```
-GROSS REVENUE (Reports + Subscriptions)
+GROSS REVENUE
+  (Platform Subscriptions: RM 1,500/company/year)
+  (Consultation Services:  RM 8,000/report — billed by Associate to SME)
   Less:  Consultant Fees          30% of gross revenue
   Less:  Referral Fees            15% of subscription revenue (where referral applies)
-  Less:  IT Monthly Retainer      RM 3,500 / month (deducted from revenue pool)
+  Less:  IT Monthly Retainer      RM 3,500 / month (deducted from revenue pool, Month 3+)
   Less:  Operational Costs        Adcellent's agreed operating expenses
                                   ─────────────────────────────────────────
                            =      NET DISTRIBUTABLE PROFIT
@@ -54,16 +64,16 @@ GROSS REVENUE (Reports + Subscriptions)
 
 | Item | Early Stage | Growth | Scale |
 |---|---|---|---|
-| ESG Reports | 5 × RM 8,000 = **RM 40,000** | 15 × RM 8,000 = **RM 120,000** | 40 × RM 8,000 = **RM 320,000** |
-| Subscriptions (new/renewals) | 2 × RM 1,500 = **RM 3,000** | 10 × RM 1,500 + 3 × RM 3,500 = **RM 25,500** | 20 × RM 1,500 + 10 × RM 3,500 = **RM 65,000** |
-| **Gross Revenue** | **RM 43,000** | **RM 145,500** | **RM 385,000** |
-| Less: Consultant (30%) | – RM 12,900 | – RM 43,650 | – RM 115,500 |
-| Less: Referral (15% est.) | – RM 450 | – RM 1,875 | – RM 4,875 |
+| Platform Subscriptions | 5 × RM 1,500 = **RM 7,500** | 20 × RM 1,500 = **RM 30,000** | 60 × RM 1,500 = **RM 90,000** |
+| Consultation Reports | 3 × RM 8,000 = **RM 24,000** | 10 × RM 8,000 = **RM 80,000** | 25 × RM 8,000 = **RM 200,000** |
+| **Gross Revenue** | **RM 31,500** | **RM 110,000** | **RM 290,000** |
+| Less: Consultant (30%) | – RM 9,450 | – RM 33,000 | – RM 87,000 |
+| Less: Referral (15% subs est.) | – RM 563 | – RM 2,250 | – RM 6,750 |
 | Less: IT Retainer | – RM 3,500 | – RM 3,500 | – RM 3,500 |
 | Less: Ops (est.) | – RM 3,000 | – RM 7,000 | – RM 15,000 |
-| **Net Profit** | **RM 23,150** | **RM 89,475** | **RM 246,125** |
-| **SLV 30%** | **RM 6,945** | **RM 26,843** | **RM 73,838** |
-| **Adcellent 70%** | **RM 16,205** | **RM 62,633** | **RM 172,288** |
+| **Net Profit** | **RM 14,987** | **RM 64,250** | **RM 177,750** |
+| **SLV 30%** | **RM 4,496** | **RM 19,275** | **RM 53,325** |
+| **Adcellent 70%** | **RM 10,491** | **RM 44,975** | **RM 124,425** |
 
 ---
 
@@ -80,13 +90,16 @@ GROSS REVENUE (Reports + Subscriptions)
 
 ## 6. Associate Partner Programme
 
+Associates are certified ESG consultants recruited and managed by Adcellent. They deliver the Consultation Service to SME clients.
+
 | | |
 |---|---|
-| **Associate cost price** | RM 8,000 per ESG report |
-| **Recommended client price** | RM 15,000 per ESG report |
-| **Associate gross margin** | RM 7,000 per report |
+| **SME pays for consultation** | RM 8,000 per report |
+| **Platform subscription required** | SME must have an active Platform subscription (RM 1,500/year) |
+| **Associate role** | Professional review, data validation, gap remediation, submission guidance |
+| **Associate access** | Platform credentials issued by Adcellent |
 
-Associates are recruited, trained, and managed by Adcellent. Platform access issued by Adcellent.
+Associates do not resell the platform subscription — they sell their professional consultation service on top of it.
 
 ---
 

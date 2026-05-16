@@ -5,52 +5,20 @@
  */
 return [
 
+    // ── Free tier ────────────────────────────────────────────────────────────
+    // All 15 mandatory Bursa SEDG indicators + basic report generation.
+    // No credit card required — SMEs can start immediately.
     'starter' => [
         'code'          => 'starter',
-        'name'          => 'Starter',
-        'tagline'       => 'Try before you commit',
+        'name'          => 'Free',
+        'tagline'       => 'Start your ESG journey at no cost',
         'price_myr'     => 0,
         'billing'       => 'free',
         'badge'         => 'Free forever',
-        'color'         => '#64748b',
-        'company_limit' => 1,
-        'frameworks'    => ['BURSA_SEDG'],
-        // 5 preview indicators — one from each mandatory category
-        'indicator_ids' => [
-            'SEDG-E01', // Energy — most visible
-            'SEDG-S01', // Employee headcount — easy to fill
-            'SEDG-S07', // Safety incidents — critical
-            'SEDG-G01', // Board gender — Bursa mandatory
-            'SEDG-G07', // Anti-corruption — MACC S17A
-        ],
-        'features' => [
-            '5 Bursa SEDG core indicators',
-            '1 company',
-            'ESG score dashboard',
-            'Basic data entry',
-        ],
-        'locked_features' => [
-            'Gap analysis & recommendations',
-            'PDF report generation',
-            'Carbon calculator',
-            'Benchmarking',
-            'Indicator Collections add-ons',
-        ],
-        'cta'     => 'Get Started Free',
-        'popular' => false,
-    ],
-
-    'standard' => [
-        'code'          => 'standard',
-        'name'          => 'Standard',
-        'tagline'       => 'Bursa SEDG mandatory compliance',
-        'price_myr'     => 1500,
-        'billing'       => 'annual',
-        'badge'         => 'RM 1,500 / year',
         'color'         => '#16a34a',
         'company_limit' => 1,
         'frameworks'    => ['BURSA_SEDG'],
-        // 15 mandatory Bursa SEDG primary indicators (SEDG 2022)
+        // All 15 mandatory Bursa SEDG primary indicators
         'indicator_ids' => [
             // Environment — 5 mandatory
             'SEDG-E01', // Energy intensity
@@ -72,48 +40,71 @@ return [
             'SEDG-G09', // Community investment
         ],
         'features' => [
-            '15 mandatory Bursa SEDG indicators',
-            '1 company',
-            'Gap analysis & prioritised fixes',
-            'PDF compliance report',
-            'Carbon calculator (Scope 1, 2, 3)',
-            'Benchmarking vs industry peers',
-            'Indicator Collections add-ons',
-            'Email support',
+            'All 15 mandatory Bursa SEDG indicators',
+            'ESG score dashboard',
+            'Basic ESG report generation',
+            '1 company profile',
+            'Carbon calculator (view only)',
         ],
         'locked_features' => [
-            'Multi-framework access',
-            'Consultant multi-company mode',
+            'Full data collection OS (all indicators)',
+            'Advanced report generation & PDF export',
+            'Gap analysis & recommendations',
+            'Benchmarking vs industry peers',
+            'GRI, ISSB, ESRS & other frameworks',
         ],
-        'cta'     => 'Choose Standard',
-        'popular' => true,
-        'trial_days' => 14,
+        'cta'     => 'Get Started Free',
+        'popular' => false,
     ],
 
-    'professional' => [
-        'code'          => 'professional',
-        'name'          => 'Professional',
-        'tagline'       => 'All frameworks. All indicators.',
-        'price_myr'     => 3500,
+    // ── Platform subscription ─────────────────────────────────────────────────
+    // Full data collection on the AiServe ESG OS platform.
+    // All indicators across all frameworks + full report generation.
+    'standard' => [
+        'code'          => 'standard',
+        'name'          => 'Platform',
+        'tagline'       => 'Full ESG data collection & report generation',
+        'price_myr'     => 1500,
         'billing'       => 'annual',
-        'badge'         => 'RM 3,500 / year',
-        'color'         => '#7c3aed',
-        'company_limit' => 5,
+        'badge'         => 'RM 1,500 / year',
+        'color'         => '#0ea5e9',
+        'company_limit' => 1,
         'frameworks'    => 'all',
-        'indicator_ids' => 'all', // no gating
+        'indicator_ids' => 'all', // full access — no gating
         'features' => [
-            'All 200+ indicators across 10 frameworks',
-            'Up to 5 companies',
-            'GRI, ISSB, ESRS, CDP, TCFD, UN SDGs, SASB',
-            'All Indicator Collections included',
-            'Consultant multi-company management',
-            'Admin panel',
-            'API access (coming soon)',
-            'Priority support + onboarding call',
+            'All indicators across all frameworks',
+            'Full ESG OS data collection',
+            'Full report generation & PDF export',
+            'Gap analysis & prioritised action plan',
+            'Carbon calculator (Scope 1, 2 & 3)',
+            'Benchmarking vs industry peers',
+            'GRI, ISSB, ESRS, CDP, TCFD frameworks',
+            '1 company profile',
+            'Email support',
         ],
         'locked_features' => [],
-        'cta'     => 'Go Professional',
-        'popular' => false,
-        'trial_days' => 14,
+        'cta'          => 'Subscribe — RM 1,500/year',
+        'popular'      => true,
+        'trial_days'   => 14,
+    ],
+
+    // ── Professional (internal — used for 14-day trial fallback only) ─────────
+    // Not shown publicly. Mirrors 'standard' for trial purposes.
+    'professional' => [
+        'code'          => 'professional',
+        'name'          => 'Platform',
+        'tagline'       => 'Full ESG data collection & report generation',
+        'price_myr'     => 1500,
+        'billing'       => 'annual',
+        'badge'         => 'RM 1,500 / year',
+        'color'         => '#0ea5e9',
+        'company_limit' => 1,
+        'frameworks'    => 'all',
+        'indicator_ids' => 'all',
+        'features'      => [],
+        'locked_features' => [],
+        'cta'           => 'Subscribe',
+        'popular'       => false,
+        'trial_days'    => 14,
     ],
 ];
