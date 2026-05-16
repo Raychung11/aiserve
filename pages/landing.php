@@ -13,390 +13,566 @@ $isLoggedIn = Auth::check();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AiServe ESG OS — Malaysia's ESG Platform for SMEs &amp; Consultants</title>
-  <meta name="description" content="Bursa SEDG, GRI, TCFD, CDP and ESRS compliance platform. Automated gap analysis, carbon calculator, and audit-ready ESG reports for Malaysian businesses.">
+  <meta name="description" content="Start free with all 15 mandatory Bursa SEDG indicators. Subscribe for full ESG data collection and report generation. Engage a certified consultant for professional review.">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link href="<?= APP_URL ?>/assets/css/app.css" rel="stylesheet">
-  <link href="<?= APP_URL ?>/assets/css/landing.css" rel="stylesheet">
-</head>
-<body class="landing-body">
+<style>
+/* ── Reset & base ── */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #1e293b; }
+a { text-decoration: none; }
 
-<!-- ═══════════════════════════════════════════════════════
-     NAVBAR
-═══════════════════════════════════════════════════════ -->
-<nav class="landing-nav" id="landingNav">
-  <div class="ln-brand">
-    <div class="ln-logo"><i class="bi bi-leaf-fill"></i></div>
-    <span class="ln-name">AiServe <span class="text-success">ESG OS</span></span>
+/* ── NAV ── */
+.lp-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(15,23,42,0.96); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 60px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  transition: background .3s;
+}
+.lp-nav.scrolled { background: rgba(15,23,42,1); }
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-logo  { background: #16a34a; color: #fff; width: 32px; height: 32px; border-radius: 8px;
+             display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.nav-name  { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -.3px; }
+.nav-name span { color: #4ade80; }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { color: rgba(255,255,255,.7); font-size: 13px; font-weight: 500; transition: color .15s; }
+.nav-links a:hover { color: #fff; }
+.nav-actions { display: flex; gap: 10px; align-items: center; }
+.btn-nav-login { padding: 7px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,.25);
+                 color: #fff; font-size: 13px; font-weight: 600; background: transparent; transition: background .15s; }
+.btn-nav-login:hover { background: rgba(255,255,255,.1); color: #fff; }
+.btn-nav-cta   { padding: 7px 18px; border-radius: 8px; background: #16a34a; color: #fff;
+                 font-size: 13px; font-weight: 700; transition: background .15s; }
+.btn-nav-cta:hover { background: #15803d; color: #fff; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f2d1a 100%);
+  padding: 100px 20px 80px; text-align: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(22,163,74,.18) 0%, transparent 70%);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(22,163,74,.15); border: 1px solid rgba(74,222,128,.3);
+  color: #4ade80; padding: 5px 16px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; letter-spacing: .04em;
+  margin-bottom: 24px; position: relative;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 900; color: #fff;
+  line-height: 1.15; margin-bottom: 20px; position: relative;
+}
+.hero h1 .accent { color: #4ade80; }
+.hero-sub {
+  font-size: 1.1rem; color: rgba(255,255,255,.7); max-width: 600px;
+  margin: 0 auto 36px; line-height: 1.7; position: relative;
+}
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; margin-bottom: 36px; }
+.btn-hero-primary {
+  padding: 14px 32px; border-radius: 10px; background: #16a34a; color: #fff;
+  font-size: 15px; font-weight: 700; transition: background .15s, transform .15s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-hero-primary:hover { background: #15803d; color: #fff; transform: translateY(-1px); }
+.btn-hero-secondary {
+  padding: 14px 32px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,.3);
+  color: #fff; font-size: 15px; font-weight: 600; background: transparent;
+  transition: background .15s; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-hero-secondary:hover { background: rgba(255,255,255,.08); color: #fff; }
+.hero-trust { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; position: relative; }
+.hero-trust span { color: rgba(255,255,255,.6); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.hero-trust i { color: #4ade80; }
+
+/* ── STATS BAR ── */
+.stats-bar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 28px 20px; }
+.stats-inner { max-width: 900px; margin: 0 auto; display: flex; justify-content: center;
+               align-items: center; gap: 0; flex-wrap: wrap; }
+.stat-item { text-align: center; padding: 0 40px; }
+.stat-num  { font-size: 2rem; font-weight: 900; color: #0f172a; line-height: 1; }
+.stat-num span { color: #16a34a; }
+.stat-lbl  { font-size: 12px; color: #94a3b8; font-weight: 600; margin-top: 4px; }
+.stat-div  { width: 1px; height: 40px; background: #e2e8f0; flex-shrink: 0; }
+
+/* ── JOURNEY ── */
+.journey-section { padding: 72px 20px; background: #f8fafc; }
+.section-eyebrow { text-align: center; font-size: 11px; font-weight: 800; letter-spacing: .1em;
+                   text-transform: uppercase; color: #16a34a; margin-bottom: 10px; }
+.section-title   { text-align: center; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800;
+                   color: #0f172a; margin-bottom: 12px; }
+.section-sub     { text-align: center; color: #64748b; font-size: 1rem; max-width: 520px;
+                   margin: 0 auto 48px; }
+.journey-steps { display: flex; gap: 0; justify-content: center; align-items: stretch;
+                 max-width: 960px; margin: 0 auto; flex-wrap: wrap; gap: 20px; }
+.journey-card {
+  flex: 1; min-width: 260px; max-width: 300px;
+  background: #fff; border: 1.5px solid #e2e8f0; border-radius: 16px;
+  padding: 28px 24px; position: relative;
+}
+.journey-card.j-free    { border-top: 4px solid #16a34a; }
+.journey-card.j-platform { border-top: 4px solid #0ea5e9; }
+.journey-card.j-consult { border-top: 4px solid #8b5cf6; }
+.j-step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; margin-bottom: 16px;
+}
+.j-free    .j-step-num { background: #f0fdf4; color: #16a34a; }
+.j-platform .j-step-num { background: #f0f9ff; color: #0369a1; }
+.j-consult .j-step-num { background: #faf5ff; color: #7c3aed; }
+.j-title    { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+.j-price    { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
+.j-free    .j-price { color: #16a34a; }
+.j-platform .j-price { color: #0ea5e9; }
+.j-consult .j-price { color: #8b5cf6; }
+.j-desc     { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 16px; }
+.j-features { list-style: none; padding: 0; margin: 0; }
+.j-features li { font-size: 12px; color: #374151; padding: 4px 0;
+                 display: flex; align-items: flex-start; gap: 8px; }
+.j-features li i { font-size: 13px; margin-top: 1px; flex-shrink: 0; }
+.j-cta {
+  display: block; text-align: center; margin-top: 20px; padding: 10px;
+  border-radius: 8px; font-size: 13px; font-weight: 700; transition: opacity .15s;
+}
+.j-cta:hover { opacity: .85; }
+.j-free    .j-cta { background: #f0fdf4; color: #16a34a; border: 1.5px solid #bbf7d0; }
+.j-platform .j-cta { background: #0ea5e9; color: #fff; }
+.j-consult .j-cta { background: #8b5cf6; color: #fff; }
+
+/* ── FEATURES ── */
+.features-section { padding: 72px 20px; background: #fff; }
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px; max-width: 1060px; margin: 0 auto;
+}
+.feat-card {
+  padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px;
+  background: #fafafa; transition: box-shadow .2s, transform .2s;
+}
+.feat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); transform: translateY(-2px); background: #fff; }
+.feat-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 14px;
+}
+.feat-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+.feat-desc  { font-size: 12px; color: #64748b; line-height: 1.6; }
+
+/* ── FRAMEWORKS ── */
+.frameworks-section { padding: 72px 20px; background: #f8fafc; }
+.fw-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 900px; margin: 0 auto; }
+.fw-pill {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 12px 18px; transition: border-color .15s, box-shadow .15s;
+}
+.fw-pill:hover { border-color: var(--c); box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+.fw-pill-icon { width: 32px; height: 32px; border-radius: 8px;
+                display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.fw-pill-name { font-size: 13px; font-weight: 700; color: #0f172a; }
+.fw-pill-desc { font-size: 11px; color: #94a3b8; }
+
+/* ── ROLES ── */
+.roles-section { padding: 72px 20px; background: #fff; }
+.roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+              gap: 16px; max-width: 1060px; margin: 0 auto; }
+.role-card {
+  border-radius: 14px; padding: 24px; border: 1.5px solid #e2e8f0;
+  transition: box-shadow .2s, transform .2s;
+}
+.role-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); transform: translateY(-2px); }
+.role-icon { font-size: 26px; margin-bottom: 12px; }
+.role-card h5 { font-size: 15px; font-weight: 800; margin-bottom: 8px; color: #0f172a; }
+.role-card p  { font-size: 12px; color: #64748b; line-height: 1.6; margin-bottom: 12px; }
+.role-list { list-style: none; padding: 0; margin: 0; }
+.role-list li { font-size: 12px; padding: 3px 0; display: flex; align-items: center; gap: 7px; color: #374151; }
+.role-list li::before { content: '✓'; font-weight: 800; font-size: 11px; flex-shrink: 0; }
+.role-sme      { background: #f0fdf4; border-color: #bbf7d0; }
+.role-sme .role-icon { color: #16a34a; }
+.role-sme .role-list li::before { color: #16a34a; }
+.role-assoc    { background: #f0f9ff; border-color: #bae6fd; }
+.role-assoc .role-icon { color: #0369a1; }
+.role-assoc .role-list li::before { color: #0369a1; }
+.role-consult  { background: #faf5ff; border-color: #ddd6fe; }
+.role-consult .role-icon { color: #7c3aed; }
+.role-consult .role-list li::before { color: #7c3aed; }
+.role-ref      { background: #fffbeb; border-color: #fde68a; }
+.role-ref .role-icon { color: #d97706; }
+.role-ref .role-list li::before { color: #d97706; }
+
+/* ── CTA BANNER ── */
+.cta-section {
+  background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%);
+  padding: 80px 20px; text-align: center;
+}
+.cta-section h2 { font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 14px; }
+.cta-section p  { color: rgba(255,255,255,.7); max-width: 520px; margin: 0 auto 32px; }
+.cta-leaf { font-size: 40px; color: #4ade80; margin-bottom: 16px; }
+
+/* ── FOOTER ── */
+.lp-footer { background: #0f172a; padding: 48px 20px 24px; }
+.footer-inner { max-width: 1060px; margin: 0 auto; }
+.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 32px; margin-bottom: 32px; }
+@media(max-width:768px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+.footer-brand-name { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.footer-brand-desc { font-size: 12px; color: #64748b; line-height: 1.6; }
+.footer-heading { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;
+                  letter-spacing: .08em; margin-bottom: 12px; }
+.footer-link { display: block; color: #64748b; font-size: 13px; margin-bottom: 8px; transition: color .15s; }
+.footer-link:hover { color: #fff; }
+.fw-badge { display: inline-block; background: rgba(255,255,255,.07); color: #94a3b8;
+            border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 600; margin: 3px; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.07); padding-top: 20px;
+                 display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.footer-bottom span { font-size: 12px; color: #475569; }
+
+/* ── Utility ── */
+.container-lg { max-width: 1060px; margin: 0 auto; }
+@media(max-width:640px) {
+  .nav-links { display: none; }
+  .hero { padding: 72px 16px 60px; }
+  .stat-item { padding: 0 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────────── -->
+<nav class="lp-nav" id="lpNav">
+  <div class="nav-brand">
+    <div class="nav-logo"><i class="bi bi-leaf-fill"></i></div>
+    <span class="nav-name">AiServe <span>ESG OS</span></span>
   </div>
-  <div class="ln-links d-none d-md-flex">
+  <div class="nav-links">
+    <a href="#journey">How It Works</a>
     <a href="#features">Features</a>
     <a href="#frameworks">Standards</a>
-    <a href="#pricing">Pricing</a>
     <a href="#roles">Who It's For</a>
   </div>
-  <div class="ln-actions">
+  <div class="nav-actions">
     <?php if ($isLoggedIn): ?>
-    <a href="<?= APP_URL ?>/dashboard" class="btn btn-success btn-sm">
-      <i class="bi bi-speedometer2 me-1"></i>My Dashboard
-    </a>
+    <a href="<?= APP_URL ?>/dashboard" class="btn-nav-cta"><i class="bi bi-speedometer2 me-1"></i>My Dashboard</a>
     <?php else: ?>
-    <a href="<?= APP_URL ?>/login" class="btn btn-outline-light btn-sm me-2">Login</a>
-    <a href="<?= APP_URL ?>/register" class="btn btn-success btn-sm">
-      <i class="bi bi-rocket-takeoff me-1"></i>Get Started Free
-    </a>
+    <a href="<?= APP_URL ?>/login"    class="btn-nav-login">Login</a>
+    <a href="<?= APP_URL ?>/register" class="btn-nav-cta"><i class="bi bi-rocket-takeoff me-1"></i>Start Free</a>
     <?php endif; ?>
   </div>
 </nav>
 
-<!-- ═══════════════════════════════════════════════════════
-     HERO
-═══════════════════════════════════════════════════════ -->
-<section class="hero-section">
-  <div class="hero-bg-pattern"></div>
-  <div class="container hero-container">
-    <div class="hero-badge">
-      <i class="bi bi-patch-check-fill me-1 text-success"></i>
-      Built for Malaysia — Bursa SEDG · GRI · TCFD · CDP · ESRS
-    </div>
-    <h1 class="hero-headline">
-      ESG Compliance,<br>
-      <span class="hero-headline-accent">Done Right.</span>
-    </h1>
-    <p class="hero-sub">
-      The all-in-one ESG operating system for Malaysian SMEs, accounting firms, and ESG consultants.
-      Track disclosures, close gaps, calculate carbon, and generate audit-ready reports — in one platform.
-    </p>
-    <div class="hero-actions">
-      <?php if ($isLoggedIn): ?>
-      <a href="<?= APP_URL ?>/dashboard" class="btn btn-success btn-lg hero-btn-primary">
-        <i class="bi bi-speedometer2 me-2"></i>Go to My Dashboard
-      </a>
-      <?php else: ?>
-      <a href="<?= APP_URL ?>/register" class="btn btn-success btn-lg hero-btn-primary">
-        <i class="bi bi-rocket-takeoff me-2"></i>Start Free Today
-      </a>
-      <a href="<?= APP_URL ?>/login" class="btn btn-outline-light btn-lg hero-btn-secondary">
-        <i class="bi bi-box-arrow-in-right me-2"></i>Login to Platform
-      </a>
-      <?php endif; ?>
-    </div>
-    <div class="hero-trust">
-      <span><i class="bi bi-check-circle-fill text-success me-1"></i>Free Starter Plan</span>
-      <span><i class="bi bi-check-circle-fill text-success me-1"></i>14-day Professional trial</span>
-      <span><i class="bi bi-check-circle-fill text-success me-1"></i>No credit card required</span>
-    </div>
+<!-- ── HERO ─────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <i class="bi bi-patch-check-fill"></i>
+    Built for Malaysia — Bursa SEDG · GRI · ISSB · CDP · ESRS · TCFD
   </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     STATS BAR
-═══════════════════════════════════════════════════════ -->
-<section class="stats-bar">
-  <div class="container">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-num">200<span class="stat-plus">+</span></div>
-        <div class="stat-label">ESG Indicators</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-num">6</div>
-        <div class="stat-label">Reporting Frameworks</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Subscription Tiers</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-num">RM0</div>
-        <div class="stat-label">to Get Started</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     FEATURES
-═══════════════════════════════════════════════════════ -->
-<section class="features-section" id="features">
-  <div class="container">
-    <div class="section-label">PLATFORM FEATURES</div>
-    <h2 class="section-heading">Everything you need for ESG compliance</h2>
-    <p class="section-sub">From data collection to board-ready reports — all in one place.</p>
-
-    <div class="row g-4 mt-2">
-      <?php
-      $features = [
-        ['bi-bar-chart-steps',   'success', 'Gap Analysis',       'Instantly see which mandatory Bursa SEDG or GRI disclosures are missing. Priority-ranked by critical / high / medium impact.'],
-        ['bi-calculator',        'primary', 'Carbon Calculator',  'Scope 1, 2 & 3 calculations using Malaysia MyGHG 2023 factors. Auto-maps results to your ESG indicators.'],
-        ['bi-file-earmark-text', 'info',    'Report Generator',   'Generate audit-ready PDF/Word ESG reports mapped to Bursa SEDG, GRI, or TCFD templates in minutes.'],
-        ['bi-tree',              'success', 'E/S/G Data Entry',   '200+ indicators with guidance notes, data sources, and verification flags for every disclosure.'],
-        ['bi-currency-dollar',   'warning', 'Green Financing',    'Automatically identifies BNM, Khazanah, and commercial green financing opportunities your company is eligible for.'],
-        ['bi-bar-chart-line',    'purple',  'Benchmarking',       'Compare your ESG scores against Malaysian industry peers. See where you rank and what to improve first.'],
-        ['bi-people-fill',       'primary', 'Multi-Role Access',  'Principal → Associate → Manager hierarchy for consulting firms. Each role sees the right data.'],
-        ['bi-shield-lock',       'success', 'Audit Trail',        'Every data entry is timestamped, sourced, and verifiable. Full activity log for compliance auditors.'],
-      ];
-      foreach ($features as [$icon, $color, $title, $desc]):
-      ?>
-      <div class="col-lg-3 col-md-6">
-        <div class="feature-card">
-          <div class="feature-icon bg-<?= $color ?>-soft">
-            <i class="bi <?= $icon ?> text-<?= $color ?>"></i>
-          </div>
-          <h5 class="feature-title"><?= $title ?></h5>
-          <p class="feature-desc"><?= $desc ?></p>
-        </div>
-      </div>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     FRAMEWORKS
-═══════════════════════════════════════════════════════ -->
-<section class="frameworks-section" id="frameworks">
-  <div class="container">
-    <div class="section-label">SUPPORTED STANDARDS</div>
-    <h2 class="section-heading">All major ESG reporting frameworks</h2>
-    <p class="section-sub">One platform for every framework your clients or regulators require.</p>
-
-    <div class="frameworks-grid mt-4">
-      <?php
-      $frameworks = [
-        ['bi-flag-fill',        '#dc2626', 'Bursa SEDG',  'Mandatory for Bursa Malaysia-listed and pre-IPO companies. All 41 SEDG indicators.'],
-        ['bi-globe',            '#0891b2', 'GRI Standards','Global Reporting Initiative — widely accepted for voluntary and regulated ESG.'],
-        ['bi-cloud-sun-fill',   '#0d9488', 'TCFD / ISSB', 'Climate-related financial disclosures. ISSB S1 & S2 aligned.'],
-        ['bi-droplet-fill',     '#0284c7', 'CDP',         'Carbon Disclosure Project — investors and supply chains worldwide.'],
-        ['bi-building-fill',    '#7c3aed', 'ESRS',        'EU Corporate Sustainability Reporting Directive (CSRD) for export-facing firms.'],
-        ['bi-briefcase-fill',   '#ca8a04', 'SASB',        'Industry-specific: Manufacturing, Food & Beverage, Technology packs.'],
-      ];
-      foreach ($frameworks as [$icon, $color, $name, $desc]):
-      ?>
-      <div class="fw-card">
-        <div class="fw-icon" style="background:<?= $color ?>22; color:<?= $color ?>">
-          <i class="bi <?= $icon ?>"></i>
-        </div>
-        <div class="fw-name"><?= $name ?></div>
-        <div class="fw-desc"><?= $desc ?></div>
-      </div>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     WHO IT'S FOR (ROLES)
-═══════════════════════════════════════════════════════ -->
-<section class="roles-section" id="roles">
-  <div class="container">
-    <div class="section-label">WHO IT'S FOR</div>
-    <h2 class="section-heading">Built for every stakeholder in the ESG ecosystem</h2>
-
-    <div class="row g-4 mt-2">
-      <div class="col-md-3">
-        <div class="role-card role-sme">
-          <div class="role-icon"><i class="bi bi-building"></i></div>
-          <h5>SME Owner</h5>
-          <p>Track your own company's ESG data, close gaps, and generate reports for banks, buyers, or regulators.</p>
-          <ul class="role-list">
-            <li>Self-service data entry</li>
-            <li>Instant gap analysis</li>
-            <li>Green financing check</li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="role-card role-principal">
-          <div class="role-icon"><i class="bi bi-diagram-3-fill"></i></div>
-          <h5>Principal</h5>
-          <p>Consulting firm owner. Manage your entire associate team and see portfolio-wide ESG metrics at a glance.</p>
-          <ul class="role-list">
-            <li>All associates &amp; clients</li>
-            <li>Portfolio avg ESG score</li>
-            <li>Plan &amp; revenue overview</li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="role-card role-associate">
-          <div class="role-icon"><i class="bi bi-briefcase-fill"></i></div>
-          <h5>Associate</h5>
-          <p>Accounting firm, COSEC, or senior ESG consultant managing a portfolio of clients with a team of managers.</p>
-          <ul class="role-list">
-            <li>Client portfolio grid</li>
-            <li>Manage your managers</li>
-            <li>E/S/G mini-bar view</li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="role-card role-manager">
-          <div class="role-icon"><i class="bi bi-person-workspace"></i></div>
-          <h5>Manager</h5>
-          <p>Staff analyst or junior consultant. See only your assigned companies, pending gaps, and priority actions.</p>
-          <ul class="role-list">
-            <li>Assigned companies only</li>
-            <li>Priority action list</li>
-            <li>Quick data entry links</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     PRICING
-═══════════════════════════════════════════════════════ -->
-<section class="lp-pricing-section" id="pricing">
-  <div class="container">
-    <div class="section-label">PRICING</div>
-    <h2 class="section-heading">Simple, transparent pricing</h2>
-    <p class="section-sub">Start free. Upgrade when your reporting requirements grow.</p>
-
-    <div class="row g-4 justify-content-center mt-2">
-      <!-- Starter -->
-      <div class="col-lg-4 col-md-6">
-        <div class="lp-plan-card">
-          <div class="lp-plan-name">Starter</div>
-          <div class="lp-plan-price"><span class="lp-currency">RM</span>0<span class="lp-period">/year</span></div>
-          <div class="lp-plan-desc">5 preview indicators. Try the platform risk-free.</div>
-          <a href="<?= APP_URL ?>/register" class="btn btn-outline-primary w-100 mb-3">Get Started Free</a>
-          <ul class="lp-plan-features">
-            <li><i class="bi bi-check text-success"></i> 5 ESG indicators</li>
-            <li><i class="bi bi-check text-success"></i> Basic dashboard</li>
-            <li><i class="bi bi-check text-success"></i> Carbon calculator</li>
-            <li><i class="bi bi-x text-muted"></i> <span class="text-muted">Full gap analysis</span></li>
-            <li><i class="bi bi-x text-muted"></i> <span class="text-muted">Report generation</span></li>
-          </ul>
-        </div>
-      </div>
-      <!-- Standard -->
-      <div class="col-lg-4 col-md-6">
-        <div class="lp-plan-card lp-plan-popular">
-          <div class="lp-popular-badge">Most Popular</div>
-          <div class="lp-plan-name">Standard</div>
-          <div class="lp-plan-price"><span class="lp-currency">RM</span>1,500<span class="lp-period">/year</span></div>
-          <div class="lp-plan-desc">15 mandatory Bursa SEDG indicators. Regulatory baseline.</div>
-          <a href="<?= APP_URL ?>/register" class="btn btn-success w-100 mb-3">Start 14-day Trial</a>
-          <ul class="lp-plan-features">
-            <li><i class="bi bi-check text-success"></i> 15 mandatory Bursa SEDG indicators</li>
-            <li><i class="bi bi-check text-success"></i> Full gap analysis</li>
-            <li><i class="bi bi-check text-success"></i> Report generation</li>
-            <li><i class="bi bi-check text-success"></i> Carbon calculator</li>
-            <li><i class="bi bi-check text-success"></i> Add-on collections available</li>
-          </ul>
-        </div>
-      </div>
-      <!-- Professional -->
-      <div class="col-lg-4 col-md-6">
-        <div class="lp-plan-card lp-plan-pro">
-          <div class="lp-plan-name">Professional</div>
-          <div class="lp-plan-price"><span class="lp-currency">RM</span>3,500<span class="lp-period">/year</span></div>
-          <div class="lp-plan-desc">All 200+ indicators across all 6 frameworks. No limits.</div>
-          <a href="<?= APP_URL ?>/register" class="btn btn-primary w-100 mb-3">Start 14-day Trial</a>
-          <ul class="lp-plan-features">
-            <li><i class="bi bi-check text-success"></i> All 200+ indicators</li>
-            <li><i class="bi bi-check text-success"></i> All 6 frameworks</li>
-            <li><i class="bi bi-check text-success"></i> Multi-company support</li>
-            <li><i class="bi bi-check text-success"></i> Benchmarking</li>
-            <li><i class="bi bi-check text-success"></i> Priority support</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="text-center mt-4">
-      <a href="<?= APP_URL ?>/pricing" class="text-muted small">
-        View full pricing &amp; add-on indicator collections <i class="bi bi-arrow-right ms-1"></i>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     FINAL CTA
-═══════════════════════════════════════════════════════ -->
-<section class="cta-section">
-  <div class="container text-center">
-    <div class="cta-leaf"><i class="bi bi-leaf-fill"></i></div>
-    <h2 class="cta-heading">Start your ESG journey today</h2>
-    <p class="cta-sub">Join Malaysian SMEs and consulting firms already using AiServe ESG OS to meet Bursa SEDG requirements and secure green financing.</p>
+  <h1>
+    ESG Compliance,<br>
+    <span class="accent">Made Simple.</span>
+  </h1>
+  <p class="hero-sub">
+    The complete ESG operating system for Malaysian SMEs and consultants.
+    Start free with all mandatory indicators. Subscribe for full data collection and report generation.
+    Engage a certified consultant for professional review.
+  </p>
+  <div class="hero-btns">
     <?php if ($isLoggedIn): ?>
-    <a href="<?= APP_URL ?>/dashboard" class="btn btn-success btn-lg px-5">
-      <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+    <a href="<?= APP_URL ?>/dashboard" class="btn-hero-primary">
+      <i class="bi bi-speedometer2"></i>Go to My Dashboard
     </a>
     <?php else: ?>
-    <a href="<?= APP_URL ?>/register" class="btn btn-success btn-lg px-5 me-3">
-      <i class="bi bi-rocket-takeoff me-2"></i>Create Free Account
+    <a href="<?= APP_URL ?>/register" class="btn-hero-primary">
+      <i class="bi bi-rocket-takeoff"></i>Start Free — No Credit Card
     </a>
-    <a href="<?= APP_URL ?>/login" class="btn btn-outline-light btn-lg px-5">
-      Sign In
+    <a href="<?= APP_URL ?>/login" class="btn-hero-secondary">
+      <i class="bi bi-box-arrow-in-right"></i>Login to Platform
     </a>
     <?php endif; ?>
   </div>
+  <div class="hero-trust">
+    <span><i class="bi bi-check-circle-fill"></i>All 15 mandatory Bursa SEDG indicators — free</span>
+    <span><i class="bi bi-check-circle-fill"></i>14-day Platform trial</span>
+    <span><i class="bi bi-check-circle-fill"></i>No credit card required</span>
+  </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     FOOTER
-═══════════════════════════════════════════════════════ -->
-<footer class="landing-footer">
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <div class="ln-logo ln-logo-sm"><i class="bi bi-leaf-fill"></i></div>
-          <span class="fw-bold text-white">AiServe ESG OS</span>
-        </div>
-        <p class="text-muted small">Malaysia's AI-powered ESG operating system for SMEs, accounting firms, and ESG consultants.</p>
+<!-- ── STATS BAR ─────────────────────────────────────────── -->
+<section class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num">200<span>+</span></div>
+      <div class="stat-lbl">ESG Indicators</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num">10</div>
+      <div class="stat-lbl">Reporting Frameworks</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num">RM<span>0</span></div>
+      <div class="stat-lbl">to Get Started</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-lbl">Simple Steps</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS / JOURNEY ─────────────────────────────────────────── -->
+<section class="journey-section" id="journey">
+  <div class="section-eyebrow">How It Works</div>
+  <h2 class="section-title">Your ESG Journey in 3 Steps</h2>
+  <p class="section-sub">From free setup to professional submission — everything in one platform.</p>
+
+  <div class="journey-steps">
+
+    <!-- Step 1 -->
+    <div class="journey-card j-free">
+      <div class="j-step-num">1</div>
+      <div class="j-title">Sign Up Free</div>
+      <div class="j-price">Free Forever</div>
+      <div class="j-desc">Register your company and start entering ESG data immediately. All 15 mandatory Bursa SEDG indicators are included at no cost.</div>
+      <ul class="j-features">
+        <li><i class="bi bi-check-circle-fill" style="color:#16a34a"></i>All 15 mandatory Bursa SEDG indicators</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#16a34a"></i>ESG score dashboard</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#16a34a"></i>Basic report generation</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#16a34a"></i>No credit card needed</li>
+      </ul>
+      <a href="<?= APP_URL ?>/register" class="j-cta"><i class="bi bi-rocket-takeoff me-1"></i>Create Free Account</a>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="journey-card j-platform">
+      <div class="j-step-num">2</div>
+      <div class="j-title">Subscribe to Platform</div>
+      <div class="j-price">RM 1,500 <span style="font-size:14px;font-weight:600;color:#64748b">/ year</span></div>
+      <div class="j-desc">Unlock the full ESG data collection OS. Access all indicators across all frameworks, full report generation, gap analysis, and carbon calculator.</div>
+      <ul class="j-features">
+        <li><i class="bi bi-check-circle-fill" style="color:#0ea5e9"></i>All indicators — all frameworks</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#0ea5e9"></i>Full report generation & PDF export</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#0ea5e9"></i>Gap analysis & action plan</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#0ea5e9"></i>Carbon calculator (Scope 1, 2 & 3)</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#0ea5e9"></i>Industry benchmarking</li>
+      </ul>
+      <a href="<?= APP_URL ?>/register" class="j-cta"><i class="bi bi-lightning-charge-fill me-1"></i>Start 14-Day Trial</a>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="journey-card j-consult">
+      <div class="j-step-num">3</div>
+      <div class="j-title">Engage a Consultant</div>
+      <div class="j-price">RM 8,000 <span style="font-size:14px;font-weight:600;color:#64748b">/ report</span></div>
+      <div class="j-desc">Have a certified ESG associate professionally review your generated report, validate your data, and guide you through regulatory submission.</div>
+      <ul class="j-features">
+        <li><i class="bi bi-check-circle-fill" style="color:#8b5cf6"></i>Professional report review & validation</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#8b5cf6"></i>Regulatory submission guidance</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#8b5cf6"></i>Gap remediation recommendations</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#8b5cf6"></i>1-on-1 consultation session</li>
+        <li><i class="bi bi-check-circle-fill" style="color:#8b5cf6"></i>Report sign-off by certified consultant</li>
+      </ul>
+      <a href="mailto:hello@aiserve.my?subject=Consultation Enquiry" class="j-cta"><i class="bi bi-envelope-fill me-1"></i>Enquire Now</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── FEATURES ─────────────────────────────────────────── -->
+<section class="features-section" id="features">
+  <div class="section-eyebrow">Platform Features</div>
+  <h2 class="section-title">Everything you need for ESG compliance</h2>
+  <p class="section-sub">From data entry to board-ready reports — all in one place.</p>
+
+  <div class="features-grid container-lg">
+    <?php
+    $features = [
+      ['bi-list-check',        '#f0f9ff','#0ea5e9', 'Full Indicator Library',  'All 15 mandatory Bursa SEDG indicators free. Subscribe for 200+ indicators across GRI, ISSB, ESRS, CDP, TCFD, and SASB.'],
+      ['bi-bar-chart-steps',   '#f0fdf4','#16a34a', 'Gap Analysis',            'Instantly see which mandatory disclosures are missing. Priority-ranked by critical / high / medium impact with a clear action plan.'],
+      ['bi-calculator',        '#fff7ed','#f97316', 'Carbon Calculator',       'Scope 1, 2 & 3 calculations using Malaysia MyGHG 2023 factors. Auto-saves results directly to your GHG indicators.'],
+      ['bi-file-earmark-text', '#faf5ff','#8b5cf6', 'Report Generation',       'Generate full ESG reports mapped to Bursa SEDG, GRI, or TCFD templates. Export to PDF for submission or investor disclosure.'],
+      ['bi-bar-chart-line',    '#fffbeb','#d97706', 'Industry Benchmarking',   'Compare your ESG scores against Malaysian industry peers. See where you rank and what to prioritise first.'],
+      ['bi-shield-check',      '#f0fdf4','#16a34a', 'Audit Trail',             'Every data entry is timestamped, sourced, and verifiable. Full activity log for compliance auditors and board review.'],
+      ['bi-people-fill',       '#f0f9ff','#0369a1', 'Consultant Hierarchy',    'Principal → Associate → Manager org structure for consulting firms. Each role sees exactly the right companies and data.'],
+      ['bi-currency-dollar',   '#f0fdf4','#16a34a', 'Green Financing',         'Automatically identify BNM, Khazanah, and commercial green financing your company may qualify for based on ESG score.'],
+    ];
+    foreach ($features as [$icon, $bg, $color, $title, $desc]):
+    ?>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:<?= $bg ?>;color:<?= $color ?>">
+        <i class="bi <?= $icon ?>"></i>
       </div>
-      <div class="col-md-2">
+      <div class="feat-title"><?= $title ?></div>
+      <p class="feat-desc"><?= $desc ?></p>
+    </div>
+    <?php endforeach; ?>
+  </div>
+</section>
+
+<!-- ── FRAMEWORKS ─────────────────────────────────────────── -->
+<section class="frameworks-section" id="frameworks">
+  <div class="section-eyebrow">Supported Standards</div>
+  <h2 class="section-title">All major ESG reporting frameworks</h2>
+  <p class="section-sub">One platform for every framework your clients or regulators require.</p>
+
+  <div class="fw-grid">
+    <?php
+    $fws = [
+      ['bi-flag-fill',       '#dc2626', 'Bursa SEDG',   'Mandatory for Malaysian-listed & pre-IPO companies'],
+      ['bi-globe',           '#0891b2', 'GRI Standards', 'Global standard — voluntary & regulated ESG'],
+      ['bi-cloud-sun-fill',  '#0d9488', 'ISSB / TCFD',  'Climate financial disclosures — IFRS S1 & S2'],
+      ['bi-droplet-fill',    '#0284c7', 'CDP',           'Carbon Disclosure Project for investors & supply chains'],
+      ['bi-building-fill',   '#7c3aed', 'ESRS',          'EU CSRD — for export-facing companies'],
+      ['bi-briefcase-fill',  '#ca8a04', 'SASB',          'Industry-specific packs — Manufacturing, Tech, F&B'],
+      ['bi-bullseye',        '#16a34a', 'UN SDGs',       'Sustainable Development Goals alignment'],
+      ['bi-diagram-3',       '#475569', 'TCFD',          'Task Force on Climate-related Financial Disclosures'],
+    ];
+    foreach ($fws as [$icon, $color, $name, $desc]):
+    ?>
+    <div class="fw-pill" style="--c:<?= $color ?>">
+      <div class="fw-pill-icon" style="background:<?= $color ?>18;color:<?= $color ?>">
+        <i class="bi <?= $icon ?>"></i>
+      </div>
+      <div>
+        <div class="fw-pill-name"><?= $name ?></div>
+        <div class="fw-pill-desc"><?= $desc ?></div>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+</section>
+
+<!-- ── WHO IT'S FOR ─────────────────────────────────────────── -->
+<section class="roles-section" id="roles">
+  <div class="section-eyebrow">Who It's For</div>
+  <h2 class="section-title">Built for the full ESG ecosystem</h2>
+  <p class="section-sub">Every role in the ESG value chain — from business owner to certified consultant.</p>
+
+  <div class="roles-grid container-lg">
+
+    <div class="role-card role-sme">
+      <div class="role-icon"><i class="bi bi-building"></i></div>
+      <h5>SME Owner</h5>
+      <p>Track your company's ESG data, close gaps, and generate reports for banks, investors, buyers, or Bursa submission.</p>
+      <ul class="role-list">
+        <li>Start free — 15 mandatory indicators</li>
+        <li>Subscribe for full platform access</li>
+        <li>Self-service at RM 1,500/year</li>
+      </ul>
+    </div>
+
+    <div class="role-card role-assoc">
+      <div class="role-icon"><i class="bi bi-briefcase-fill"></i></div>
+      <h5>ESG Consultant / Associate</h5>
+      <p>Deliver professional ESG report review and consultation services to SME clients at RM 8,000 per report.</p>
+      <ul class="role-list">
+        <li>Manage multiple client companies</li>
+        <li>Review & validate client reports</li>
+        <li>Submission guidance & sign-off</li>
+      </ul>
+    </div>
+
+    <div class="role-card role-ref">
+      <div class="role-icon"><i class="bi bi-people-fill"></i></div>
+      <h5>Referral Partner</h5>
+      <p>Accountants, lawyers, company secretaries, and bankers who refer SME clients to the platform earn recurring referral fees.</p>
+      <ul class="role-list">
+        <li>15% referral fee per subscription</li>
+        <li>Recurring annually on renewals</li>
+        <li>No platform management needed</li>
+      </ul>
+    </div>
+
+    <div class="role-card role-consult">
+      <div class="role-icon"><i class="bi bi-diagram-3-fill"></i></div>
+      <h5>Consulting Firm</h5>
+      <p>Principal → Associate → Manager hierarchy gives your team the right access. Portfolio dashboard shows all clients in one view.</p>
+      <ul class="role-list">
+        <li>Full org tree management</li>
+        <li>Portfolio ESG score overview</li>
+        <li>Assign managers to clients</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── CTA ─────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="cta-leaf"><i class="bi bi-leaf-fill"></i></div>
+  <h2>Start your ESG journey today</h2>
+  <p>Join Malaysian SMEs and consulting firms already using AiServe ESG OS to meet Bursa SEDG requirements, secure green financing, and deliver investor-grade sustainability reports.</p>
+  <?php if ($isLoggedIn): ?>
+  <a href="<?= APP_URL ?>/dashboard" class="btn-hero-primary" style="display:inline-flex">
+    <i class="bi bi-speedometer2"></i>Go to Dashboard
+  </a>
+  <?php else: ?>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a href="<?= APP_URL ?>/register" class="btn-hero-primary">
+      <i class="bi bi-rocket-takeoff"></i>Create Free Account
+    </a>
+    <a href="<?= APP_URL ?>/pricing" class="btn-hero-secondary">
+      <i class="bi bi-grid-3x3-gap"></i>View Full Pricing
+    </a>
+  </div>
+  <?php endif; ?>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────── -->
+<footer class="lp-footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div class="nav-logo" style="width:30px;height:30px;font-size:14px"><i class="bi bi-leaf-fill"></i></div>
+          <div class="footer-brand-name">AiServe ESG OS</div>
+        </div>
+        <div class="footer-brand-desc">Malaysia's ESG operating system for SMEs, accounting firms, and certified ESG consultants. Built for Bursa SEDG compliance and beyond.</div>
+      </div>
+      <div>
         <div class="footer-heading">Platform</div>
+        <a href="#journey" class="footer-link">How It Works</a>
         <a href="#features" class="footer-link">Features</a>
         <a href="#frameworks" class="footer-link">Standards</a>
         <a href="<?= APP_URL ?>/pricing" class="footer-link">Pricing</a>
       </div>
-      <div class="col-md-2">
+      <div>
         <div class="footer-heading">Account</div>
-        <a href="<?= APP_URL ?>/login" class="footer-link">Login</a>
-        <a href="<?= APP_URL ?>/register" class="footer-link">Register</a>
+        <a href="<?= APP_URL ?>/login"    class="footer-link">Login</a>
+        <a href="<?= APP_URL ?>/register" class="footer-link">Register Free</a>
+        <a href="mailto:hello@aiserve.my" class="footer-link">Contact Us</a>
       </div>
-      <div class="col-md-4">
+      <div>
         <div class="footer-heading">Compliance Frameworks</div>
-        <div class="d-flex flex-wrap gap-2 mt-1">
-          <?php foreach (['Bursa SEDG','GRI','TCFD','ISSB','CDP','ESRS','SASB'] as $fw): ?>
-          <span class="footer-fw-badge"><?= $fw ?></span>
+        <div style="margin-top:8px">
+          <?php foreach (['Bursa SEDG','GRI','ISSB','TCFD','CDP','ESRS','SASB','UN SDGs'] as $fw): ?>
+          <span class="fw-badge"><?= $fw ?></span>
           <?php endforeach; ?>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
-      <span class="text-muted small">&copy; <?= date('Y') ?> AiServe. Built for Malaysia's ESG ecosystem.</span>
-      <span class="text-muted small">MyGHG 2023 &bull; DEFRA 2023 &bull; Bursa SEDG 2022</span>
+      <span>&copy; <?= date('Y') ?> AiServe Sdn Bhd &bull; hello@aiserve.my &bull; All prices in MYR</span>
+      <span>MyGHG 2023 &bull; DEFRA 2023 &bull; Bursa SEDG 2nd Edition 2022</span>
     </div>
   </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Sticky nav on scroll
-const nav = document.getElementById('landingNav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('nav-scrolled', window.scrollY > 40);
-});
+const nav = document.getElementById('lpNav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
 
-// Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
 });
 </script>
