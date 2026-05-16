@@ -12,11 +12,55 @@ $plans      = Subscription::getAllPlans();
 $isLoggedIn = Auth::check();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-MY">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pricing — <?= APP_NAME ?></title>
+
+  <!-- Primary SEO -->
+  <title>ESG Pricing Plans | Free, RM 1,500/yr, RM 8,000/report — AiServe ESG OS</title>
+  <meta name="description" content="Compare AiServe ESG OS plans. Free Bursa SEDG reporting, RM 1,500/year for full ESG data collection OS, or RM 8,000 professional ESG consultation. No credit card required.">
+  <meta name="keywords" content="ESG pricing Malaysia, Bursa SEDG subscription, ESG software cost Malaysia, ESG consultant Malaysia, SME ESG reporting price">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<?= APP_URL ?>/pricing">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="<?= APP_URL ?>/pricing">
+  <meta property="og:site_name"   content="AiServe ESG OS">
+  <meta property="og:locale"      content="en_MY">
+  <meta property="og:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — AiServe ESG OS">
+  <meta property="og:description" content="Free Bursa SEDG reporting for Malaysian SMEs. Upgrade to Platform for RM 1,500/year. Professional ESG consultation at RM 8,000/report.">
+  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — AiServe ESG OS">
+  <meta name="twitter:description" content="Free Bursa SEDG reporting. Full ESG OS at RM 1,500/yr. Professional consultation at RM 8,000/report.">
+  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+
+  <!-- Favicon -->
+  <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
+
+  <!-- Schema.org pricing structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "AiServe ESG OS Pricing",
+    "url": "<?= APP_URL ?>/pricing",
+    "description": "Pricing plans for AiServe ESG OS — Malaysia's ESG reporting platform for SMEs.",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Free Plan", "description": "15 mandatory Bursa SEDG indicators at no cost" },
+        { "@type": "ListItem", "position": 2, "name": "Platform — RM 1,500/year", "description": "Full ESG data collection OS across all frameworks" },
+        { "@type": "ListItem", "position": 3, "name": "Consultation — RM 8,000/report", "description": "Professional ESG report review by certified associates" }
+      ]
+    }
+  }
+  </script>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>

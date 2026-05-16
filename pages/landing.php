@@ -8,12 +8,55 @@ Auth::startSession();
 $isLoggedIn = Auth::check();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-MY">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AiServe ESG OS — Malaysia's ESG Platform for SMEs &amp; Consultants</title>
-  <meta name="description" content="Start free with all 15 mandatory Bursa SEDG indicators. Subscribe for full ESG data collection and report generation. Engage a certified consultant for professional review.">
+
+  <!-- Primary SEO -->
+  <title>AiServe ESG OS | Free ESG Reporting Platform for Malaysian SMEs</title>
+  <meta name="description" content="Malaysia's ESG reporting platform for SMEs. Start free with 15 mandatory Bursa SEDG indicators. Full data collection OS at RM 1,500/yr. Expert ESG consultation available.">
+  <meta name="keywords" content="ESG reporting Malaysia, Bursa SEDG, SME ESG platform, ESG compliance Malaysia, Bursa SEDG indicators, Malaysia ESG software, sustainability reporting Malaysia, ESG report generator">
+  <meta name="author" content="AiServe ESG OS">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<?= APP_URL ?>/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="<?= APP_URL ?>/">
+  <meta property="og:site_name"   content="AiServe ESG OS">
+  <meta property="og:locale"      content="en_MY">
+  <meta property="og:title"       content="AiServe ESG OS | Free ESG Reporting Platform for Malaysian SMEs">
+  <meta property="og:description" content="Start free with 15 mandatory Bursa SEDG indicators. Full ESG data collection OS at RM 1,500/yr. Professional ESG consultation at RM 8,000/report.">
+  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="AiServe ESG OS | Free ESG Reporting for Malaysian SMEs">
+  <meta name="twitter:description" content="Start free with 15 mandatory Bursa SEDG indicators. RM 1,500/yr for full ESG OS. RM 8,000/report for expert consultation.">
+  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+
+  <!-- Favicon -->
+  <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
+
+  <!-- Schema.org structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "AiServe ESG OS",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "url": "<?= APP_URL ?>",
+    "description": "Malaysia's ESG reporting platform for SMEs. Covers Bursa SEDG, GRI, ISSB, CDP, ESRS and more.",
+    "offers": [
+      { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "MYR" },
+      { "@type": "Offer", "name": "Platform", "price": "1500", "priceCurrency": "MYR" }
+    ],
+    "provider": { "@type": "Organization", "name": "AiServe ESG OS" }
+  }
+  </script>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
