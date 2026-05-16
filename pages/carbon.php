@@ -10,6 +10,7 @@ if (!$activeCompany) {
 $pageTitle = 'Carbon Calculator';
 $success   = $error = '';
 $result    = null;
+$saved     = false;
 $period    = (string)($activeCompany['reporting_year'] ?? date('Y'));
 
 $numericFields = [
@@ -31,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = CarbonCalculator::calculate($inputs);
         if (!empty($_POST['save_to_esg'])) {
             CarbonCalculator::saveToESG($activeCompanyId, $result, $activeCompany['framework'], $period, $currentUser['id']);
-            $success = 'GHG emission data saved to your ESG indicators.';
+            $success = 'GHG emission data saved to your ESG indicators (Scope 1, 2 & 3).';
+            $saved = true;
         }
     }
 }
@@ -586,7 +588,7 @@ include __DIR__ . '/../includes/header.php';
               </div>
             </div>
 
-            <?php if ($result): ?>
+            <?php if ($saved && $result): ?>
             <div class="cc-saved-banner">
               <i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:18px"></i>
               <div>
@@ -598,6 +600,11 @@ include __DIR__ . '/../includes/header.php';
                   <strong>Total: <?= $result['total'] ?> tCO₂e</strong>
                 </div>
               </div>
+            </div>
+            <?php elseif ($result && !$saved): ?>
+            <div style="margin:12px 20px;padding:10px 14px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;font-size:12px;color:#0369a1;display:flex;align-items:center;gap:10px">
+              <i class="bi bi-info-circle-fill" style="font-size:16px"></i>
+              <div>Results calculated. Click <strong>Save to ESG</strong> to push Scope 1, 2 &amp; 3 values to your indicators.</div>
             </div>
             <?php endif; ?>
 

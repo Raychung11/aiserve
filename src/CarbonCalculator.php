@@ -100,16 +100,50 @@ class CarbonCalculator {
     }
 
     public static function saveToESG(int $companyId, array $result, string $framework, string $period, int $userId): void {
-        // Map framework GHG indicator IDs to calculated scope values
+        // Correct indicator IDs matching config/indicators/*.php files
         $mappings = [
-            'BURSA_SEDG' => ['BURSA-E-04' => $result['scope1'], 'BURSA-E-05' => $result['scope2']],
-            'GRI'        => ['GRI-305-1' => $result['scope1'], 'GRI-305-2' => $result['scope2'], 'GRI-305-3' => $result['scope3']],
-            'ISSB'       => ['ISSB-E-4'  => $result['scope1'], 'ISSB-E-5'  => $result['scope2'], 'ISSB-E-6'  => $result['scope3']],
-            'CDP'        => ['CDP-C6-1'  => $result['scope1'], 'CDP-C6-3'  => $result['scope2'], 'CDP-C6-5'  => $result['scope3']],
-            'ESRS'       => ['ESRS-E1-6' => $result['total']],
+            'BURSA_SEDG' => [
+                'SEDG-E04' => $result['scope1'],
+                'SEDG-E05' => $result['scope2'],
+                'SEDG-E06' => $result['scope3'],
+            ],
+            'GRI' => [
+                'GRI-305-1' => $result['scope1'],
+                'GRI-305-2' => $result['scope2'],
+                'GRI-305-3' => $result['scope3'],
+            ],
+            'ISSB' => [
+                'ISSB-MET-01' => $result['scope1'],
+                'ISSB-MET-02' => $result['scope2'],
+                'ISSB-MET-03' => $result['scope3'],
+            ],
+            'CDP' => [
+                'CDP-C6-1' => $result['scope1'],
+                'CDP-C6-3' => $result['scope2'],
+                'CDP-C6-5' => $result['scope3'],
+            ],
+            'ESRS' => [
+                'ESRS-E1-6' => $result['total'],
+            ],
+            // Combined framework: save to both BURSA_SEDG and GRI indicator sets
+            'SEDG+GRI' => [
+                'SEDG-E04'  => $result['scope1'],
+                'SEDG-E05'  => $result['scope2'],
+                'SEDG-E06'  => $result['scope3'],
+                'GRI-305-1' => $result['scope1'],
+                'GRI-305-2' => $result['scope2'],
+                'GRI-305-3' => $result['scope3'],
+            ],
         ];
 
-        foreach ($mappings[$framework] ?? [] as $indicatorId => $value) {
+        $indicators = $mappings[$framework] ?? [];
+
+        // Fallback: if framework not directly mapped, try BURSA_SEDG
+        if (empty($indicators)) {
+            $indicators = $mappings['BURSA_SEDG'];
+        }
+
+        foreach ($indicators as $indicatorId => $value) {
             if ($value > 0) {
                 ESGDataManager::save($companyId, $indicatorId, $framework, 'ENVIRONMENT', (string)$value, [
                     'unit'    => 'tCO2e',
