@@ -1,4 +1,4 @@
--- AiServe ESG OS — Migration v5
+-- Adcellent ESG OS — Migration v5
 -- Adds platform_settings table for super admin configuration
 
 CREATE TABLE IF NOT EXISTS `platform_settings` (
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `platform_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO `platform_settings` (`key`, `value`, `grp`) VALUES
-  ('platform_name',      'AiServe ESG OS', 'general'),
+  ('platform_name',      'Adcellent ESG OS', 'general'),
   ('default_framework',  'BURSA_SEDG',     'general'),
   ('reporting_year',     '2025',           'general'),
   ('maintenance_mode',   '0',              'general'),

@@ -78,7 +78,7 @@ include __DIR__ . '/../includes/header.php';
     <?php if (isset($_GET['welcome'])): ?>
     <div class="alert alert-success alert-dismissible fade show mx-4 mt-3" role="alert">
       <i class="bi bi-party-popper-fill me-2"></i>
-      <strong>Welcome to AiServe ESG OS!</strong> Your dashboard is ready.
+      <strong>Welcome to Adcellent ESG OS!</strong> Your dashboard is ready.
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     <?php endif; ?>

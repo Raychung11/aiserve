@@ -198,7 +198,7 @@ include __DIR__ . '/../includes/header.php';
               <p class="text-muted small mt-3 mb-0">
                 <i class="bi bi-envelope me-1"></i>
                 We'll contact you at <strong><?= htmlspecialchars($currentUser['email']) ?></strong> to arrange payment and activation.
-                Questions? Email <a href="mailto:hello@aiserve.my">hello@aiserve.my</a>
+                Questions? Email <a href="mailto:hello@adcellent.com.my">hello@adcellent.com.my</a>
               </p>
               <?php endif; ?>
             </div>

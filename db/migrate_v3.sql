@@ -1,4 +1,4 @@
--- AiServe ESG OS — Migration v3
+-- Adcellent ESG OS — Migration v3
 -- Adds subscription and indicator collection tables
 -- Run once via phpMyAdmin or CLI:
 --   mysql -u <user> -p <dbname> < migrate_v3.sql

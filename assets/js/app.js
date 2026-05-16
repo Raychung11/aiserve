@@ -1,5 +1,5 @@
 /**
- * AiServe ESG OS — Main JavaScript
+ * Adcellent ESG OS — Main JavaScript
  */
 
 'use strict';

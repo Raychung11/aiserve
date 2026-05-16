@@ -3,7 +3,7 @@
  * Application Configuration
  */
 
-define('APP_NAME', 'AiServe ESG OS');
+define('APP_NAME', 'Adcellent ESG OS');
 define('APP_VERSION', '1.0.0');
 
 // Auto-detect APP_URL — works on Hostinger, localhost, and subdirectory installs.
@@ -29,7 +29,7 @@ define('APP_COUNTRY', 'Malaysia');
 define('REPORTING_YEAR', date('Y'));
 
 // Session configuration
-define('SESSION_NAME', 'aiserve_session');
+define('SESSION_NAME', 'adcellent_session');
 define('SESSION_LIFETIME', 86400); // 24 hours
 
 // Pagination

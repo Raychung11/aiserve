@@ -14,27 +14,27 @@ $isLoggedIn = Auth::check();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Primary SEO -->
-  <title>AiServe ESG OS | Free ESG Reporting Platform for Malaysian SMEs</title>
+  <title>Adcellent ESG OS | Free ESG Reporting Platform for Malaysian SMEs</title>
   <meta name="description" content="Malaysia's ESG reporting platform for SMEs. Start free with 15 mandatory Bursa SEDG indicators. Full data collection OS at RM 1,500/yr. Expert ESG consultation available.">
   <meta name="keywords" content="ESG reporting Malaysia, Bursa SEDG, SME ESG platform, ESG compliance Malaysia, Bursa SEDG indicators, Malaysia ESG software, sustainability reporting Malaysia, ESG report generator">
-  <meta name="author" content="AiServe ESG OS">
+  <meta name="author" content="Adcellent ESG OS">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="<?= APP_URL ?>/">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="<?= APP_URL ?>/">
-  <meta property="og:site_name"   content="AiServe ESG OS">
+  <meta property="og:site_name"   content="Adcellent ESG OS">
   <meta property="og:locale"      content="en_MY">
-  <meta property="og:title"       content="AiServe ESG OS | Free ESG Reporting Platform for Malaysian SMEs">
+  <meta property="og:title"       content="Adcellent ESG OS | Free ESG Reporting Platform for Malaysian SMEs">
   <meta property="og:description" content="Start free with 15 mandatory Bursa SEDG indicators. Full ESG data collection OS at RM 1,500/yr. Professional ESG consultation at RM 8,000/report.">
-  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-adcellent.png">
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="AiServe ESG OS | Free ESG Reporting for Malaysian SMEs">
+  <meta name="twitter:title"       content="Adcellent ESG OS | Free ESG Reporting for Malaysian SMEs">
   <meta name="twitter:description" content="Start free with 15 mandatory Bursa SEDG indicators. RM 1,500/yr for full ESG OS. RM 8,000/report for expert consultation.">
-  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-adcellent.png">
 
   <!-- Favicon -->
   <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
@@ -44,7 +44,7 @@ $isLoggedIn = Auth::check();
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "AiServe ESG OS",
+    "name": "Adcellent ESG OS",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "url": "<?= APP_URL ?>",
@@ -53,7 +53,7 @@ $isLoggedIn = Auth::check();
       { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "MYR" },
       { "@type": "Offer", "name": "Platform", "price": "1500", "priceCurrency": "MYR" }
     ],
-    "provider": { "@type": "Organization", "name": "AiServe ESG OS" }
+    "provider": { "@type": "Organization", "name": "Adcellent ESG OS" }
   }
   </script>
 
@@ -290,7 +290,7 @@ a { text-decoration: none; }
 <nav class="lp-nav" id="lpNav">
   <div class="nav-brand">
     <div class="nav-logo"><i class="bi bi-leaf-fill"></i></div>
-    <span class="nav-name">AiServe <span>ESG OS</span></span>
+    <span class="nav-name">Adcellent <span>ESG OS</span></span>
   </div>
   <div class="nav-links">
     <a href="#journey">How It Works</a>
@@ -421,7 +421,7 @@ a { text-decoration: none; }
         <li><i class="bi bi-check-circle-fill" style="color:#8b5cf6"></i>1-on-1 consultation session</li>
         <li><i class="bi bi-check-circle-fill" style="color:#8b5cf6"></i>Report sign-off by certified consultant</li>
       </ul>
-      <a href="mailto:hello@aiserve.my?subject=Consultation Enquiry" class="j-cta"><i class="bi bi-envelope-fill me-1"></i>Enquire Now</a>
+      <a href="mailto:hello@adcellent.com.my?subject=Consultation Enquiry" class="j-cta"><i class="bi bi-envelope-fill me-1"></i>Enquire Now</a>
     </div>
 
   </div>
@@ -550,7 +550,7 @@ a { text-decoration: none; }
 <section class="cta-section">
   <div class="cta-leaf"><i class="bi bi-leaf-fill"></i></div>
   <h2>Start your ESG journey today</h2>
-  <p>Join Malaysian SMEs and consulting firms already using AiServe ESG OS to meet Bursa SEDG requirements, secure green financing, and deliver investor-grade sustainability reports.</p>
+  <p>Join Malaysian SMEs and consulting firms already using Adcellent ESG OS to meet Bursa SEDG requirements, secure green financing, and deliver investor-grade sustainability reports.</p>
   <?php if ($isLoggedIn): ?>
   <a href="<?= APP_URL ?>/dashboard" class="btn-hero-primary" style="display:inline-flex">
     <i class="bi bi-speedometer2"></i>Go to Dashboard
@@ -574,7 +574,7 @@ a { text-decoration: none; }
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <div class="nav-logo" style="width:30px;height:30px;font-size:14px"><i class="bi bi-leaf-fill"></i></div>
-          <div class="footer-brand-name">AiServe ESG OS</div>
+          <div class="footer-brand-name">Adcellent ESG OS</div>
         </div>
         <div class="footer-brand-desc">Malaysia's ESG operating system for SMEs, accounting firms, and certified ESG consultants. Built for Bursa SEDG compliance and beyond.</div>
       </div>
@@ -589,7 +589,7 @@ a { text-decoration: none; }
         <div class="footer-heading">Account</div>
         <a href="<?= APP_URL ?>/login"    class="footer-link">Login</a>
         <a href="<?= APP_URL ?>/register" class="footer-link">Register Free</a>
-        <a href="mailto:hello@aiserve.my" class="footer-link">Contact Us</a>
+        <a href="mailto:hello@adcellent.com.my" class="footer-link">Contact Us</a>
       </div>
       <div>
         <div class="footer-heading">Compliance Frameworks</div>
@@ -601,7 +601,7 @@ a { text-decoration: none; }
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; <?= date('Y') ?> AiServe Sdn Bhd &bull; hello@aiserve.my &bull; All prices in MYR</span>
+      <span>&copy; <?= date('Y') ?> Adcellent Sdn Bhd &bull; hello@adcellent.com.my &bull; All prices in MYR</span>
       <span>MyGHG 2023 &bull; DEFRA 2023 &bull; Bursa SEDG 2nd Edition 2022</span>
     </div>
   </div>

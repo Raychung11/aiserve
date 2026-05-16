@@ -58,7 +58,7 @@ return [
     ],
 
     // ── Platform subscription ─────────────────────────────────────────────────
-    // Full data collection on the AiServe ESG OS platform.
+    // Full data collection on the Adcellent ESG OS platform.
     // All indicators across all frameworks + full report generation.
     'standard' => [
         'code'          => 'standard',

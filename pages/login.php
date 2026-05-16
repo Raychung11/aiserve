@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In | AiServe ESG OS</title>
+  <title>Sign In | Adcellent ESG OS</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="<?= APP_URL ?>/login">
   <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <a href="<?= APP_URL ?>/" style="text-decoration:none">
       <div class="d-flex align-items-center gap-2 mb-4">
         <div class="login-brand-logo"><i class="bi bi-leaf-fill"></i></div>
-        <span style="font-size:18px;font-weight:800;color:#f1f5f9">AiServe <span style="color:#16a34a">ESG OS</span></span>
+        <span style="font-size:18px;font-weight:800;color:#f1f5f9">Adcellent <span style="color:#16a34a">ESG OS</span></span>
       </div>
     </a>
 

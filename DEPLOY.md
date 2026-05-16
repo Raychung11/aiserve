@@ -1,4 +1,4 @@
-# AiServe ESG OS — Hostinger Deployment Guide
+# Adcellent ESG OS — Hostinger Deployment Guide
 
 ## Requirements
 - PHP 8.0+

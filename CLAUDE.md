@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**AiServe ESG OS** — a PHP 8.x multi-tenant ESG (Environmental, Social, Governance) reporting platform for Malaysian SMEs. Hosted on Hostinger shared hosting. No build system, no Composer, no npm. Pure PHP + MySQL + Bootstrap 5 via CDN.
+**Adcellent ESG OS** — a PHP 8.x multi-tenant ESG (Environmental, Social, Governance) reporting platform for Malaysian SMEs. Hosted on Hostinger shared hosting. No build system, no Composer, no npm. Pure PHP + MySQL + Bootstrap 5 via CDN.
 
 ## Deployment (no local dev server)
 

@@ -1,4 +1,4 @@
--- AiServe ESG OS Database Schema
+-- Adcellent ESG OS Database Schema
 -- Compatible with MySQL 8.0+ / MariaDB 10.4+
 -- Hostinger deployment ready
 

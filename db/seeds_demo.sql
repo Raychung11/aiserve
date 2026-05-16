@@ -1,4 +1,4 @@
--- AiServe ESG OS — Demo Account Seeds
+-- Adcellent ESG OS — Demo Account Seeds
 -- Password for ALL accounts: Demo@1234
 -- Run AFTER schema.sql and migrate_v4.sql
 -- ─────────────────────────────────────────────────────────────

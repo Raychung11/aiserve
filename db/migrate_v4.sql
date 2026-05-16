@@ -1,4 +1,4 @@
--- AiServe ESG OS — Migration v4
+-- Adcellent ESG OS — Migration v4
 -- Adds 3-level consultant hierarchy: principal → associate → manager
 
 -- Update role ENUM to include hierarchy roles

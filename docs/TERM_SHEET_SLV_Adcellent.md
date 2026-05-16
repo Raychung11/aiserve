@@ -1,6 +1,6 @@
 # TERM SHEET
 ## Strategic Collaboration — SLV Group & Adcellent Sdn Bhd
-### AiServe ESG OS Platform
+### Adcellent ESG OS Platform
 
 ---
 
@@ -20,7 +20,7 @@
 
 ## 2. Scope
 
-SLV Group provides the **AiServe ESG OS** platform (software, infrastructure, ongoing development). Adcellent leads market outreach, recruits and manages Associate Partners and Referral Partners, and delivers ESG reporting and subscription services to end clients.
+SLV Group provides the **Adcellent ESG OS** platform (software, infrastructure, ongoing development). Adcellent leads market outreach, recruits and manages Associate Partners and Referral Partners, and delivers ESG reporting and subscription services to end clients.
 
 ---
 
@@ -155,7 +155,7 @@ Upon a qualifying IPO by either Party or a jointly established entity:
 | Platform source code & design | **SLV exclusive** |
 | ESG data on the platform | **Client exclusive** — neither party owns client data |
 | ESG frameworks (Bursa SEDG, GRI, ISSB, etc.) | Based on international/regulatory standards — not owned by either party. Adcellent responsible for monitoring updates; SLV implements them. |
-| AiServe ESG OS brand & platform identity | **Co-owned equally** by SLV and Adcellent |
+| Adcellent ESG OS brand & platform identity | **Co-owned equally** by SLV and Adcellent |
 | Adcellent brand, client relationships, associate & referral network | **Adcellent exclusive** |
 
 ---

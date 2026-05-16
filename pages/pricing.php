@@ -18,8 +18,8 @@ $isLoggedIn = Auth::check();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Primary SEO -->
-  <title>ESG Pricing Plans | Free, RM 1,500/yr, RM 8,000/report — AiServe ESG OS</title>
-  <meta name="description" content="Compare AiServe ESG OS plans. Free Bursa SEDG reporting, RM 1,500/year for full ESG data collection OS, or RM 8,000 professional ESG consultation. No credit card required.">
+  <title>ESG Pricing Plans | Free, RM 1,500/yr, RM 8,000/report — Adcellent ESG OS</title>
+  <meta name="description" content="Compare Adcellent ESG OS plans. Free Bursa SEDG reporting, RM 1,500/year for full ESG data collection OS, or RM 8,000 professional ESG consultation. No credit card required.">
   <meta name="keywords" content="ESG pricing Malaysia, Bursa SEDG subscription, ESG software cost Malaysia, ESG consultant Malaysia, SME ESG reporting price">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="<?= APP_URL ?>/pricing">
@@ -27,17 +27,17 @@ $isLoggedIn = Auth::check();
   <!-- Open Graph -->
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="<?= APP_URL ?>/pricing">
-  <meta property="og:site_name"   content="AiServe ESG OS">
+  <meta property="og:site_name"   content="Adcellent ESG OS">
   <meta property="og:locale"      content="en_MY">
-  <meta property="og:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — AiServe ESG OS">
+  <meta property="og:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — Adcellent ESG OS">
   <meta property="og:description" content="Free Bursa SEDG reporting for Malaysian SMEs. Upgrade to Platform for RM 1,500/year. Professional ESG consultation at RM 8,000/report.">
-  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-adcellent.png">
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — AiServe ESG OS">
+  <meta name="twitter:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — Adcellent ESG OS">
   <meta name="twitter:description" content="Free Bursa SEDG reporting. Full ESG OS at RM 1,500/yr. Professional consultation at RM 8,000/report.">
-  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-aiserve.png">
+  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-adcellent.png">
 
   <!-- Favicon -->
   <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
@@ -47,9 +47,9 @@ $isLoggedIn = Auth::check();
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "AiServe ESG OS Pricing",
+    "name": "Adcellent ESG OS Pricing",
     "url": "<?= APP_URL ?>/pricing",
-    "description": "Pricing plans for AiServe ESG OS — Malaysia's ESG reporting platform for SMEs.",
+    "description": "Pricing plans for Adcellent ESG OS — Malaysia's ESG reporting platform for SMEs.",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": [
@@ -335,7 +335,7 @@ body { background: #f8fafc; font-family: 'Segoe UI', sans-serif; }
       <strong><i class="bi bi-people-fill me-1"></i>Who delivers this?</strong>
       Our certified associate consultants — accountants, ESG advisers, and sustainability professionals trained on Bursa SEDG requirements.
     </div>
-    <a href="mailto:hello@aiserve.my?subject=Consultation Enquiry" class="plan-cta cta-consult">
+    <a href="mailto:hello@adcellent.com.my?subject=Consultation Enquiry" class="plan-cta cta-consult">
       <i class="bi bi-envelope-fill me-1"></i>Enquire Now
     </a>
   </div>
@@ -366,7 +366,7 @@ body { background: #f8fafc; font-family: 'Segoe UI', sans-serif; }
     ],
     [
       'q' => 'How do I activate my subscription?',
-      'a' => 'Contact us at hello@aiserve.my or speak to your assigned consultant. We issue an invoice and activate your account within 1 business day. Online self-serve payment is coming soon.',
+      'a' => 'Contact us at hello@adcellent.com.my or speak to your assigned consultant. We issue an invoice and activate your account within 1 business day. Online self-serve payment is coming soon.',
     ],
     [
       'q' => 'What happens to my data if I do not renew?',
@@ -383,7 +383,7 @@ body { background: #f8fafc; font-family: 'Segoe UI', sans-serif; }
 
 <!-- Footer -->
 <div class="pricing-footer">
-  © <?= date('Y') ?> AiServe Sdn Bhd &bull; hello@aiserve.my &bull; All prices in Malaysian Ringgit (MYR) &bull; SST may apply
+  © <?= date('Y') ?> Adcellent Sdn Bhd &bull; hello@adcellent.com.my &bull; All prices in Malaysian Ringgit (MYR) &bull; SST may apply
 </div>
 
 </body>

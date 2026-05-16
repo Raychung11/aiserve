@@ -1,4 +1,4 @@
--- AiServe ESG OS — Migration v2
+-- Adcellent ESG OS — Migration v2
 -- Expands framework columns from ENUM to VARCHAR(50)
 -- Required for installations running v1 (Bursa SEDG + GRI only)
 -- before upgrading to v2 (all 10 frameworks)

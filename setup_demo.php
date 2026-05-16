@@ -1,6 +1,6 @@
 <?php
 /**
- * AiServe ESG OS — Demo Account Seeder
+ * Adcellent ESG OS — Demo Account Seeder
  * ------------------------------------
  * Run ONCE to create demo accounts for all 6 roles.
  * DELETE this file after use.
@@ -112,7 +112,7 @@ if ($demoCompanyId) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo Seed — AiServe ESG OS</title>
+  <title>Demo Seed — Adcellent ESG OS</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #0f172a; color: #f1f5f9; padding: 40px 24px; }
@@ -167,7 +167,7 @@ if ($demoCompanyId) {
 <body>
 <div class="wrap">
   <h1>Demo Accounts Created</h1>
-  <p class="sub">AiServe ESG OS — one-time seed script</p>
+  <p class="sub">Adcellent ESG OS — one-time seed script</p>
 
   <div class="warn">
     <strong>⚠ Delete this file after use</strong>

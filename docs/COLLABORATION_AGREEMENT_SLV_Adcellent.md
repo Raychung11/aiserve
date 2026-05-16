@@ -1,7 +1,7 @@
 # COLLABORATION AGREEMENT
 
 **Between SLV Group and Adcellent Sdn Bhd**
-**In respect of AiServe ESG OS Platform**
+**In respect of Adcellent ESG OS Platform**
 
 ---
 
@@ -21,7 +21,7 @@ SLV and Adcellent are individually referred to as a "**Party**" and collectively
 
 **WHEREAS:**
 
-A. SLV has developed and owns the **AiServe ESG OS** platform, a software-as-a-service solution providing ESG (Environmental, Social, Governance) reporting tools for Malaysian SMEs and corporations.
+A. SLV has developed and owns the **Adcellent ESG OS** platform, a software-as-a-service solution providing ESG (Environmental, Social, Governance) reporting tools for Malaysian SMEs and corporations.
 
 B. Adcellent is engaged in business development and consulting services and maintains an established network for recruiting Associate Partners and Referral Partners in the professional services market.
 
@@ -44,7 +44,7 @@ C. The Parties wish to collaborate to commercialise the Platform and share the n
 - **"Net Distributable Profit"** means Gross Revenue less all Permitted Deductions as defined in Clause 5.
 - **"Operational Costs"** means Adcellent's agreed monthly operating expenses directly attributable to the collaboration, as evidenced by receipts or invoices.
 - **"Permitted Deductions"** means Consultant Fees, Referral Fees, the IT Monthly Retainer, and Operational Costs.
-- **"Platform"** means the AiServe ESG OS software, including all features, databases, infrastructure, and branding operated by SLV.
+- **"Platform"** means the Adcellent ESG OS software, including all features, databases, infrastructure, and branding operated by SLV.
 - **"Professional Plan"** means the annual platform subscription priced at **RM 3,500 per annum**.
 - **"Referral Fee"** means 10%–15% of a Subscription Value payable to a qualifying Referral Partner.
 - **"Referral Partner"** means an accountant, auditor, lawyer, company secretary, banker, or other qualifying professional who introduces a Subscriber to the Platform.
@@ -254,7 +254,7 @@ If in any month the Permitted Deductions exceed Gross Revenue (resulting in a ne
 
 **11.3 ESG Frameworks:** The ESG reporting frameworks available on the Platform (including Bursa Malaysia SEDG, GRI, ISSB, ESRS, and others) are based on **international and regulatory standards** that are not owned by either Party. Adcellent shall be responsible for monitoring updates to these standards and notifying SLV of required changes. SLV shall implement such updates on the Platform within a reasonable timeframe.
 
-**11.4 Platform Branding:** The AiServe ESG OS brand, platform name, logo, and associated marketing identity are **co-owned equally** by SLV and Adcellent. Neither Party may rebrand, transfer, or license the platform brand to a third party without the other Party's prior written consent. In the event of termination, both Parties shall negotiate in good faith the future use or assignment of the co-owned brand.
+**11.4 Platform Branding:** The Adcellent ESG OS brand, platform name, logo, and associated marketing identity are **co-owned equally** by SLV and Adcellent. Neither Party may rebrand, transfer, or license the platform brand to a third party without the other Party's prior written consent. In the event of termination, both Parties shall negotiate in good faith the future use or assignment of the co-owned brand.
 
 **11.5 Adcellent Exclusive Property:** Adcellent's own corporate brand, client relationships, associate network, referral network, and go-to-market materials and strategies are the exclusive property of **Adcellent**.
 

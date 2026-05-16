@@ -11,7 +11,7 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
   <div class="sidebar-brand">
     <div class="brand-icon"><i class="bi bi-leaf-fill"></i></div>
     <div class="brand-text">
-      <div class="brand-name">AiServe ESG OS</div>
+      <div class="brand-name">Adcellent ESG OS</div>
       <div class="brand-tagline">Malaysia ESG Platform</div>
     </div>
   </div>
