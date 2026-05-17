@@ -96,4 +96,61 @@ class UserController
         flash('success', 'Profile updated.');
         redirect('user/profile');
     }
+
+    public function updatePhoto(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/profile'); }
+        $path = uploadPhoto('photo', 'users');
+        if ($path) {
+            Database::execute('UPDATE users SET avatar = ? WHERE id = ?', [$path, Auth::id()]);
+            flash('success', 'Photo updated.');
+        }
+        redirect('user/profile');
+    }
+
+    public function changePassword(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/profile'); }
+
+        $current = $_POST['current_password'] ?? '';
+        $new     = $_POST['new_password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
+
+        $user = Database::queryOne('SELECT password FROM users WHERE id = ?', [Auth::id()]);
+        if (!password_verify($current, $user['password'])) {
+            flash('error', 'Current password is incorrect.'); redirect('user/profile');
+        }
+        if (strlen($new) < 8) {
+            flash('error', 'New password must be at least 8 characters.'); redirect('user/profile');
+        }
+        if ($new !== $confirm) {
+            flash('error', 'Passwords do not match.'); redirect('user/profile');
+        }
+
+        Database::execute('UPDATE users SET password = ? WHERE id = ?', [password_hash($new, PASSWORD_BCRYPT), Auth::id()]);
+        flash('success', 'Password changed successfully.');
+        redirect('user/profile');
+    }
+
+    public function records(): void
+    {
+        $userId  = Auth::id();
+        $records = Database::query(
+            'SELECT mr.*, du.name AS doctor_name, d.speciality,
+                    a.appointment_date, a.appointment_time, a.type
+             FROM medical_records mr
+             JOIN doctors d ON mr.doctor_id = d.id
+             JOIN users du ON d.user_id = du.id
+             JOIN appointments a ON mr.appointment_id = a.id
+             WHERE mr.patient_id = ?
+             ORDER BY mr.created_at DESC',
+            [$userId]
+        );
+
+        view('layouts/app', [
+            'pageTitle' => 'My Medical Records',
+            'content'   => 'user/records',
+            'records'   => $records,
+        ]);
+    }
 }

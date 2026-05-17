@@ -220,4 +220,39 @@ class OrganisationController
         flash('success', 'Profile updated.');
         redirect('organisation/profile');
     }
+
+    public function updatePhoto(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('organisation/profile'); }
+        $path = uploadPhoto('photo', 'orgs');
+        if ($path) {
+            Database::execute('UPDATE users SET avatar = ? WHERE id = ?', [$path, $this->userId]);
+            flash('success', 'Logo updated.');
+        }
+        redirect('organisation/profile');
+    }
+
+    public function changePassword(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('organisation/profile'); }
+
+        $current = $_POST['current_password'] ?? '';
+        $new     = $_POST['new_password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
+
+        $user = Database::queryOne('SELECT password FROM users WHERE id = ?', [$this->userId]);
+        if (!password_verify($current, $user['password'])) {
+            flash('error', 'Current password is incorrect.'); redirect('organisation/profile');
+        }
+        if (strlen($new) < 8) {
+            flash('error', 'New password must be at least 8 characters.'); redirect('organisation/profile');
+        }
+        if ($new !== $confirm) {
+            flash('error', 'Passwords do not match.'); redirect('organisation/profile');
+        }
+
+        Database::execute('UPDATE users SET password = ? WHERE id = ?', [password_hash($new, PASSWORD_BCRYPT), $this->userId]);
+        flash('success', 'Password changed successfully.');
+        redirect('organisation/profile');
+    }
 }

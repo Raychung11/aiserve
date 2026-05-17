@@ -340,6 +340,40 @@ class AdminController
         ]);
     }
 
+    public function approvals(): void
+    {
+        $pending = Database::query(
+            'SELECT u.*, d.speciality, o.name AS org_name
+             FROM users u
+             LEFT JOIN doctors d ON d.user_id = u.id
+             LEFT JOIN organisations o ON o.user_id = u.id
+             WHERE u.approved = 0 AND u.role IN ("medic","organisation")
+             ORDER BY u.created_at DESC'
+        );
+
+        view('layouts/app', [
+            'pageTitle' => 'Pending Approvals',
+            'content'   => 'admin/approvals',
+            'pending'   => $pending,
+        ]);
+    }
+
+    public function approvalAction(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('admin/approvals'); }
+        $id     = (int) ($_POST['id'] ?? 0);
+        $action = $_POST['action'] ?? '';
+
+        if ($action === 'approve') {
+            Database::execute('UPDATE users SET approved = 1, is_active = 1 WHERE id = ?', [$id]);
+            flash('success', 'Account approved. The user can now log in.');
+        } elseif ($action === 'reject') {
+            Database::execute('UPDATE users SET is_active = 0 WHERE id = ?', [$id]);
+            flash('success', 'Account rejected.');
+        }
+        redirect('admin/approvals');
+    }
+
     public function settings(): void
     {
         view('layouts/app', ['pageTitle' => 'Settings', 'content' => 'admin/settings']);
@@ -348,7 +382,6 @@ class AdminController
     public function updateSettings(): void
     {
         if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('admin/settings'); }
-        // Settings can be stored in a config file or DB settings table
         flash('success', 'Settings saved.');
         redirect('admin/settings');
     }

@@ -51,12 +51,14 @@
             <?php $role = Auth::role(); ?>
 
             <?php if ($role === 'admin'): ?>
+            <?php $pendingCount = Database::queryOne('SELECT COUNT(*) as c FROM users WHERE approved = 0 AND role IN ("medic","organisation")')['c'] ?? 0; ?>
             <p class="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Admin</p>
             <?= navLink('admin/dashboard', 'fa-gauge', 'Dashboard') ?>
             <?= navLink('admin/doctors', 'fa-user-doctor', 'Doctors') ?>
             <?= navLink('admin/organisations', 'fa-hospital', 'Organisations') ?>
             <?= navLink('admin/appointments', 'fa-calendar-check', 'Appointments') ?>
             <?= navLink('admin/users', 'fa-users', 'Users') ?>
+            <?= navLinkBadge('admin/approvals', 'fa-user-check', 'Approvals', $pendingCount) ?>
             <?= navLink('admin/reports', 'fa-chart-bar', 'Reports') ?>
             <?= navLink('admin/settings', 'fa-gear', 'Settings') ?>
 
@@ -64,6 +66,7 @@
             <p class="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Medic</p>
             <?= navLink('medic/dashboard', 'fa-gauge', 'Dashboard') ?>
             <?= navLink('medic/appointments', 'fa-calendar-check', 'Appointments') ?>
+            <?= navLink('medic/records', 'fa-notes-medical', 'Medical Records') ?>
             <?= navLink('medic/schedule', 'fa-clock', 'My Schedule') ?>
             <?= navLink('medic/profile', 'fa-user', 'My Profile') ?>
 
@@ -79,6 +82,7 @@
             <p class="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Patient</p>
             <?= navLink('user/dashboard', 'fa-gauge', 'Dashboard') ?>
             <?= navLink('user/appointments', 'fa-calendar-check', 'My Appointments') ?>
+            <?= navLink('user/records', 'fa-notes-medical', 'Medical Records') ?>
             <?= navLink('user/profile', 'fa-user', 'My Profile') ?>
             <?= navLink('doctors', 'fa-user-doctor', 'Find Doctors') ?>
             <?php endif; ?>
@@ -131,6 +135,22 @@
 </div>
 
 <?php
+function navLinkBadge(string $path, string $icon, string $label, int $badge): string {
+    $current = trim($_GET['url'] ?? '', '/');
+    if ($current === '') $current = 'home';
+    $active = $current === $path;
+    $cls = $active ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white';
+    $badgeHtml = $badge > 0
+        ? '<span class="ml-auto bg-yellow-400 text-yellow-900 text-xs font-bold px-1.5 py-0.5 rounded-full">' . $badge . '</span>'
+        : '';
+    return sprintf(
+        '<a href="%s" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm mb-0.5 %s">
+            <i class="fa-solid %s w-4 text-center"></i><span>%s</span>%s
+         </a>',
+        url($path), $cls, $icon, htmlspecialchars($label, ENT_QUOTES), $badgeHtml
+    );
+}
+
 function navLink(string $path, string $icon, string $label): string {
     $current = trim($_GET['url'] ?? '', '/');
     if ($current === '') $current = 'home';

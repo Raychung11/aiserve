@@ -46,7 +46,13 @@
                         <span class="text-xs bg-<?= $c ?>-100 text-<?= $c ?>-700 px-2.5 py-1 rounded-full capitalize"><?= $appt['status'] ?></span>
                     </td>
                     <td class="px-5 py-3 text-right">
-                        <?php if (!in_array($appt['status'], ['completed','cancelled'])): ?>
+                        <div class="flex items-center justify-end gap-2 flex-wrap">
+                        <?php if ($appt['status'] === 'completed'): ?>
+                            <a href="<?= url('medic/records/create?appointment_id=' . $appt['id']) ?>"
+                               class="px-2.5 py-1 bg-green-100 text-green-700 text-xs rounded-lg hover:bg-green-200 font-medium whitespace-nowrap">
+                                <i class="fa-solid fa-notes-medical mr-1"></i>Write Record
+                            </a>
+                        <?php elseif (!in_array($appt['status'], ['cancelled'])): ?>
                         <form method="POST" action="<?= url('medic/appointments/update') ?>" class="inline-flex gap-1">
                             <?= csrf_field() ?>
                             <input type="hidden" name="id" value="<?= $appt['id'] ?>">
@@ -58,6 +64,7 @@
                             <button class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">Update</button>
                         </form>
                         <?php endif; ?>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>

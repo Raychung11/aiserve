@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
         ];
 
         $userIds = [];
-        $stmt = $pdo->prepare('INSERT INTO users (name,email,password,role,phone) VALUES (?,?,?,?,?)');
+        $stmt = $pdo->prepare('INSERT INTO users (name,email,password,role,phone,approved) VALUES (?,?,?,?,?,1)');
         foreach ($users as $u) {
             $stmt->execute($u);
             $userIds[$u[1]] = (int) $pdo->lastInsertId();

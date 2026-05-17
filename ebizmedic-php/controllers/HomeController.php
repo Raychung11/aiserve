@@ -116,7 +116,7 @@ class HomeController
 
         $doctorId = (int) ($_GET['doctor_id'] ?? 0);
         $doctor = Database::queryOne(
-            'SELECT d.*, u.name FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.id = ? AND d.is_active = 1',
+            'SELECT d.*, u.name, u.avatar FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.id = ? AND d.is_active = 1',
             [$doctorId]
         );
         if (!$doctor) { flash('error', 'Doctor not found.'); redirect('doctors'); }
@@ -130,13 +130,71 @@ class HomeController
             [$doctorId]
         );
 
+        // Build schedule map keyed by day for JS slot picker
+        $scheduleMap = [];
+        foreach ($schedules as $s) {
+            $scheduleMap[$s['day_of_week']] = ['start' => $s['start_time'], 'end' => $s['end_time']];
+        }
+
+        // Pre-load booked slots for next 90 days so JS can disable them
+        $bookedSlots = Database::query(
+            "SELECT appointment_date, appointment_time FROM appointments
+             WHERE doctor_id = ? AND status NOT IN ('cancelled')
+             AND appointment_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 90 DAY)",
+            [$doctorId]
+        );
+        $bookedMap = [];
+        foreach ($bookedSlots as $b) {
+            $bookedMap[$b['appointment_date']][] = substr($b['appointment_time'], 0, 5);
+        }
+
         view('layouts/public', [
-            'pageTitle' => 'Book Appointment — eBizMedic',
-            'content'   => 'home/booking',
-            'doctor'    => $doctor,
-            'services'  => $services,
-            'schedules' => $schedules,
+            'pageTitle'   => 'Book Appointment — eBizMedic',
+            'content'     => 'home/booking',
+            'doctor'      => $doctor,
+            'services'    => $services,
+            'schedules'   => $schedules,
+            'scheduleMap' => $scheduleMap,
+            'bookedMap'   => $bookedMap,
         ]);
+    }
+
+    // AJAX endpoint: return available slots for a doctor+date as JSON
+    public function slots(): void
+    {
+        header('Content-Type: application/json');
+        $doctorId = (int) ($_GET['doctor_id'] ?? 0);
+        $date     = $_GET['date'] ?? '';
+
+        if (!$doctorId || !$date) { echo json_encode([]); exit; }
+
+        $dayName  = strtolower(date('l', strtotime($date)));
+        $schedule = Database::queryOne(
+            'SELECT * FROM schedules WHERE doctor_id = ? AND day_of_week = ? AND is_available = 1',
+            [$doctorId, $dayName]
+        );
+
+        if (!$schedule) { echo json_encode([]); exit; }
+
+        $booked = array_column(Database::query(
+            "SELECT appointment_time FROM appointments
+             WHERE doctor_id = ? AND appointment_date = ? AND status NOT IN ('cancelled')",
+            [$doctorId, $date]
+        ), 'appointment_time');
+
+        $booked  = array_map(fn($t) => substr($t, 0, 5), $booked);
+        $slots   = [];
+        $current = strtotime($date . ' ' . $schedule['start_time']);
+        $end     = strtotime($date . ' ' . $schedule['end_time']);
+
+        while ($current < $end) {
+            $time   = date('H:i', $current);
+            $slots[] = ['time' => $time, 'booked' => in_array($time, $booked)];
+            $current += 30 * 60; // 30-min intervals
+        }
+
+        echo json_encode($slots);
+        exit;
     }
 
     public function storeBooking(): void

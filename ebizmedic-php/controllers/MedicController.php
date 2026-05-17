@@ -205,4 +205,114 @@ class MedicController
         flash('success', 'Profile updated.');
         redirect('medic/profile');
     }
+
+    public function updatePhoto(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('medic/profile'); }
+        $path = uploadPhoto('photo', 'doctors');
+        if ($path) {
+            Database::execute('UPDATE users SET avatar = ? WHERE id = ?', [$path, $this->userId]);
+            flash('success', 'Photo updated.');
+        }
+        redirect('medic/profile');
+    }
+
+    public function changePassword(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('medic/profile'); }
+
+        $current = $_POST['current_password'] ?? '';
+        $new     = $_POST['new_password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
+
+        $user = Database::queryOne('SELECT password FROM users WHERE id = ?', [$this->userId]);
+        if (!password_verify($current, $user['password'])) {
+            flash('error', 'Current password is incorrect.'); redirect('medic/profile');
+        }
+        if (strlen($new) < 8) {
+            flash('error', 'New password must be at least 8 characters.'); redirect('medic/profile');
+        }
+        if ($new !== $confirm) {
+            flash('error', 'Passwords do not match.'); redirect('medic/profile');
+        }
+
+        Database::execute('UPDATE users SET password = ? WHERE id = ?', [password_hash($new, PASSWORD_BCRYPT), $this->userId]);
+        flash('success', 'Password changed successfully.');
+        redirect('medic/profile');
+    }
+
+    public function records(): void
+    {
+        $doctorId = $this->doctor['id'];
+        $records  = Database::query(
+            'SELECT mr.*, u.name AS patient_name, a.appointment_date, a.appointment_time, a.type
+             FROM medical_records mr
+             JOIN users u ON mr.patient_id = u.id
+             JOIN appointments a ON mr.appointment_id = a.id
+             WHERE mr.doctor_id = ?
+             ORDER BY mr.created_at DESC',
+            [$doctorId]
+        );
+
+        view('layouts/app', [
+            'pageTitle' => 'Medical Records',
+            'content'   => 'medic/records',
+            'records'   => $records,
+        ]);
+    }
+
+    public function createRecord(): void
+    {
+        $appointmentId = (int) ($_GET['appointment_id'] ?? 0);
+        $appointment   = Database::queryOne(
+            'SELECT a.*, u.name AS patient_name FROM appointments a
+             JOIN users u ON a.patient_id = u.id
+             WHERE a.id = ? AND a.doctor_id = ?',
+            [$appointmentId, $this->doctor['id']]
+        );
+        if (!$appointment) { flash('error', 'Appointment not found.'); redirect('medic/appointments'); }
+
+        $existing = Database::queryOne('SELECT id FROM medical_records WHERE appointment_id = ?', [$appointmentId]);
+        if ($existing) { flash('error', 'Record already exists for this appointment.'); redirect('medic/records'); }
+
+        view('layouts/app', [
+            'pageTitle'   => 'New Medical Record',
+            'content'     => 'medic/record_form',
+            'appointment' => $appointment,
+        ]);
+    }
+
+    public function storeRecord(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('medic/records'); }
+
+        $appointmentId  = (int) ($_POST['appointment_id'] ?? 0);
+        $appointment    = Database::queryOne(
+            'SELECT * FROM appointments WHERE id = ? AND doctor_id = ?',
+            [$appointmentId, $this->doctor['id']]
+        );
+        if (!$appointment) { flash('error', 'Appointment not found.'); redirect('medic/appointments'); }
+
+        Database::insert(
+            'INSERT INTO medical_records (appointment_id,doctor_id,patient_id,chief_complaint,diagnosis,treatment,prescription,follow_up_date,notes)
+             VALUES (?,?,?,?,?,?,?,?,?)',
+            [
+                $appointmentId,
+                $this->doctor['id'],
+                $appointment['patient_id'],
+                trim($_POST['chief_complaint'] ?? ''),
+                trim($_POST['diagnosis'] ?? ''),
+                trim($_POST['treatment'] ?? ''),
+                trim($_POST['prescription'] ?? ''),
+                $_POST['follow_up_date'] ?: null,
+                trim($_POST['notes'] ?? ''),
+            ]
+        );
+
+        // Auto-mark appointment as completed
+        Database::execute("UPDATE appointments SET status='completed' WHERE id=?", [$appointmentId]);
+
+        flash('success', 'Medical record saved and appointment marked as completed.');
+        redirect('medic/records');
+    }
 }
