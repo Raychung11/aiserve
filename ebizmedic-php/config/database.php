@@ -10,9 +10,9 @@ class Database
             return self::$instance;
         }
 
-        $host = $_ENV['DB_HOST'] ?? 'localhost';
-        $name = $_ENV['DB_NAME'] ?? 'ebizmedic';
-        $user = $_ENV['DB_USER'] ?? 'root';
+        $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
+        $name = $_ENV['DB_NAME'] ?? 'u822252863_ebizmedic';
+        $user = $_ENV['DB_USER'] ?? 'u822252863_ebizmedic';
         $pass = $_ENV['DB_PASS'] ?? '';
 
         $dsn = "mysql:host={$host};dbname={$name};charset=utf8mb4";
