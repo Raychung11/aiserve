@@ -351,7 +351,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
         foreach ($medicines as $m) {
             $stmtMed->execute($m);
             $medId = (int) $pdo->lastInsertId();
-            $medIds[] = ['id' => $medId, 'org_id' => $m[0], 'price' => $m[8], 'unit' => $m[4]];
+            $medIds[] = ['id' => $medId, 'org_id' => $m[0], 'price' => $m[7], 'unit' => $m[4]];
             if ($m[5] > 0) {
                 $stmtMov->execute([$medId, 'in', $m[5], 'Initial stock', $m[0] === $ksId ? $pharmaKsId : $pharmaHpId]);
             }
