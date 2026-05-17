@@ -132,6 +132,36 @@ class UserController
         redirect('user/profile');
     }
 
+    public function dispensary(): void
+    {
+        $userId    = Auth::id();
+        $dispensings = Database::query(
+            'SELECT d.*, o.name AS org_name, du.name AS dispensed_by_name
+             FROM dispensings d
+             JOIN organisations o ON d.organisation_id = o.id
+             JOIN users du        ON d.dispensed_by     = du.id
+             WHERE d.patient_id = ?
+             ORDER BY d.created_at DESC',
+            [$userId]
+        );
+
+        // Fetch items for each dispensing
+        foreach ($dispensings as &$disp) {
+            $disp['items'] = Database::query(
+                'SELECT di.*, m.name AS medicine_name, m.unit FROM dispensing_items di
+                 JOIN medicines m ON di.medicine_id = m.id
+                 WHERE di.dispensing_id = ?',
+                [$disp['id']]
+            );
+        }
+
+        view('layouts/app', [
+            'pageTitle'   => 'My Dispensing History',
+            'content'     => 'user/dispensary',
+            'dispensings' => $dispensings,
+        ]);
+    }
+
     public function records(): void
     {
         $userId  = Auth::id();

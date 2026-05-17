@@ -78,6 +78,7 @@ class Auth
             'admin'        => 'admin/dashboard',
             'medic'        => 'medic/dashboard',
             'organisation' => 'organisation/dashboard',
+            'pharmacist'   => 'pharmacist/dashboard',
             default        => 'user/dashboard',
         };
     }

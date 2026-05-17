@@ -69,11 +69,31 @@ $routes = [
         'organisation/appointments'     => ['OrganisationController', 'appointments'],
         'organisation/profile'          => ['OrganisationController', 'profile'],
 
+        // Pharmacist
+        'pharmacist/dashboard'          => ['PharmacistController',   'dashboard'],
+        'pharmacist/dispense'           => ['PharmacistController',   'dispense'],
+        'pharmacist/history'            => ['PharmacistController',   'history'],
+        'pharmacist/medicines'          => ['PharmacistController',   'medicines'],
+
+        // Organisation — dispensary
+        'organisation/dispensary'         => ['OrganisationController', 'dispensary'],
+        'organisation/dispensary/add'     => ['OrganisationController', 'addMedicine'],
+        'organisation/dispensary/edit'    => ['OrganisationController', 'editMedicine'],
+        'organisation/dispensary/history' => ['OrganisationController', 'dispensaryHistory'],
+        'organisation/dispensary/stock'   => ['OrganisationController', 'stockForm'],
+
+        // Admin dispensary
+        'admin/dispensary'              => ['AdminController',        'dispensary'],
+
         // User
         'user/dashboard'                => ['UserController',         'dashboard'],
         'user/appointments'             => ['UserController',         'appointments'],
         'user/records'                  => ['UserController',         'records'],
+        'user/dispensary'               => ['UserController',         'dispensary'],
         'user/profile'                  => ['UserController',         'profile'],
+
+        // Medic dispensary
+        'medic/dispensary'              => ['MedicController',        'dispensary'],
     ],
     'POST' => [
         'login'                         => ['AuthController',         'login'],
@@ -102,10 +122,22 @@ $routes = [
         'organisation/profile/photo'    => ['OrganisationController', 'updatePhoto'],
         'organisation/profile/password' => ['OrganisationController', 'changePassword'],
 
-        'booking/store'                 => ['HomeController',         'storeBooking'],
-        'user/profile/update'           => ['UserController',         'updateProfile'],
-        'user/profile/photo'            => ['UserController',         'updatePhoto'],
-        'user/profile/password'         => ['UserController',         'changePassword'],
+        'booking/store'                      => ['HomeController',         'storeBooking'],
+        'user/profile/update'                => ['UserController',         'updateProfile'],
+        'user/profile/photo'                 => ['UserController',         'updatePhoto'],
+        'user/profile/password'              => ['UserController',         'changePassword'],
+
+        // Pharmacist
+        'pharmacist/dispense/store'          => ['PharmacistController',   'storeDispensing'],
+
+        // Organisation dispensary
+        'organisation/dispensary/store'      => ['OrganisationController', 'storeMedicine'],
+        'organisation/dispensary/update'     => ['OrganisationController', 'updateMedicine'],
+        'organisation/dispensary/stock/save' => ['OrganisationController', 'saveStock'],
+        'organisation/dispensary/staff/store'=> ['OrganisationController', 'storePharmacist'],
+
+        // Admin
+        'admin/dispensary/dispense'          => ['AdminController',        'dispenseAdmin'],
     ],
 ];
 

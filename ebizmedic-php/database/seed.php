@@ -17,16 +17,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
 
         // ── Wipe existing data (FK-safe order) ───────────────────────────
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
-        foreach (['appointments','schedules','services','doctors','organisations','users'] as $t) {
+        foreach ([
+            'dispensing_items','dispensings','stock_movements','medicines',
+            'pharmacists','appointments','medical_records','schedules',
+            'services','doctors','organisations','users'
+        ] as $t) {
             $pdo->exec("TRUNCATE TABLE $t");
         }
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
 
         // ── Passwords ─────────────────────────────────────────────────────
-        $adminPass = password_hash('Admin@123',   PASSWORD_BCRYPT);
-        $orgPass   = password_hash('Org@123456',  PASSWORD_BCRYPT);
-        $docPass   = password_hash('Doctor@123',  PASSWORD_BCRYPT);
-        $userPass  = password_hash('User@123',    PASSWORD_BCRYPT);
+        $adminPass   = password_hash('Admin@123',   PASSWORD_BCRYPT);
+        $orgPass     = password_hash('Org@123456',  PASSWORD_BCRYPT);
+        $docPass     = password_hash('Doctor@123',  PASSWORD_BCRYPT);
+        $userPass    = password_hash('User@123',    PASSWORD_BCRYPT);
+        $pharmaPass  = password_hash('Pharma@123',  PASSWORD_BCRYPT);
 
         // ══════════════════════════════════════════════════════════════════
         // USERS
@@ -45,6 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
             ['Dr. Mohd Hafiz Yusof',     'hafiz.yusof@doctor.com',     $docPass,   'medic',        '+60 11-555 6666'],
             ['Dr. Priya Nair',           'priya.nair@doctor.com',      $docPass,   'medic',        '+60 16-777 8888'],
             ['Dr. James Wong',           'james.wong@doctor.com',      $docPass,   'medic',        '+60 17-999 0000'],
+
+            // Pharmacists
+            ['Nurul Aina',               'pharma@kliniksehat.com',     $pharmaPass,'pharmacist',   '+60 11-222 3333'],
+            ['Rajan Pillai',             'pharma@hospitalprima.com',   $pharmaPass,'pharmacist',   '+60 11-444 5555'],
 
             // Patients
             ['Ali Hassan',               'ali@patient.com',            $userPass,  'user',         '+60 12-123 4567'],
@@ -289,8 +298,210 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
             'INSERT INTO appointments (patient_id,doctor_id,service_id,organisation_id,appointment_date,appointment_time,type,status,notes)
              VALUES (?,?,?,?,?,?,?,?,?)'
         );
+        $apptIds = [];
         foreach ($appointments as $appt) {
             $stmt->execute($appt);
+            $apptIds[] = (int) $pdo->lastInsertId();
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // PHARMACISTS
+        // ══════════════════════════════════════════════════════════════════
+        $pdo->prepare('INSERT INTO pharmacists (user_id, organisation_id) VALUES (?,?)')
+            ->execute([$userIds['pharma@kliniksehat.com'], $ksId]);
+        $pdo->prepare('INSERT INTO pharmacists (user_id, organisation_id) VALUES (?,?)')
+            ->execute([$userIds['pharma@hospitalprima.com'], $hpId]);
+
+        $pharmaKsId = $userIds['pharma@kliniksehat.com'];
+        $pharmaHpId = $userIds['pharma@hospitalprima.com'];
+
+        // ══════════════════════════════════════════════════════════════════
+        // MEDICINES
+        // ══════════════════════════════════════════════════════════════════
+        $medicines = [
+            // Klinik Sehat KL medicines
+            [$ksId, 'Paracetamol 500mg',      'Acetaminophen',      'Analgesic',    'tablet',    200, 30,  0.15,  'For fever and mild to moderate pain relief.'],
+            [$ksId, 'Ibuprofen 400mg',         'Ibuprofen',          'NSAID',        'tablet',    150, 30,  0.30,  'Anti-inflammatory, antipyretic, analgesic.'],
+            [$ksId, 'Amoxicillin 500mg',       'Amoxicillin',        'Antibiotic',   'capsule',   100, 20,  0.80,  'Broad-spectrum penicillin antibiotic.'],
+            [$ksId, 'Cetirizine 10mg',         'Cetirizine HCl',     'Antihistamine','tablet',    120, 20,  0.25,  'For allergy relief and hay fever.'],
+            [$ksId, 'Omeprazole 20mg',         'Omeprazole',         'PPI',          'capsule',   80,  15,  1.20,  'Proton pump inhibitor for acid reflux.'],
+            [$ksId, 'Hydrocortisone Cream 1%', null,                 'Topical',      'tube',      30,  5,   8.50,  'For skin inflammation and eczema.'],
+            [$ksId, 'Salbutamol Inhaler',      'Albuterol',          'Bronchodilator','inhaler',  15,  3,   18.00, 'Relieves bronchospasm in asthma.'],
+            [$ksId, 'Atorvastatin 20mg',       'Atorvastatin',       'Statin',       'tablet',    60,  10,  1.50,  'Reduces LDL cholesterol levels.'],
+            [$ksId, 'Metformin 500mg',         'Metformin HCl',      'Antidiabetic', 'tablet',    5,   10,  0.20,  'First-line therapy for type 2 diabetes.'],
+
+            // Hospital Prima Penang medicines
+            [$hpId, 'Paracetamol 500mg',      'Acetaminophen',      'Analgesic',    'tablet',    300, 50,  0.15,  'For fever and mild to moderate pain relief.'],
+            [$hpId, 'Azithromycin 250mg',      'Azithromycin',       'Antibiotic',   'tablet',    80,  15,  2.50,  'Macrolide antibiotic for respiratory infections.'],
+            [$hpId, 'Loratadine 10mg',         'Loratadine',         'Antihistamine','tablet',    100, 20,  0.35,  'Non-drowsy antihistamine for allergies.'],
+            [$hpId, 'Prednisolone 5mg',        'Prednisolone',       'Corticosteroid','tablet',   60,  10,  0.50,  'For inflammatory and autoimmune conditions.'],
+            [$hpId, 'Amlodipine 5mg',          'Amlodipine',         'Antihypertensive','tablet', 80,  15,  0.80,  'Calcium channel blocker for high blood pressure.'],
+            [$hpId, 'ORS Sachets',             'Oral Rehydration',   'Electrolyte',  'sachet',    50,  10,  1.00,  'Oral rehydration salts for dehydration.'],
+            [$hpId, 'Tramadol 50mg',           'Tramadol HCl',       'Analgesic',    'tablet',    8,   5,   2.00,  'Opioid pain reliever for moderate-severe pain.'],
+        ];
+
+        $medIds = [];
+        $stmtMed = $pdo->prepare(
+            'INSERT INTO medicines (organisation_id,name,generic_name,category,unit,stock_qty,reorder_level,unit_price,description)
+             VALUES (?,?,?,?,?,?,?,?,?)'
+        );
+        $stmtMov = $pdo->prepare(
+            'INSERT INTO stock_movements (medicine_id,type,quantity,reference,created_by) VALUES (?,?,?,?,?)'
+        );
+        foreach ($medicines as $m) {
+            $stmtMed->execute($m);
+            $medId = (int) $pdo->lastInsertId();
+            $medIds[] = ['id' => $medId, 'org_id' => $m[0], 'price' => $m[8], 'unit' => $m[4]];
+            if ($m[5] > 0) {
+                $stmtMov->execute([$medId, 'in', $m[5], 'Initial stock', $m[0] === $ksId ? $pharmaKsId : $pharmaHpId]);
+            }
+        }
+
+        // Key medicines by org for dispensing samples
+        $ksMeds = array_values(array_filter($medIds, fn($m) => $m['org_id'] === $ksId));
+        $hpMeds = array_values(array_filter($medIds, fn($m) => $m['org_id'] === $hpId));
+
+        // ══════════════════════════════════════════════════════════════════
+        // MEDICAL RECORDS (for the 5 completed appointments)
+        // ══════════════════════════════════════════════════════════════════
+        $recordData = [
+            // Ali Hassan - Dr Ahmad (Cardiology) - appt index 0
+            [$apptIds[0], $drAhmad, $userIds['ali@patient.com'],
+             'Chest pain and breathlessness on exertion', 'Stable angina', 'Rest, lifestyle modification, medication',
+             "Atorvastatin 20mg 1 tablet nightly\nAspirin 75mg 1 tablet daily",
+             date('Y-m-d', strtotime('+3 months')), 'Monitor for any worsening symptoms.'],
+
+            // Siti - Dr Sarah (Dermatology) - appt index 1
+            [$apptIds[1], $drSarah, $userIds['siti@patient.com'],
+             'Acne breakout on face and back', 'Moderate acne vulgaris', 'Topical retinoid + antibiotic wash',
+             "Hydrocortisone Cream 1% apply twice daily on affected areas\nCetirizine 10mg 1 tablet at night",
+             date('Y-m-d', strtotime('+6 weeks')), 'Avoid direct sunlight. Use sunscreen daily.'],
+
+            // Raj - Dr Hafiz (GP) - appt index 2
+            [$apptIds[2], $drHafiz, $userIds['raj@patient.com'],
+             'High blood pressure, follow-up', 'Hypertension Stage 1', 'Lifestyle modification, medication adjustment',
+             "Amlodipine 5mg 1 tablet daily in the morning\nORS Sachets 1 sachet as needed for hydration",
+             date('Y-m-d', strtotime('+1 month')), 'Check BP daily. Reduce salt intake.'],
+
+            // Lim - Dr Priya (Paediatrics) - appt index 3
+            [$apptIds[3], $drPriya, $userIds['lim@patient.com'],
+             'Child annual health check-up, 5 years old', 'Healthy child, mild seasonal allergy', 'Dietary advice, allergy management',
+             "Loratadine 10mg 0.5 tablet daily if sneezing\nParacetamol 500mg use only when fever > 38.5°C",
+             date('Y-m-d', strtotime('+6 months')), 'Growth and development on track.'],
+
+            // Ali - Dr Sarah (Dermatology) - appt index 4
+            [$apptIds[4], $drSarah, $userIds['ali@patient.com'],
+             'Eczema flare-up on arms and legs', 'Atopic eczema, moderate', 'Emollient therapy, topical steroid',
+             "Hydrocortisone Cream 1% apply twice daily\nCetirizine 10mg 1 tablet at night for itch",
+             date('Y-m-d', strtotime('+4 weeks')), 'Moisturise at least twice daily. Avoid harsh soaps.'],
+        ];
+
+        $stmtRec = $pdo->prepare(
+            'INSERT INTO medical_records (appointment_id,doctor_id,patient_id,chief_complaint,diagnosis,treatment,prescription,follow_up_date,notes)
+             VALUES (?,?,?,?,?,?,?,?,?)'
+        );
+        $recordIds = [];
+        foreach ($recordData as $r) {
+            $stmtRec->execute($r);
+            $recordIds[] = (int) $pdo->lastInsertId();
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // DISPENSINGS (tied to the medical records above)
+        // ══════════════════════════════════════════════════════════════════
+        $dispensings = [
+            // Ali's cardiology record → Klinik Sehat pharmacist
+            [
+                'patient_id'        => $userIds['ali@patient.com'],
+                'doctor_id'         => $drAhmad,
+                'organisation_id'   => $ksId,
+                'medical_record_id' => $recordIds[0],
+                'dispensed_by'      => $pharmaKsId,
+                'notes'             => 'Take atorvastatin at the same time each night.',
+                'total_amount'      => 0,
+                'items'             => [
+                    ['med_idx' => 7, 'meds' => $ksMeds, 'qty' => 30, 'dosage' => '1 tablet nightly'],  // Atorvastatin
+                    ['med_idx' => 0, 'meds' => $ksMeds, 'qty' => 30, 'dosage' => '1 tablet daily'],    // Paracetamol (as Aspirin placeholder)
+                ],
+            ],
+            // Siti's dermatology record → Klinik Sehat pharmacist
+            [
+                'patient_id'        => $userIds['siti@patient.com'],
+                'doctor_id'         => $drSarah,
+                'organisation_id'   => $ksId,
+                'medical_record_id' => $recordIds[1],
+                'dispensed_by'      => $pharmaKsId,
+                'notes'             => 'Apply cream sparingly. Avoid eyes and open wounds.',
+                'total_amount'      => 0,
+                'items'             => [
+                    ['med_idx' => 5, 'meds' => $ksMeds, 'qty' => 2, 'dosage' => 'Apply twice daily'],   // Hydrocortisone
+                    ['med_idx' => 3, 'meds' => $ksMeds, 'qty' => 14, 'dosage' => '1 tablet at night'],  // Cetirizine
+                ],
+            ],
+            // Raj's hypertension record → Hospital Prima pharmacist
+            [
+                'patient_id'        => $userIds['raj@patient.com'],
+                'doctor_id'         => $drHafiz,
+                'organisation_id'   => $hpId,
+                'medical_record_id' => $recordIds[2],
+                'dispensed_by'      => $pharmaHpId,
+                'notes'             => 'Monitor blood pressure daily and log readings.',
+                'total_amount'      => 0,
+                'items'             => [
+                    ['med_idx' => 4, 'meds' => $hpMeds, 'qty' => 30, 'dosage' => '1 tablet daily morning'],  // Amlodipine
+                    ['med_idx' => 5, 'meds' => $hpMeds, 'qty' => 5,  'dosage' => '1 sachet when needed'],    // ORS
+                ],
+            ],
+            // Ali's eczema record → Klinik Sehat pharmacist
+            [
+                'patient_id'        => $userIds['ali@patient.com'],
+                'doctor_id'         => $drSarah,
+                'organisation_id'   => $ksId,
+                'medical_record_id' => $recordIds[4],
+                'dispensed_by'      => $pharmaKsId,
+                'notes'             => '',
+                'total_amount'      => 0,
+                'items'             => [
+                    ['med_idx' => 5, 'meds' => $ksMeds, 'qty' => 1, 'dosage' => 'Apply twice daily'],
+                    ['med_idx' => 3, 'meds' => $ksMeds, 'qty' => 7, 'dosage' => '1 tablet at night'],
+                ],
+            ],
+        ];
+
+        $stmtDisp = $pdo->prepare(
+            'INSERT INTO dispensings (patient_id,doctor_id,organisation_id,medical_record_id,dispensed_by,notes,total_amount)
+             VALUES (?,?,?,?,?,?,?)'
+        );
+        $stmtDItem = $pdo->prepare(
+            'INSERT INTO dispensing_items (dispensing_id,medicine_id,quantity,unit_price,dosage_instructions) VALUES (?,?,?,?,?)'
+        );
+        $stmtDeduct = $pdo->prepare('UPDATE medicines SET stock_qty = stock_qty - ? WHERE id = ?');
+        $stmtMovOut = $pdo->prepare(
+            'INSERT INTO stock_movements (medicine_id,type,quantity,reference,created_by) VALUES (?,?,?,?,?)'
+        );
+
+        foreach ($dispensings as $disp) {
+            // Calculate total
+            $total = 0;
+            foreach ($disp['items'] as $lineItem) {
+                $med    = $lineItem['meds'][$lineItem['med_idx']] ?? null;
+                if (!$med) continue;
+                $total += $med['price'] * $lineItem['qty'];
+            }
+
+            $stmtDisp->execute([
+                $disp['patient_id'], $disp['doctor_id'], $disp['organisation_id'],
+                $disp['medical_record_id'], $disp['dispensed_by'], $disp['notes'], $total
+            ]);
+            $dispId = (int) $pdo->lastInsertId();
+
+            foreach ($disp['items'] as $lineItem) {
+                $med = $lineItem['meds'][$lineItem['med_idx']] ?? null;
+                if (!$med) continue;
+                $stmtDItem->execute([$dispId, $med['id'], $lineItem['qty'], $med['price'], $lineItem['dosage']]);
+                $stmtDeduct->execute([$lineItem['qty'], $med['id']]);
+                $stmtMovOut->execute([$med['id'], 'out', $lineItem['qty'], 'Dispensing #' . $dispId, $disp['dispensed_by']]);
+            }
         }
 
         $done = true;
@@ -368,6 +579,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
                 </div>
             </div>
 
+            <!-- Pharmacists -->
+            <div>
+                <h3 class="font-semibold text-gray-800 mb-2 text-sm uppercase tracking-wide">Pharmacists</h3>
+                <div class="bg-teal-50 border border-teal-100 rounded-xl p-4 font-mono text-sm space-y-1.5">
+                    <p><strong>pharma@kliniksehat.com</strong> — Nurul Aina (Klinik Sehat KL)</p>
+                    <p><strong>pharma@hospitalprima.com</strong> — Rajan Pillai (Hospital Prima)</p>
+                    <p class="text-gray-500 mt-2">All pharmacists password: <strong>Pharma@123</strong></p>
+                </div>
+            </div>
+
             <!-- Patients -->
             <div>
                 <h3 class="font-semibold text-gray-800 mb-2 text-sm uppercase tracking-wide">Patients</h3>
@@ -413,10 +634,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
             <li>✅ 1 Admin account</li>
             <li>✅ 2 Organisations (Klinik Sehat KL, Hospital Prima Penang)</li>
             <li>✅ 5 Doctors (Cardiology, Dermatology, GP, Paediatrics, Orthopaedics)</li>
+            <li>✅ 2 Pharmacists (one per organisation)</li>
             <li>✅ 4 Patient accounts</li>
             <li>✅ 10 Services across both organisations</li>
             <li>✅ Weekly schedules for all 5 doctors</li>
             <li>✅ 13 Appointments (completed, confirmed, pending, cancelled)</li>
+            <li>✅ 16 Medicines across both organisations</li>
+            <li>✅ 5 Medical records for completed appointments</li>
+            <li>✅ 4 Sample dispensings with line items and stock movements</li>
         </ul>
 
         <form method="POST">

@@ -255,4 +255,230 @@ class OrganisationController
         flash('success', 'Password changed successfully.');
         redirect('organisation/profile');
     }
+
+    // ── Dispensary ────────────────────────────────────────────────────────────
+
+    public function dispensary(): void
+    {
+        $orgId    = $this->org['id'];
+        $search   = trim($_GET['search'] ?? '');
+        $category = trim($_GET['category'] ?? '');
+
+        $where  = 'WHERE organisation_id = ?';
+        $params = [$orgId];
+        if ($search)   { $where .= ' AND (name LIKE ? OR generic_name LIKE ?)'; $params[] = "%$search%"; $params[] = "%$search%"; }
+        if ($category) { $where .= ' AND category = ?'; $params[] = $category; }
+
+        $medicines = Database::query("SELECT * FROM medicines $where ORDER BY name", $params);
+        $categories = Database::query(
+            'SELECT DISTINCT category FROM medicines WHERE organisation_id = ? AND category IS NOT NULL ORDER BY category', [$orgId]
+        );
+        $lowCount = Database::queryOne(
+            'SELECT COUNT(*) as c FROM medicines WHERE organisation_id = ? AND stock_qty <= reorder_level AND is_active = 1', [$orgId]
+        )['c'];
+
+        // Pharmacist staff
+        $staff = Database::query(
+            'SELECT u.* FROM users u
+             JOIN pharmacists p ON p.user_id = u.id
+             WHERE p.organisation_id = ?',
+            [$orgId]
+        );
+
+        view('layouts/app', [
+            'pageTitle'  => 'Dispensary',
+            'content'    => 'organisation/dispensary',
+            'medicines'  => $medicines,
+            'categories' => $categories,
+            'lowCount'   => $lowCount,
+            'search'     => $search,
+            'category'   => $category,
+            'org'        => $this->org,
+            'staff'      => $staff,
+        ]);
+    }
+
+    public function addMedicine(): void
+    {
+        view('layouts/app', [
+            'pageTitle' => 'Add Medicine',
+            'content'   => 'organisation/medicine_form',
+            'medicine'  => null,
+            'org'       => $this->org,
+        ]);
+    }
+
+    public function storeMedicine(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('organisation/dispensary'); }
+
+        $name        = trim($_POST['name'] ?? '');
+        $generic     = trim($_POST['generic_name'] ?? '');
+        $category    = trim($_POST['category'] ?? '');
+        $unit        = trim($_POST['unit'] ?? 'tablet');
+        $stock       = (int) ($_POST['stock_qty'] ?? 0);
+        $reorder     = (int) ($_POST['reorder_level'] ?? 10);
+        $price       = (float) ($_POST['unit_price'] ?? 0);
+        $description = trim($_POST['description'] ?? '');
+
+        if (!$name) { flash('error', 'Medicine name is required.'); redirect('organisation/dispensary/add'); }
+
+        $medId = Database::insert(
+            'INSERT INTO medicines (organisation_id,name,generic_name,category,unit,stock_qty,reorder_level,unit_price,description)
+             VALUES (?,?,?,?,?,?,?,?,?)',
+            [$this->org['id'], $name, $generic, $category, $unit, $stock, $reorder, $price, $description]
+        );
+
+        if ($stock > 0) {
+            Database::insert(
+                'INSERT INTO stock_movements (medicine_id,type,quantity,reference,created_by) VALUES (?,?,?,?,?)',
+                [$medId, 'in', $stock, 'Initial stock', $this->userId]
+            );
+        }
+
+        flash('success', 'Medicine added successfully.');
+        redirect('organisation/dispensary');
+    }
+
+    public function editMedicine(): void
+    {
+        $id  = (int) ($_GET['id'] ?? 0);
+        $med = Database::queryOne('SELECT * FROM medicines WHERE id = ? AND organisation_id = ?', [$id, $this->org['id']]);
+        if (!$med) { flash('error', 'Medicine not found.'); redirect('organisation/dispensary'); }
+
+        view('layouts/app', [
+            'pageTitle' => 'Edit Medicine',
+            'content'   => 'organisation/medicine_form',
+            'medicine'  => $med,
+            'org'       => $this->org,
+        ]);
+    }
+
+    public function updateMedicine(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('organisation/dispensary'); }
+
+        $id          = (int) ($_POST['id'] ?? 0);
+        $name        = trim($_POST['name'] ?? '');
+        $generic     = trim($_POST['generic_name'] ?? '');
+        $category    = trim($_POST['category'] ?? '');
+        $unit        = trim($_POST['unit'] ?? 'tablet');
+        $reorder     = (int) ($_POST['reorder_level'] ?? 10);
+        $price       = (float) ($_POST['unit_price'] ?? 0);
+        $description = trim($_POST['description'] ?? '');
+        $isActive    = isset($_POST['is_active']) ? 1 : 0;
+
+        Database::execute(
+            'UPDATE medicines SET name=?,generic_name=?,category=?,unit=?,reorder_level=?,unit_price=?,description=?,is_active=? WHERE id=? AND organisation_id=?',
+            [$name, $generic, $category, $unit, $reorder, $price, $description, $isActive, $id, $this->org['id']]
+        );
+
+        flash('success', 'Medicine updated.');
+        redirect('organisation/dispensary');
+    }
+
+    public function stockForm(): void
+    {
+        $id  = (int) ($_GET['id'] ?? 0);
+        $med = Database::queryOne('SELECT * FROM medicines WHERE id = ? AND organisation_id = ?', [$id, $this->org['id']]);
+        if (!$med) { flash('error', 'Medicine not found.'); redirect('organisation/dispensary'); }
+
+        $movements = Database::query(
+            'SELECT sm.*, u.name AS by_name FROM stock_movements sm
+             JOIN users u ON sm.created_by = u.id
+             WHERE sm.medicine_id = ? ORDER BY sm.created_at DESC LIMIT 20',
+            [$id]
+        );
+
+        view('layouts/app', [
+            'pageTitle' => 'Manage Stock — ' . $med['name'],
+            'content'   => 'organisation/stock_form',
+            'medicine'  => $med,
+            'movements' => $movements,
+            'org'       => $this->org,
+        ]);
+    }
+
+    public function saveStock(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('organisation/dispensary'); }
+
+        $medId    = (int) ($_POST['medicine_id'] ?? 0);
+        $type     = in_array($_POST['type'] ?? '', ['in','adjustment']) ? $_POST['type'] : 'in';
+        $qty      = (int) ($_POST['quantity'] ?? 0);
+        $notes    = trim($_POST['notes'] ?? '');
+        $ref      = trim($_POST['reference'] ?? '');
+
+        $med = Database::queryOne('SELECT * FROM medicines WHERE id = ? AND organisation_id = ?', [$medId, $this->org['id']]);
+        if (!$med || $qty <= 0) { flash('error', 'Invalid data.'); redirect('organisation/dispensary'); }
+
+        if ($type === 'in') {
+            Database::execute('UPDATE medicines SET stock_qty = stock_qty + ? WHERE id = ?', [$qty, $medId]);
+        } else {
+            Database::execute('UPDATE medicines SET stock_qty = ? WHERE id = ?', [$qty, $medId]);
+        }
+
+        Database::insert(
+            'INSERT INTO stock_movements (medicine_id,type,quantity,reference,notes,created_by) VALUES (?,?,?,?,?,?)',
+            [$medId, $type, $qty, $ref ?: 'Manual stock update', $notes, $this->userId]
+        );
+
+        flash('success', 'Stock updated successfully.');
+        redirect('organisation/dispensary/stock?id=' . $medId);
+    }
+
+    public function dispensaryHistory(): void
+    {
+        $orgId  = $this->org['id'];
+        $page   = max(1, (int) ($_GET['page'] ?? 1));
+        $paging = paginate(
+            Database::queryOne('SELECT COUNT(*) as c FROM dispensings WHERE organisation_id = ?', [$orgId])['c'],
+            20, $page
+        );
+
+        $dispensings = Database::query(
+            'SELECT d.*, u.name AS patient_name, du.name AS dispensed_by_name
+             FROM dispensings d
+             JOIN users u  ON d.patient_id  = u.id
+             JOIN users du ON d.dispensed_by = du.id
+             WHERE d.organisation_id = ?
+             ORDER BY d.created_at DESC LIMIT ? OFFSET ?',
+            [$orgId, $paging['per_page'], $paging['offset']]
+        );
+
+        view('layouts/app', [
+            'pageTitle'   => 'Dispensing History',
+            'content'     => 'organisation/dispensary_history',
+            'dispensings' => $dispensings,
+            'paging'      => $paging,
+            'org'         => $this->org,
+        ]);
+    }
+
+    public function storePharmacist(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('organisation/dispensary'); }
+
+        $name     = trim($_POST['name'] ?? '');
+        $email    = trim($_POST['email'] ?? '');
+        $password = 'Pharma@123';
+
+        if (!$name || !$email) { flash('error', 'Name and email required.'); redirect('organisation/dispensary'); }
+        if (Database::queryOne('SELECT id FROM users WHERE email = ?', [$email])) {
+            flash('error', 'Email already registered.'); redirect('organisation/dispensary');
+        }
+
+        $userId = Database::insert(
+            'INSERT INTO users (name,email,password,role,approved) VALUES (?,?,?,"pharmacist",1)',
+            [$name, $email, password_hash($password, PASSWORD_BCRYPT)]
+        );
+
+        Database::insert(
+            'INSERT INTO pharmacists (user_id,organisation_id) VALUES (?,?)',
+            [$userId, $this->org['id']]
+        );
+
+        flash('success', "Pharmacist added. Default password: $password");
+        redirect('organisation/dispensary');
+    }
 }

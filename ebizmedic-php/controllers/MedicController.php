@@ -282,6 +282,27 @@ class MedicController
         ]);
     }
 
+    public function dispensary(): void
+    {
+        $doctorId = $this->doctor['id'];
+
+        $dispensings = Database::query(
+            'SELECT d.*, u.name AS patient_name, du.name AS dispensed_by_name
+             FROM dispensings d
+             JOIN users u  ON d.patient_id  = u.id
+             JOIN users du ON d.dispensed_by = du.id
+             WHERE d.doctor_id = ?
+             ORDER BY d.created_at DESC',
+            [$doctorId]
+        );
+
+        view('layouts/app', [
+            'pageTitle'   => 'Dispensing Records',
+            'content'     => 'medic/dispensary',
+            'dispensings' => $dispensings,
+        ]);
+    }
+
     public function storeRecord(): void
     {
         if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('medic/records'); }

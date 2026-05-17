@@ -340,6 +340,39 @@ class AdminController
         ]);
     }
 
+    public function dispensary(): void
+    {
+        $stats = [
+            'medicines'  => Database::queryOne('SELECT COUNT(*) as c FROM medicines WHERE is_active = 1')['c'],
+            'dispensed'  => Database::queryOne('SELECT COUNT(*) as c FROM dispensings')['c'],
+            'low_stock'  => Database::queryOne('SELECT COUNT(*) as c FROM medicines WHERE stock_qty <= reorder_level AND is_active = 1')['c'],
+        ];
+
+        $lowStock = Database::query(
+            'SELECT m.*, o.name AS org_name FROM medicines m
+             JOIN organisations o ON m.organisation_id = o.id
+             WHERE m.stock_qty <= m.reorder_level AND m.is_active = 1
+             ORDER BY m.stock_qty ASC LIMIT 15'
+        );
+
+        $recentDispensings = Database::query(
+            'SELECT d.*, u.name AS patient_name, o.name AS org_name, du.name AS dispensed_by_name
+             FROM dispensings d
+             JOIN users u  ON d.patient_id   = u.id
+             JOIN users du ON d.dispensed_by  = du.id
+             JOIN organisations o ON d.organisation_id = o.id
+             ORDER BY d.created_at DESC LIMIT 10'
+        );
+
+        view('layouts/app', [
+            'pageTitle'         => 'Dispensary Overview',
+            'content'           => 'admin/dispensary',
+            'stats'             => $stats,
+            'lowStock'          => $lowStock,
+            'recentDispensings' => $recentDispensings,
+        ]);
+    }
+
     public function approvals(): void
     {
         $pending = Database::query(

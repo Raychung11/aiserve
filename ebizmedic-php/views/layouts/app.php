@@ -59,6 +59,7 @@
             <?= navLink('admin/appointments', 'fa-calendar-check', 'Appointments') ?>
             <?= navLink('admin/users', 'fa-users', 'Users') ?>
             <?= navLinkBadge('admin/approvals', 'fa-user-check', 'Approvals', $pendingCount) ?>
+            <?= navLink('admin/dispensary', 'fa-capsules', 'Dispensary') ?>
             <?= navLink('admin/reports', 'fa-chart-bar', 'Reports') ?>
             <?= navLink('admin/settings', 'fa-gear', 'Settings') ?>
 
@@ -67,6 +68,7 @@
             <?= navLink('medic/dashboard', 'fa-gauge', 'Dashboard') ?>
             <?= navLink('medic/appointments', 'fa-calendar-check', 'Appointments') ?>
             <?= navLink('medic/records', 'fa-notes-medical', 'Medical Records') ?>
+            <?= navLink('medic/dispensary', 'fa-prescription-bottle-medical', 'Dispensary') ?>
             <?= navLink('medic/schedule', 'fa-clock', 'My Schedule') ?>
             <?= navLink('medic/profile', 'fa-user', 'My Profile') ?>
 
@@ -76,13 +78,22 @@
             <?= navLink('organisation/doctors', 'fa-user-doctor', 'Our Doctors') ?>
             <?= navLink('organisation/services', 'fa-stethoscope', 'Services') ?>
             <?= navLink('organisation/appointments', 'fa-calendar-check', 'Appointments') ?>
+            <?= navLink('organisation/dispensary', 'fa-capsules', 'Dispensary') ?>
             <?= navLink('organisation/profile', 'fa-building', 'Profile') ?>
+
+            <?php elseif ($role === 'pharmacist'): ?>
+            <p class="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pharmacist</p>
+            <?= navLink('pharmacist/dashboard', 'fa-gauge', 'Dashboard') ?>
+            <?= navLink('pharmacist/dispense', 'fa-hand-holding-medical', 'Dispense') ?>
+            <?= navLink('pharmacist/medicines', 'fa-capsules', 'Medicines') ?>
+            <?= navLink('pharmacist/history', 'fa-clock-rotate-left', 'History') ?>
 
             <?php elseif ($role === 'user'): ?>
             <p class="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Patient</p>
             <?= navLink('user/dashboard', 'fa-gauge', 'Dashboard') ?>
             <?= navLink('user/appointments', 'fa-calendar-check', 'My Appointments') ?>
             <?= navLink('user/records', 'fa-notes-medical', 'Medical Records') ?>
+            <?= navLink('user/dispensary', 'fa-prescription-bottle-medical', 'My Medicines') ?>
             <?= navLink('user/profile', 'fa-user', 'My Profile') ?>
             <?= navLink('doctors', 'fa-user-doctor', 'Find Doctors') ?>
             <?php endif; ?>
