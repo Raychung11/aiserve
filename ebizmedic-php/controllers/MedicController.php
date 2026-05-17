@@ -10,14 +10,14 @@ class MedicController
         Auth::requireRole('medic');
         $this->userId = Auth::id();
         $doctor = Database::queryOne(
-            'SELECT d.*, u.name, u.email FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.user_id = ?',
+            'SELECT d.*, u.name, u.email, u.phone, u.avatar FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.user_id = ?',
             [$this->userId]
         );
         if (!$doctor) {
             // Create profile if missing
             Database::insert('INSERT INTO doctors (user_id) VALUES (?)', [$this->userId]);
             $doctor = Database::queryOne(
-                'SELECT d.*, u.name, u.email FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.user_id = ?',
+                'SELECT d.*, u.name, u.email, u.phone, u.avatar FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.user_id = ?',
                 [$this->userId]
             );
         }
