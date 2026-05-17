@@ -103,7 +103,5 @@ CREATE TABLE appointments (
     FOREIGN KEY (organisation_id) REFERENCES organisations(id) ON DELETE SET NULL
 );
 
--- Seed: default admin account (password: admin123)
-INSERT INTO users (name, email, password, role) VALUES
-('Admin', 'admin@ebizmedic.com', '$2y$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMqJqhN3JFe8kTjHMKJ5JDaJa2', 'admin');
--- Note: generate a real hash with password_hash('yourpassword', PASSWORD_BCRYPT)
+-- Note: Use the seeder instead — visit yourdomain.com/database/seed.php after uploading files.
+-- It creates all demo accounts with correct bcrypt hashes.
