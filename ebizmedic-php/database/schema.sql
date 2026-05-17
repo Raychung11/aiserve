@@ -1,8 +1,6 @@
 -- eBizMedic MySQL Schema
--- Run this once to set up the database
-
-CREATE DATABASE IF NOT EXISTS ebizmedic CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE ebizmedic;
+-- Import this file via Hostinger hPanel > phpMyAdmin
+-- (The database is already created by Hostinger — do NOT add CREATE DATABASE here)
 
 -- Users (all roles share this table)
 CREATE TABLE users (
