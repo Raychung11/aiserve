@@ -5,8 +5,9 @@ class HomeController
     public function index(): void
     {
         $featuredDoctors = Database::query(
-            'SELECT d.*, u.name, u.avatar FROM doctors d
+            'SELECT d.*, u.name, u.avatar, o.name AS org_name FROM doctors d
              JOIN users u ON d.user_id = u.id
+             LEFT JOIN organisations o ON d.organisation_id = o.id
              WHERE d.is_active = 1 ORDER BY d.created_at DESC LIMIT 6'
         );
 
@@ -17,7 +18,7 @@ class HomeController
         ];
 
         view('layouts/public', [
-            'pageTitle'       => 'eBizMedic — Healthcare at Your Fingertips',
+            'pageTitle'       => 'EbizMedic — Comprehensive Telehealth Solutions for Every Malaysian',
             'content'         => 'home/index',
             'featuredDoctors' => $featuredDoctors,
             'stats'           => $stats,
