@@ -26,11 +26,23 @@ class UserController
             [$userId]
         );
 
+        $todayOnline = Database::query(
+            'SELECT a.*, du.name AS doctor_name, d.speciality
+             FROM appointments a
+             JOIN doctors d ON a.doctor_id = d.id
+             JOIN users du ON d.user_id = du.id
+             WHERE a.patient_id = ? AND a.type = "online" AND a.status = "confirmed"
+               AND a.appointment_date = CURDATE()
+             ORDER BY a.appointment_time ASC',
+            [$userId]
+        );
+
         view('layouts/app', [
-            'pageTitle' => 'My Dashboard',
-            'content'   => 'user/dashboard',
-            'stats'     => $stats,
-            'recent'    => $recent,
+            'pageTitle'   => 'My Dashboard',
+            'content'     => 'user/dashboard',
+            'stats'       => $stats,
+            'recent'      => $recent,
+            'todayOnline' => $todayOnline,
         ]);
     }
 

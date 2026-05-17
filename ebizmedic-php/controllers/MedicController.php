@@ -52,12 +52,23 @@ class MedicController
             [$doctorId]
         );
 
+        $todayOnline = Database::query(
+            'SELECT a.*, u.name AS patient_name
+             FROM appointments a
+             JOIN users u ON a.patient_id = u.id
+             WHERE a.doctor_id = ? AND a.type = "online" AND a.status = "confirmed"
+               AND a.appointment_date = CURDATE()
+             ORDER BY a.appointment_time ASC',
+            [$doctorId]
+        );
+
         view('layouts/app', [
-            'pageTitle' => 'My Dashboard',
-            'content'   => 'medic/dashboard',
-            'doctor'    => $this->doctor,
-            'stats'     => $stats,
-            'upcoming'  => $upcoming,
+            'pageTitle'   => 'My Dashboard',
+            'content'     => 'medic/dashboard',
+            'doctor'      => $this->doctor,
+            'stats'       => $stats,
+            'upcoming'    => $upcoming,
+            'todayOnline' => $todayOnline,
         ]);
     }
 

@@ -1,4 +1,29 @@
 <div class="pt-4">
+
+    <?php if (!empty($todayOnline)): ?>
+    <?php foreach ($todayOnline as $toa): ?>
+    <div class="mb-6 bg-green-50 border border-green-200 rounded-2xl p-5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="relative flex-shrink-0">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-white font-bold text-lg">
+                    <?= strtoupper(substr($toa['patient_name'], 0, 1)) ?>
+                </div>
+                <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
+            </div>
+            <div>
+                <p class="font-bold text-gray-900">Online Patient Ready</p>
+                <p class="text-sm text-gray-600"><?= e($toa['patient_name']) ?></p>
+                <p class="text-xs text-green-700 font-medium mt-0.5"><i class="fa-regular fa-clock mr-1"></i>Today at <?= date('H:i', strtotime($toa['appointment_time'])) ?></p>
+            </div>
+        </div>
+        <a href="<?= url('consultation/lobby?appointment_id=' . $toa['id']) ?>"
+           class="flex-shrink-0 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl text-sm transition-colors shadow-md hover:shadow-lg whitespace-nowrap">
+            <i class="fa-solid fa-video mr-1.5"></i> Start Consultation
+        </a>
+    </div>
+    <?php endforeach; ?>
+    <?php endif; ?>
+
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <?php
         $cards = [

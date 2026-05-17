@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
         // ── Wipe existing data (FK-safe order) ───────────────────────────
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
         foreach ([
+            'consultation_messages',
             'notifications','ratings','health_profiles',
             'dispensing_items','dispensings','stock_movements','medicines',
             'pharmacists','appointments','medical_records','schedules',
@@ -279,6 +280,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
             [$rajId,  $drHafiz, $serviceIds[5], $hpId, date('Y-m-d', strtotime('-10 days')), '08:30', 'onsite',  'completed', 'Follow-up for high blood pressure.'],
             [$limId,  $drPriya, $serviceIds[6], $hpId, date('Y-m-d', strtotime('-8 days')),  '09:00', 'onsite',  'completed', 'Child annual health check-up, 5 years old.'],
             [$aliId,  $drSarah, $serviceIds[4], $ksId, date('Y-m-d', strtotime('-5 days')),  '11:00', 'online',  'completed', 'Eczema flare-up on arms and legs.'],
+
+            // TODAY — online consultations (for demo of lobby & video room)
+            [$aliId,  $drSarah, $serviceIds[4], $ksId, date('Y-m-d'), date('H:i', strtotime('+30 minutes')), 'online', 'confirmed', 'Online follow-up for eczema management.'],
+            [$sitiId, $drAhmad, $serviceIds[1], $ksId, date('Y-m-d'), date('H:i', strtotime('+90 minutes')), 'online', 'confirmed', 'Online heart check-up consultation.'],
 
             // Confirmed appointments (upcoming)
             [$sitiId, $drAhmad, $serviceIds[1], $ksId, date('Y-m-d', strtotime('+2 days')),  '10:00', 'onsite',  'confirmed', 'Routine heart check-up.'],
