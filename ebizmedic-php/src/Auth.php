@@ -14,9 +14,10 @@ class Auth
     {
         self::start();
         session_regenerate_id(true);
-        $_SESSION['user_id']   = $user['id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_id']     = $user['id'];
+        $_SESSION['user_name']   = $user['name'];
+        $_SESSION['user_role']   = $user['role'];
+        $_SESSION['user_avatar'] = $user['avatar'] ?? null;
     }
 
     public static function logout(): void
@@ -36,10 +37,17 @@ class Auth
     {
         if (!self::check()) return null;
         return [
-            'id'   => $_SESSION['user_id'],
-            'name' => $_SESSION['user_name'],
-            'role' => $_SESSION['user_role'],
+            'id'     => $_SESSION['user_id'],
+            'name'   => $_SESSION['user_name'],
+            'role'   => $_SESSION['user_role'],
+            'avatar' => $_SESSION['user_avatar'] ?? null,
         ];
+    }
+
+    public static function refreshAvatar(?string $avatar): void
+    {
+        self::start();
+        $_SESSION['user_avatar'] = $avatar;
     }
 
     public static function role(): ?string

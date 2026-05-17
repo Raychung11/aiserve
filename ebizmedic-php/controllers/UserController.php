@@ -121,6 +121,7 @@ class UserController
         $path = uploadPhoto('photo', 'users');
         if ($path) {
             Database::execute('UPDATE users SET avatar = ? WHERE id = ?', [$path, Auth::id()]);
+            Auth::refreshAvatar($path);
             flash('success', 'Photo updated.');
         }
         redirect('user/profile');

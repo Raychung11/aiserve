@@ -51,9 +51,13 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
             <div class="p-5">
                 <div class="flex items-start gap-3 mb-3">
+                    <?php if (!empty($doc['avatar'])): ?>
+                    <img src="<?= asset($doc['avatar']) ?>" class="w-12 h-12 rounded-full object-cover flex-shrink-0" alt="">
+                    <?php else: ?>
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-lg font-bold flex-shrink-0">
                         <?= strtoupper(substr($doc['name'], 0, 1)) ?>
                     </div>
+                    <?php endif; ?>
                     <div class="min-w-0">
                         <h3 class="font-semibold text-gray-900 text-sm truncate"><?= e($doc['name']) ?></h3>
                         <p class="text-xs text-blue-600"><?= e($doc['speciality'] ?? 'General Practitioner') ?></p>

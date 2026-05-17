@@ -7,9 +7,13 @@
         <div class="lg:col-span-2 space-y-5">
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                 <div class="flex items-start gap-5">
+                    <?php if (!empty($doctor['avatar'])): ?>
+                    <img src="<?= asset($doctor['avatar']) ?>" class="w-20 h-20 rounded-2xl object-cover flex-shrink-0" alt="">
+                    <?php else: ?>
                     <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
                         <?= strtoupper(substr($doctor['name'], 0, 1)) ?>
                     </div>
+                    <?php endif; ?>
                     <div class="flex-1 min-w-0">
                         <h1 class="text-2xl font-bold text-gray-900"><?= e($doctor['name']) ?></h1>
                         <p class="text-blue-600 font-medium"><?= e($doctor['speciality'] ?? 'General Practitioner') ?></p>

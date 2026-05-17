@@ -233,6 +233,7 @@ class MedicController
         $path = uploadPhoto('photo', 'doctors');
         if ($path) {
             Database::execute('UPDATE users SET avatar = ? WHERE id = ?', [$path, $this->userId]);
+            Auth::refreshAvatar($path);
             flash('success', 'Photo updated.');
         }
         redirect('medic/profile');

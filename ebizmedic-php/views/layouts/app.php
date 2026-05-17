@@ -36,9 +36,14 @@
         <!-- User Info -->
         <div class="px-4 py-4 border-b border-slate-700">
             <div class="flex items-center gap-3">
+                <?php $__av = Auth::user()['avatar'] ?? null; ?>
+                <?php if ($__av): ?>
+                <img src="<?= asset($__av) ?>" class="w-9 h-9 rounded-full object-cover flex-shrink-0" alt="">
+                <?php else: ?>
                 <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold flex-shrink-0">
                     <?= strtoupper(substr(Auth::user()['name'], 0, 1)) ?>
                 </div>
+                <?php endif; ?>
                 <div class="min-w-0">
                     <p class="text-sm font-medium truncate"><?= e(Auth::user()['name']) ?></p>
                     <p class="text-xs text-slate-400 capitalize"><?= e(Auth::role()) ?></p>

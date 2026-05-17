@@ -319,9 +319,13 @@
                 <?php foreach ($featuredDoctors as $doc): ?>
                 <div class="flex-none w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 p-6">
                     <div class="flex items-start gap-4">
+                        <?php if (!empty($doc['avatar'])): ?>
+                        <img src="<?= asset($doc['avatar']) ?>" class="w-14 h-14 rounded-full object-cover flex-shrink-0" alt="">
+                        <?php else: ?>
                         <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                             <?= strtoupper(substr($doc['name'], 0, 1)) ?>
                         </div>
+                        <?php endif; ?>
                         <div class="min-w-0">
                             <h3 class="font-bold text-gray-900 truncate"><?= e($doc['name']) ?></h3>
                             <p class="text-sm text-blue-600 font-medium"><?= e($doc['speciality'] ?? 'General Practitioner') ?></p>

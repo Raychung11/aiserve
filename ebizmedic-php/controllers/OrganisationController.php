@@ -227,6 +227,7 @@ class OrganisationController
         $path = uploadPhoto('photo', 'orgs');
         if ($path) {
             Database::execute('UPDATE users SET avatar = ? WHERE id = ?', [$path, $this->userId]);
+            Auth::refreshAvatar($path);
             flash('success', 'Logo updated.');
         }
         redirect('organisation/profile');
