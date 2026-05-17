@@ -49,7 +49,7 @@ function csrf_field(): string
 
 function csrf_verify(): bool
 {
-    $token = $_POST['_csrf'] ?? '';
+    $token = $_POST['_csrf'] ?? $_POST['_token'] ?? '';
     return hash_equals(csrf_token(), $token);
 }
 

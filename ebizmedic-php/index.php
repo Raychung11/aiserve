@@ -99,6 +99,11 @@ $routes = [
         'user/health-profile'           => ['UserController',         'healthProfile'],
         'notifications'                 => ['NotificationController', 'index'],
         'dispensings/invoice'           => ['InvoiceController',      'show'],
+
+        // Consultation
+        'consultation/lobby'            => ['ConsultationController', 'lobby'],
+        'consultation/room'             => ['ConsultationController', 'room'],
+        'consultation/messages'         => ['ConsultationController', 'messages'],
     ],
     'POST' => [
         'login'                         => ['AuthController',         'login'],
@@ -146,6 +151,10 @@ $routes = [
 
         // Admin
         'admin/dispensary/dispense'          => ['AdminController',        'dispenseAdmin'],
+
+        // Consultation
+        'consultation/chat'                  => ['ConsultationController', 'sendMessage'],
+        'consultation/end'                   => ['ConsultationController', 'endCall'],
     ],
 ];
 

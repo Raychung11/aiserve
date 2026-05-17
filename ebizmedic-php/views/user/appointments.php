@@ -24,7 +24,10 @@
         <?php foreach ($appointments as $appt): ?>
         <?php
             $c = ['pending'=>'yellow','confirmed'=>'blue','completed'=>'green','cancelled'=>'red'][$appt['status']] ?? 'gray';
-            $canRate = $appt['status'] === 'completed' && !in_array($appt['id'], $ratedIds ?? []);
+            $canRate  = $appt['status'] === 'completed' && !in_array($appt['id'], $ratedIds ?? []);
+            $canJoin  = $appt['type'] === 'online'
+                     && $appt['status'] === 'confirmed'
+                     && $appt['appointment_date'] === date('Y-m-d');
         ?>
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div class="flex items-start justify-between">
@@ -35,7 +38,13 @@
                     <p class="text-xs text-gray-500 mt-0.5"><?= e($appt['org_name']) ?></p>
                     <?php endif; ?>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap justify-end">
+                    <?php if ($canJoin): ?>
+                    <a href="<?= url('consultation/lobby?appointment_id=' . $appt['id']) ?>"
+                       class="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-full font-semibold transition-colors animate-pulse">
+                        <i class="fa-solid fa-video text-xs"></i> Join Now
+                    </a>
+                    <?php endif; ?>
                     <?php if ($canRate): ?>
                     <button onclick="document.getElementById('rate-<?= $appt['id'] ?>').classList.toggle('hidden')"
                             class="text-xs px-3 py-1 border border-yellow-400 text-yellow-600 rounded-full hover:bg-yellow-50 transition-colors font-medium">

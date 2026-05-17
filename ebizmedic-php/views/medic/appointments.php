@@ -46,8 +46,18 @@
                         <span class="text-xs bg-<?= $c ?>-100 text-<?= $c ?>-700 px-2.5 py-1 rounded-full capitalize"><?= $appt['status'] ?></span>
                     </td>
                     <td class="px-5 py-3 text-right">
+                        <?php
+                        $canJoinDoc = $appt['type'] === 'online'
+                                   && $appt['status'] === 'confirmed'
+                                   && $appt['appointment_date'] === date('Y-m-d');
+                        ?>
                         <div class="flex items-center justify-end gap-2 flex-wrap">
-                        <?php if ($appt['status'] === 'completed'): ?>
+                        <?php if ($canJoinDoc): ?>
+                            <a href="<?= url('consultation/lobby?appointment_id=' . $appt['id']) ?>"
+                               class="flex items-center gap-1 px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg font-semibold whitespace-nowrap animate-pulse transition-colors">
+                                <i class="fa-solid fa-video"></i> Join Now
+                            </a>
+                        <?php elseif ($appt['status'] === 'completed'): ?>
                             <a href="<?= url('medic/records/create?appointment_id=' . $appt['id']) ?>"
                                class="px-2.5 py-1 bg-green-100 text-green-700 text-xs rounded-lg hover:bg-green-200 font-medium whitespace-nowrap">
                                 <i class="fa-solid fa-notes-medical mr-1"></i>Write Record
