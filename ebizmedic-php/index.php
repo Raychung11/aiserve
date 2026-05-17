@@ -94,6 +94,11 @@ $routes = [
 
         // Medic dispensary
         'medic/dispensary'              => ['MedicController',        'dispensary'],
+
+        // Phase 4
+        'user/health-profile'           => ['UserController',         'healthProfile'],
+        'notifications'                 => ['NotificationController', 'index'],
+        'dispensings/invoice'           => ['InvoiceController',      'show'],
     ],
     'POST' => [
         'login'                         => ['AuthController',         'login'],
@@ -126,6 +131,9 @@ $routes = [
         'user/profile/update'                => ['UserController',         'updateProfile'],
         'user/profile/photo'                 => ['UserController',         'updatePhoto'],
         'user/profile/password'              => ['UserController',         'changePassword'],
+        'user/health-profile/update'         => ['UserController',         'updateHealthProfile'],
+        'user/appointments/rate'             => ['UserController',         'rateDoctor'],
+        'notifications/read'                 => ['NotificationController', 'markRead'],
 
         // Pharmacist
         'pharmacist/dispense/store'          => ['PharmacistController',   'storeDispensing'],

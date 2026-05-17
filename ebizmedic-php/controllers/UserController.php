@@ -60,12 +60,18 @@ class UserController
             array_merge($params, [$paging['per_page'], $paging['offset']])
         );
 
+        $ratedIds = array_column(
+            Database::query('SELECT appointment_id FROM ratings WHERE patient_id = ?', [$userId]),
+            'appointment_id'
+        );
+
         view('layouts/app', [
             'pageTitle'    => 'My Appointments',
             'content'      => 'user/appointments',
             'appointments' => $appointments,
             'paging'       => $paging,
             'status'       => $status,
+            'ratedIds'     => $ratedIds,
         ]);
     }
 
@@ -182,5 +188,78 @@ class UserController
             'content'   => 'user/records',
             'records'   => $records,
         ]);
+    }
+
+    public function healthProfile(): void
+    {
+        $userId  = Auth::id();
+        $profile = Database::queryOne('SELECT * FROM health_profiles WHERE user_id = ?', [$userId]);
+
+        view('layouts/app', [
+            'pageTitle' => 'My Health Profile',
+            'content'   => 'user/health_profile',
+            'profile'   => $profile,
+        ]);
+    }
+
+    public function updateHealthProfile(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/health-profile'); }
+
+        $userId = Auth::id();
+        $data   = [
+            trim($_POST['blood_type'] ?? 'Unknown'),
+            trim($_POST['allergies'] ?? ''),
+            trim($_POST['chronic_conditions'] ?? ''),
+            trim($_POST['current_medications'] ?? ''),
+            trim($_POST['emergency_contact_name'] ?? ''),
+            trim($_POST['emergency_contact_phone'] ?? ''),
+        ];
+
+        $existing = Database::queryOne('SELECT id FROM health_profiles WHERE user_id = ?', [$userId]);
+
+        if ($existing) {
+            Database::execute(
+                'UPDATE health_profiles SET blood_type=?,allergies=?,chronic_conditions=?,current_medications=?,emergency_contact_name=?,emergency_contact_phone=? WHERE user_id=?',
+                array_merge($data, [$userId])
+            );
+        } else {
+            Database::insert(
+                'INSERT INTO health_profiles (user_id,blood_type,allergies,chronic_conditions,current_medications,emergency_contact_name,emergency_contact_phone) VALUES (?,?,?,?,?,?,?)',
+                array_merge([$userId], $data)
+            );
+        }
+
+        flash('success', 'Health profile updated.');
+        redirect('user/health-profile');
+    }
+
+    public function rateDoctor(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/appointments'); }
+
+        $appointmentId = (int) ($_POST['appointment_id'] ?? 0);
+        $rating        = (int) ($_POST['rating'] ?? 0);
+        $comment       = trim($_POST['comment'] ?? '');
+        $userId        = Auth::id();
+
+        if ($rating < 1 || $rating > 5) { flash('error', 'Please select a rating between 1 and 5.'); redirect('user/appointments'); }
+
+        $appt = Database::queryOne(
+            'SELECT * FROM appointments WHERE id = ? AND patient_id = ? AND status = "completed"',
+            [$appointmentId, $userId]
+        );
+        if (!$appt) { flash('error', 'Appointment not found.'); redirect('user/appointments'); }
+
+        $already = Database::queryOne('SELECT id FROM ratings WHERE appointment_id = ?', [$appointmentId]);
+        if ($already) { flash('error', 'You have already rated this appointment.'); redirect('user/appointments'); }
+
+        Database::insert(
+            'INSERT INTO ratings (appointment_id, doctor_id, patient_id, rating, comment) VALUES (?,?,?,?,?)',
+            [$appointmentId, $appt['doctor_id'], $userId, $rating, $comment]
+        );
+
+        flash('success', 'Thank you for your feedback!');
+        redirect('user/appointments');
     }
 }

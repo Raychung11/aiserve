@@ -109,6 +109,16 @@ class MedicController
                 'UPDATE appointments SET status = ? WHERE id = ? AND doctor_id = ?',
                 [$status, $id, $this->doctor['id']]
             );
+            $appt = Database::queryOne('SELECT patient_id FROM appointments WHERE id = ?', [$id]);
+            if ($appt) {
+                $msgs = [
+                    'confirmed'  => 'Your appointment has been confirmed by the doctor.',
+                    'completed'  => 'Your appointment is marked as completed. Please check your medical records.',
+                    'cancelled'  => 'Your appointment has been cancelled by the doctor.',
+                ];
+                notify($appt['patient_id'], 'appointment', 'Appointment ' . ucfirst($status),
+                    $msgs[$status] ?? '', 'user/appointments');
+            }
             flash('success', 'Appointment updated.');
         }
         redirect('medic/appointments');
@@ -261,27 +271,6 @@ class MedicController
         ]);
     }
 
-    public function createRecord(): void
-    {
-        $appointmentId = (int) ($_GET['appointment_id'] ?? 0);
-        $appointment   = Database::queryOne(
-            'SELECT a.*, u.name AS patient_name FROM appointments a
-             JOIN users u ON a.patient_id = u.id
-             WHERE a.id = ? AND a.doctor_id = ?',
-            [$appointmentId, $this->doctor['id']]
-        );
-        if (!$appointment) { flash('error', 'Appointment not found.'); redirect('medic/appointments'); }
-
-        $existing = Database::queryOne('SELECT id FROM medical_records WHERE appointment_id = ?', [$appointmentId]);
-        if ($existing) { flash('error', 'Record already exists for this appointment.'); redirect('medic/records'); }
-
-        view('layouts/app', [
-            'pageTitle'   => 'New Medical Record',
-            'content'     => 'medic/record_form',
-            'appointment' => $appointment,
-        ]);
-    }
-
     public function dispensary(): void
     {
         $doctorId = $this->doctor['id'];
@@ -333,7 +322,42 @@ class MedicController
         // Auto-mark appointment as completed
         Database::execute("UPDATE appointments SET status='completed' WHERE id=?", [$appointmentId]);
 
+        // Notify patient
+        notify(
+            $appointment['patient_id'], 'record',
+            'Medical Record Ready',
+            'Dr. ' . $this->doctor['name'] . ' has added your medical record. Diagnosis: ' . trim($_POST['diagnosis'] ?? ''),
+            'user/records'
+        );
+
         flash('success', 'Medical record saved and appointment marked as completed.');
         redirect('medic/records');
+    }
+
+    public function createRecord(): void
+    {
+        $appointmentId = (int) ($_GET['appointment_id'] ?? 0);
+        $appointment   = Database::queryOne(
+            'SELECT a.*, u.name AS patient_name FROM appointments a
+             JOIN users u ON a.patient_id = u.id
+             WHERE a.id = ? AND a.doctor_id = ?',
+            [$appointmentId, $this->doctor['id']]
+        );
+        if (!$appointment) { flash('error', 'Appointment not found.'); redirect('medic/appointments'); }
+
+        $existing = Database::queryOne('SELECT id FROM medical_records WHERE appointment_id = ?', [$appointmentId]);
+        if ($existing) { flash('error', 'Record already exists for this appointment.'); redirect('medic/records'); }
+
+        // Load patient health profile for doctor reference
+        $healthProfile = Database::queryOne(
+            'SELECT * FROM health_profiles WHERE user_id = ?', [$appointment['patient_id']]
+        );
+
+        view('layouts/app', [
+            'pageTitle'     => 'New Medical Record',
+            'content'       => 'medic/record_form',
+            'appointment'   => $appointment,
+            'healthProfile' => $healthProfile,
+        ]);
     }
 }

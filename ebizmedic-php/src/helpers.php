@@ -125,14 +125,37 @@ function avatarUrl(?string $path, string $name, string $size = '10'): string
 
 function paginate(int $total, int $perPage, int $current): array
 {
-    $pages = (int) ceil($total / $perPage);
+    $pages = max(1, (int) ceil($total / $perPage));
     return [
         'total'    => $total,
         'per_page' => $perPage,
+        'page'     => $current,
         'current'  => $current,
         'pages'    => $pages,
         'offset'   => ($current - 1) * $perPage,
         'has_prev' => $current > 1,
         'has_next' => $current < $pages,
     ];
+}
+
+function notify(int $userId, string $type, string $title, string $message = '', string $link = ''): void
+{
+    Database::insert(
+        'INSERT INTO notifications (user_id, type, title, message, link) VALUES (?,?,?,?,?)',
+        [$userId, $type, $title, $message, $link]
+    );
+}
+
+function stars(float $avg, int $count = 0): string
+{
+    $full  = (int) floor($avg);
+    $half  = ($avg - $full) >= 0.5;
+    $empty = 5 - $full - ($half ? 1 : 0);
+    $html  = '<span class="flex items-center gap-0.5">';
+    for ($i = 0; $i < $full; $i++)  $html .= '<i class="fa-solid fa-star text-yellow-400 text-xs"></i>';
+    if ($half)                       $html .= '<i class="fa-solid fa-star-half-stroke text-yellow-400 text-xs"></i>';
+    for ($i = 0; $i < $empty; $i++) $html .= '<i class="fa-regular fa-star text-gray-300 text-xs"></i>';
+    if ($count > 0)                  $html .= '<span class="text-xs text-gray-500 ml-1">(' . $count . ')</span>';
+    $html .= '</span>';
+    return $html;
 }

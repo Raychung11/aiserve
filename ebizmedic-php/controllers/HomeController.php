@@ -54,11 +54,13 @@ class HomeController
         );
 
         $doctors = Database::query(
-            "SELECT d.*, u.name, u.avatar, o.name AS org_name, o.city
+            "SELECT d.*, u.name, u.avatar, o.name AS org_name, o.city,
+                    ROUND(AVG(r.rating), 1) AS avg_rating, COUNT(r.id) AS rating_count
              FROM doctors d
              JOIN users u ON d.user_id = u.id
              LEFT JOIN organisations o ON d.organisation_id = o.id
-             $where ORDER BY d.created_at DESC
+             LEFT JOIN ratings r ON r.doctor_id = d.id
+             $where GROUP BY d.id ORDER BY d.created_at DESC
              LIMIT ? OFFSET ?",
             array_merge($params, [$paging['per_page'], $paging['offset']])
         );
@@ -102,12 +104,36 @@ class HomeController
             ? Database::query('SELECT * FROM services WHERE organisation_id = ? AND is_active = 1', [$doctor['organisation_id']])
             : [];
 
+        $rating = Database::queryOne(
+            'SELECT ROUND(AVG(rating), 1) AS avg, COUNT(*) AS total FROM ratings WHERE doctor_id = ?', [$id]
+        );
+
+        $reviews = Database::query(
+            'SELECT r.*, u.name AS patient_name FROM ratings r
+             JOIN users u ON r.patient_id = u.id
+             WHERE r.doctor_id = ? ORDER BY r.created_at DESC LIMIT 8',
+            [$id]
+        );
+
+        // Which completed appointments by this patient haven't been rated yet?
+        $ratableAppointments = (Auth::check() && Auth::role() === 'user')
+            ? Database::query(
+                'SELECT a.id FROM appointments a
+                 LEFT JOIN ratings r ON r.appointment_id = a.id
+                 WHERE a.doctor_id = ? AND a.patient_id = ? AND a.status = "completed" AND r.id IS NULL',
+                [$id, Auth::id()]
+            )
+            : [];
+
         view('layouts/public', [
-            'pageTitle' => $doctor['name'] . ' — eBizMedic',
-            'content'   => 'home/doctor_detail',
-            'doctor'    => $doctor,
-            'schedules' => $schedules,
-            'services'  => $services,
+            'pageTitle'           => $doctor['name'] . ' — eBizMedic',
+            'content'             => 'home/doctor_detail',
+            'doctor'              => $doctor,
+            'schedules'           => $schedules,
+            'services'            => $services,
+            'rating'              => $rating,
+            'reviews'             => $reviews,
+            'ratableAppointments' => $ratableAppointments,
         ]);
     }
 
@@ -216,13 +242,28 @@ class HomeController
             redirect("booking?doctor_id=$doctorId");
         }
 
-        $doctor = Database::queryOne('SELECT organisation_id FROM doctors WHERE id = ?', [$doctorId]);
+        $doctor = Database::queryOne(
+            'SELECT d.organisation_id, d.user_id, u.name AS doctor_name
+             FROM doctors d JOIN users u ON d.user_id = u.id WHERE d.id = ?',
+            [$doctorId]
+        );
 
-        Database::insert(
+        $apptId = Database::insert(
             'INSERT INTO appointments (patient_id, doctor_id, service_id, organisation_id, appointment_date, appointment_time, type, notes)
              VALUES (?,?,?,?,?,?,?,?)',
             [$patientId, $doctorId, $serviceId, $doctor['organisation_id'], $date, $time, $type, $notes]
         );
+
+        // Notify the doctor
+        $patient = Database::queryOne('SELECT name FROM users WHERE id = ?', [$patientId]);
+        notify($doctor['user_id'], 'appointment', 'New Appointment Booked',
+            ($patient['name'] ?? 'A patient') . ' booked a ' . $type . ' appointment on ' . date('d M Y', strtotime($date)) . ' at ' . $time . '.',
+            'medic/appointments');
+
+        // Notify the patient with confirmation
+        notify($patientId, 'appointment', 'Appointment Request Sent',
+            'Your appointment with Dr. ' . $doctor['doctor_name'] . ' on ' . date('d M Y', strtotime($date)) . ' at ' . $time . ' is pending confirmation.',
+            'user/appointments');
 
         flash('success', 'Appointment booked successfully! The doctor will confirm shortly.');
         redirect('user/appointments');

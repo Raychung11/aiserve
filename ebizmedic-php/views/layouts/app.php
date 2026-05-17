@@ -94,6 +94,7 @@
             <?= navLink('user/appointments', 'fa-calendar-check', 'My Appointments') ?>
             <?= navLink('user/records', 'fa-notes-medical', 'Medical Records') ?>
             <?= navLink('user/dispensary', 'fa-prescription-bottle-medical', 'My Medicines') ?>
+            <?= navLink('user/health-profile', 'fa-heart-pulse', 'Health Profile') ?>
             <?= navLink('user/profile', 'fa-user', 'My Profile') ?>
             <?= navLink('doctors', 'fa-user-doctor', 'Find Doctors') ?>
             <?php endif; ?>
@@ -112,14 +113,94 @@
     <div class="flex-1 flex flex-col overflow-hidden">
 
         <!-- Top bar -->
+        <?php
+        $notifUnread  = 0;
+        $notifRecent  = [];
+        if (Auth::check()) {
+            $notifUnread = (int) (Database::queryOne(
+                'SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0',
+                [Auth::id()]
+            )['c'] ?? 0);
+            $notifRecent = Database::query(
+                'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 5',
+                [Auth::id()]
+            );
+        }
+        ?>
         <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0">
             <div>
                 <h1 class="text-lg font-semibold text-gray-800"><?= e($pageTitle ?? '') ?></h1>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
                 <span class="text-sm text-gray-500"><?= date('D, d M Y') ?></span>
+
+                <!-- Notification Bell -->
+                <div class="relative" id="notifBell">
+                    <button onclick="document.getElementById('notifDropdown').classList.toggle('hidden')"
+                            class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                        <i class="fa-regular fa-bell text-lg"></i>
+                        <?php if ($notifUnread > 0): ?>
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none"><?= min($notifUnread, 9) ?></span>
+                        <?php endif; ?>
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div id="notifDropdown" class="hidden absolute right-0 top-12 w-80 bg-white rounded-2xl border border-gray-200 shadow-xl z-50 overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                            <span class="font-semibold text-sm text-gray-900">Notifications</span>
+                            <?php if ($notifUnread > 0): ?>
+                            <form method="POST" action="<?= url('notifications/read') ?>" class="inline">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="text-xs text-blue-600 hover:underline">Mark all read</button>
+                            </form>
+                            <?php endif; ?>
+                        </div>
+                        <?php if (empty($notifRecent)): ?>
+                        <p class="text-sm text-gray-400 text-center py-6">No notifications yet</p>
+                        <?php else: ?>
+                        <div class="divide-y divide-gray-50 max-h-72 overflow-y-auto">
+                            <?php foreach ($notifRecent as $n):
+                                $nIcons = [
+                                    'appointment' => ['fa-calendar-check', 'blue'],
+                                    'record'      => ['fa-notes-medical',  'green'],
+                                    'dispensing'  => ['fa-capsules',        'purple'],
+                                    'approval'    => ['fa-user-check',      'teal'],
+                                ];
+                                [$nIcon, $nColor] = $nIcons[$n['type']] ?? ['fa-bell', 'gray'];
+                            ?>
+                            <div class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 <?= !$n['is_read'] ? 'bg-blue-50/40' : '' ?>">
+                                <div class="w-8 h-8 rounded-full bg-<?= $nColor ?>-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fa-solid <?= $nIcon ?> text-<?= $nColor ?>-600 text-xs"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <?php if ($n['link']): ?>
+                                    <a href="<?= url($n['link']) ?>" class="block">
+                                    <?php endif; ?>
+                                        <p class="text-sm font-medium text-gray-900 truncate"><?= e($n['title']) ?></p>
+                                        <p class="text-xs text-gray-400 mt-0.5"><?= ago($n['created_at']) ?></p>
+                                    <?php if ($n['link']): ?>
+                                    </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <a href="<?= url('notifications') ?>" class="block text-center text-xs text-blue-600 hover:underline py-3 border-t border-gray-100">
+                            View all notifications
+                        </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         </header>
+        <script>
+        document.addEventListener('click', function(e) {
+            var bell = document.getElementById('notifBell');
+            if (bell && !bell.contains(e.target)) {
+                document.getElementById('notifDropdown').classList.add('hidden');
+            }
+        });
+        </script>
 
         <!-- Flash messages -->
         <div class="px-6 pt-4">

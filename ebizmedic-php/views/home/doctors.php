@@ -67,6 +67,12 @@
                 <p class="text-xs text-gray-500"><i class="fa-solid fa-briefcase-medical text-gray-400 mr-1"></i><?= $doc['experience_years'] ?> years exp.</p>
                 <?php endif; ?>
 
+                <?php if (($doc['avg_rating'] ?? 0) > 0): ?>
+                <div class="flex items-center gap-1 mt-1.5">
+                    <?= stars((float)$doc['avg_rating'], (int)$doc['rating_count']) ?>
+                </div>
+                <?php endif; ?>
+
                 <div class="flex gap-1.5 mt-3">
                     <?php if ($doc['is_available_online']): ?>
                     <span class="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">Online</span>

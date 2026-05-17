@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
         // ── Wipe existing data (FK-safe order) ───────────────────────────
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
         foreach ([
+            'notifications','ratings','health_profiles',
             'dispensing_items','dispensings','stock_movements','medicines',
             'pharmacists','appointments','medical_records','schedules',
             'services','doctors','organisations','users'
@@ -504,6 +505,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
             }
         }
 
+        // ══════════════════════════════════════════════════════════════════
+        // HEALTH PROFILES (Phase 4)
+        // ══════════════════════════════════════════════════════════════════
+        $healthProfiles = [
+            [
+                'user_id'                  => $aliId,
+                'blood_type'               => 'A+',
+                'allergies'                => 'Penicillin',
+                'chronic_conditions'       => 'Ischemic Heart Disease, Hypertension',
+                'current_medications'      => "Atorvastatin 20mg – 1 tablet nightly\nAspirin 75mg – 1 tablet daily",
+                'emergency_contact_name'   => 'Zainab Hassan',
+                'emergency_contact_phone'  => '+60 12-987 6543',
+            ],
+            [
+                'user_id'                  => $sitiId,
+                'blood_type'               => 'B+',
+                'allergies'                => '',
+                'chronic_conditions'       => '',
+                'current_medications'      => '',
+                'emergency_contact_name'   => 'Ahmad Razali',
+                'emergency_contact_phone'  => '+60 13-111 2222',
+            ],
+            [
+                'user_id'                  => $rajId,
+                'blood_type'               => 'O+',
+                'allergies'                => 'Sulfonamides (Sulfa drugs)',
+                'chronic_conditions'       => 'Hypertension Stage 1',
+                'current_medications'      => 'Amlodipine 5mg – 1 tablet daily morning',
+                'emergency_contact_name'   => 'Kavitha Kumar',
+                'emergency_contact_phone'  => '+60 14-333 4444',
+            ],
+            [
+                'user_id'                  => $limId,
+                'blood_type'               => 'AB+',
+                'allergies'                => 'Peanuts',
+                'chronic_conditions'       => '',
+                'current_medications'      => '',
+                'emergency_contact_name'   => 'Lim Boon Huat',
+                'emergency_contact_phone'  => '+60 15-555 6666',
+            ],
+        ];
+
+        $stmtHp = $pdo->prepare(
+            'INSERT INTO health_profiles (user_id,blood_type,allergies,chronic_conditions,current_medications,emergency_contact_name,emergency_contact_phone)
+             VALUES (:user_id,:blood_type,:allergies,:chronic_conditions,:current_medications,:emergency_contact_name,:emergency_contact_phone)'
+        );
+        foreach ($healthProfiles as $hp) {
+            $stmtHp->execute($hp);
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // RATINGS (Phase 4) — rate 4 of the 5 completed appointments
+        // Appointment indices: 0=Ali/Ahmad, 1=Siti/Sarah, 2=Raj/Hafiz, 3=Lim/Priya, 4=Ali/Sarah
+        // Leave appt index 3 (Lim/Priya) unrated so demo can show the rate button
+        // ══════════════════════════════════════════════════════════════════
+        $ratingsData = [
+            // appt 0: Ali → Dr Ahmad (Cardiology)
+            [$apptIds[0], $drAhmad, $aliId,  5, 'Dr. Ahmad was very thorough and explained everything clearly. Highly recommended!'],
+            // appt 1: Siti → Dr Sarah (Dermatology)
+            [$apptIds[1], $drSarah, $sitiId, 4, 'Professional and caring. The waiting time was a bit long but the consultation was great.'],
+            // appt 2: Raj → Dr Hafiz (GP)
+            [$apptIds[2], $drHafiz, $rajId,  5, 'Very helpful and reassuring. Dr. Hafiz took time to listen and gave practical advice.'],
+            // appt 4: Ali → Dr Sarah (eczema, online)
+            [$apptIds[4], $drSarah, $aliId,  4, 'Good online session, easy to connect and the advice was clear. Follow-up plan is helpful.'],
+        ];
+
+        $stmtRat = $pdo->prepare(
+            'INSERT INTO ratings (appointment_id,doctor_id,patient_id,rating,comment) VALUES (?,?,?,?,?)'
+        );
+        foreach ($ratingsData as $r) {
+            $stmtRat->execute($r);
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // NOTIFICATIONS (Phase 4)
+        // ══════════════════════════════════════════════════════════════════
+        $notificationsData = [
+            // Ali
+            [$aliId,  'appointment', 'Appointment Confirmed',  'Your appointment with Dr. Ahmad Razif on ' . date('d M Y', strtotime('-20 days')) . ' has been confirmed.', 'user/appointments'],
+            [$aliId,  'record',      'Medical Record Ready',   'Your medical record from Dr. Ahmad Razif is now available.',  'user/records'],
+            [$aliId,  'dispensing',  'Medicines Dispensed',    'Your prescription has been dispensed by Klinik Sehat KL. Check your medicines history.', 'user/dispensary'],
+            [$aliId,  'appointment', 'Appointment Confirmed',  'Your online appointment with Dr. Sarah Lee on ' . date('d M Y', strtotime('-5 days')) . ' has been confirmed.', 'user/appointments'],
+            [$aliId,  'record',      'Medical Record Ready',   'Your medical record from Dr. Sarah Lee (eczema) is now available.',  'user/records'],
+
+            // Siti
+            [$sitiId, 'appointment', 'Appointment Confirmed',  'Your appointment with Dr. Sarah Lee on ' . date('d M Y', strtotime('-15 days')) . ' has been confirmed.', 'user/appointments'],
+            [$sitiId, 'record',      'Medical Record Ready',   'Your medical record from Dr. Sarah Lee is now available.',  'user/records'],
+            [$sitiId, 'dispensing',  'Medicines Dispensed',    'Your prescription has been dispensed by Klinik Sehat KL.',  'user/dispensary'],
+            [$sitiId, 'appointment', 'Upcoming Appointment',   'Reminder: You have an appointment with Dr. Ahmad Razif on ' . date('d M Y', strtotime('+2 days')) . '.', 'user/appointments'],
+
+            // Raj
+            [$rajId,  'appointment', 'Appointment Confirmed',  'Your appointment with Dr. Mohd Hafiz on ' . date('d M Y', strtotime('-10 days')) . ' has been confirmed.', 'user/appointments'],
+            [$rajId,  'record',      'Medical Record Ready',   'Your medical record from Dr. Mohd Hafiz is now available.', 'user/records'],
+            [$rajId,  'dispensing',  'Medicines Dispensed',    'Your prescription has been dispensed by Hospital Prima Penang.', 'user/dispensary'],
+
+            // Lim
+            [$limId,  'appointment', 'Appointment Confirmed',  'Your appointment with Dr. Priya Nair on ' . date('d M Y', strtotime('-8 days')) . ' has been confirmed.', 'user/appointments'],
+            [$limId,  'record',      'Medical Record Ready',   'Your child\'s medical record from Dr. Priya Nair is now available.', 'user/records'],
+            [$limId,  'appointment', 'Upcoming Appointment',   'Reminder: You have an online appointment with Dr. Sarah Lee on ' . date('d M Y', strtotime('+5 days')) . '.', 'user/appointments'],
+        ];
+
+        $stmtNotif = $pdo->prepare(
+            'INSERT INTO notifications (user_id,type,title,message,link) VALUES (?,?,?,?,?)'
+        );
+        foreach ($notificationsData as $notif) {
+            $stmtNotif->execute($notif);
+        }
+
         $done = true;
 
     } catch (PDOException $e) {
@@ -642,6 +751,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirm'] ?? '') === 'yes'
             <li>✅ 16 Medicines across both organisations</li>
             <li>✅ 5 Medical records for completed appointments</li>
             <li>✅ 4 Sample dispensings with line items and stock movements</li>
+            <li>✅ 4 Patient health profiles (blood type, allergies, conditions)</li>
+            <li>✅ 4 Doctor ratings from patients (1 unrated for demo)</li>
+            <li>✅ 15 Sample notifications across all patients</li>
         </ul>
 
         <form method="POST">

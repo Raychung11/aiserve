@@ -267,6 +267,16 @@ class AdminController
         $status = $_POST['status'] ?? '';
         if (in_array($status, ['pending','confirmed','completed','cancelled'])) {
             Database::execute('UPDATE appointments SET status = ? WHERE id = ?', [$status, $id]);
+            $appt = Database::queryOne('SELECT patient_id FROM appointments WHERE id = ?', [$id]);
+            if ($appt && in_array($status, ['confirmed','completed','cancelled'])) {
+                $msgs = [
+                    'confirmed'  => 'Your appointment has been confirmed.',
+                    'completed'  => 'Your appointment is marked as completed.',
+                    'cancelled'  => 'Your appointment has been cancelled.',
+                ];
+                notify($appt['patient_id'], 'appointment', 'Appointment ' . ucfirst($status),
+                    $msgs[$status], 'user/appointments');
+            }
             flash('success', 'Appointment status updated.');
         }
         redirect('admin/appointments');
@@ -399,6 +409,8 @@ class AdminController
 
         if ($action === 'approve') {
             Database::execute('UPDATE users SET approved = 1, is_active = 1 WHERE id = ?', [$id]);
+            notify($id, 'approval', 'Account Approved',
+                'Your account has been approved. You can now log in to EbizMedic.', 'login');
             flash('success', 'Account approved. The user can now log in.');
         } elseif ($action === 'reject') {
             Database::execute('UPDATE users SET is_active = 0 WHERE id = ?', [$id]);

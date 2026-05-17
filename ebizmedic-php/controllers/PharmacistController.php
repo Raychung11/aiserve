@@ -201,6 +201,11 @@ class PharmacistController
             );
         }
 
+        // Notify patient
+        notify($patientId, 'dispensing', 'Medicines Dispensed',
+            count($lines) . ' medicine(s) dispensed. Total: RM ' . number_format($total, 2) . '. Check your dispensing history.',
+            'user/dispensary');
+
         flash('success', 'Medicines dispensed successfully. Total: RM ' . number_format($total, 2));
         redirect('pharmacist/history');
     }
