@@ -39,7 +39,6 @@ $public_routes = [
     'login'      => 'public/login.php',
     'register'   => 'public/register.php',
     'forgot'     => 'public/forgot_password.php',
-    'reset'      => 'public/reset_password.php',
     'terms'      => 'public/terms.php',
     'privacy'    => 'public/privacy.php',
     'marketplace'=> 'public/marketplace.php',

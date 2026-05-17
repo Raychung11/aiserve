@@ -85,8 +85,9 @@ function gold_stock_is_low(): bool {
 
 function adjust_gold_stock(float $grams_change, string $movement_type, string $notes = '',
                             string $ref_type = null, int $ref_id = null, int $created_by = null): float {
-    $db = getDB();
-    $db->beginTransaction();
+    $db  = getDB();
+    $own = !$db->inTransaction();
+    if ($own) $db->beginTransaction();
     try {
         $stock     = $db->query("SELECT * FROM gold_stock WHERE id=1 LIMIT 1 FOR UPDATE")->fetch();
         $new_grams = max(0, (float)$stock['current_grams'] + $grams_change);
@@ -96,10 +97,10 @@ function adjust_gold_stock(float $grams_change, string $movement_type, string $n
                       (movement_type,grams_change,grams_after,notes,reference_type,reference_id,created_by,created_at)
                       VALUES (?,?,?,?,?,?,?,NOW())")
            ->execute([$movement_type, $grams_change, $new_grams, $notes, $ref_type, $ref_id, $created_by]);
-        $db->commit();
+        if ($own) $db->commit();
         return $new_grams;
     } catch (\Throwable $e) {
-        $db->rollBack();
+        if ($own) $db->rollBack();
         throw $e;
     }
 }

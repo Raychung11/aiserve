@@ -18,8 +18,8 @@ $balance  = get_wallet_balance($user_id);
 $price    = get_active_gold_price();
 $errors   = [];
 
-const GRAMS_PER_PLATE = 0.2;
-const POINTS_PER_PLATE = 20; // 0.2g × 100 pts/g
+define('GRAMS_PER_PLATE', 0.2);
+define('POINTS_PER_PLATE', 20); // 0.2g × 100 pts/g
 
 $avail_grams  = (float)$balance['grams'];
 $max_plates   = (int)floor($avail_grams / GRAMS_PER_PLATE);
