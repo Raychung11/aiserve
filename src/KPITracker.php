@@ -8,7 +8,7 @@ class KPITracker {
         $eScore  = round($stats['ENVIRONMENT']['score'] ?? 0, 2);
         $sScore  = round($stats['SOCIAL']['score']      ?? 0, 2);
         $gScore  = round($stats['GOVERNANCE']['score']  ?? 0, 2);
-        $filled  = array_sum(array_column($stats, 'filled'));
+        $filled  = array_sum(array_column($stats, 'completed'));
         $total   = array_sum(array_column($stats, 'total'));
         $completion = $total > 0 ? round($filled / $total * 100, 2) : 0;
 

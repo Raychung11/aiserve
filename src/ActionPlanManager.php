@@ -100,6 +100,26 @@ class ActionPlanManager {
         return "<span style='background:{$bg};color:{$c};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700'>{$label}</span>";
     }
 
+    public static function addComment(int $planId, int $companyId, int $userId, string $comment): int {
+        return Database::insert('action_plan_comments', [
+            'action_plan_id' => $planId,
+            'company_id'     => $companyId,
+            'user_id'        => $userId,
+            'comment'        => $comment,
+        ]);
+    }
+
+    public static function getComments(int $planId): array {
+        return Database::fetchAll(
+            'SELECT apc.*, u.name AS author_name, u.role AS author_role
+             FROM action_plan_comments apc
+             JOIN users u ON u.id = apc.user_id
+             WHERE apc.action_plan_id = ?
+             ORDER BY apc.created_at ASC',
+            [$planId]
+        );
+    }
+
     public static function statusBadge(string $status): string {
         $map = [
             'open'        => ['#1e40af', '#dbeafe', 'Open'],

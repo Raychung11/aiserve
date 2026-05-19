@@ -16,10 +16,13 @@ class Company {
             }
         }
 
+        $validSectors = require __DIR__ . '/../config/bursa_sectors.php';
         $companyId = Database::insert('companies', [
             'name'             => htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8'),
             'registration_no'  => $data['registration_no'] ?? null,
             'industry'         => $data['industry'],
+            'bursa_sector'     => in_array($data['bursa_sector'] ?? '', $validSectors) ? $data['bursa_sector'] : null,
+            'reporting_scope'  => in_array($data['reporting_scope'] ?? '', ['hq','factory','group']) ? $data['reporting_scope'] : 'hq',
             'revenue_tier'     => $data['revenue_tier'],
             'employee_count'   => (int)$data['employee_count'],
             'framework'        => $data['framework'],
@@ -82,7 +85,8 @@ class Company {
      * Update company
      */
     public static function update(int $companyId, array $data): bool {
-        $allowed = ['name', 'registration_no', 'industry', 'revenue_tier', 'employee_count',
+        $allowed = ['name', 'registration_no', 'industry', 'bursa_sector', 'reporting_scope',
+                    'report_level', 'revenue_tier', 'employee_count',
                     'framework', 'reporting_year', 'is_pre_ipo'];
         $update  = array_intersect_key($data, array_flip($allowed));
         if (empty($update)) return false;

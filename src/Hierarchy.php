@@ -95,11 +95,15 @@ class Hierarchy {
                 'env_score'     => $stats['ENVIRONMENT']['score'] ?? 0,
                 'soc_score'     => $stats['SOCIAL']['score']      ?? 0,
                 'gov_score'     => $stats['GOVERNANCE']['score']  ?? 0,
-                'critical_gaps' => Database::fetchOne(
-                    "SELECT COUNT(*) as c FROM gap_analysis_cache
-                     WHERE company_id = ? AND priority = 'critical'",
-                    [$co['id']]
-                )['c'] ?? 0,
+                'critical_gaps' => (function(int $cid): int {
+                    $row = Database::fetchOne(
+                        "SELECT analysis_json FROM gap_analyses WHERE company_id = ? ORDER BY generated_at DESC LIMIT 1",
+                        [$cid]
+                    );
+                    if (!$row || empty($row['analysis_json'])) return 0;
+                    $gaps = json_decode($row['analysis_json'], true)['gaps'] ?? [];
+                    return count(array_filter($gaps, fn($g) => ($g['priority'] ?? '') === 'critical'));
+                })($co['id']),
             ]);
         }
         usort($out, fn($a, $b) => $a['overall_score'] <=> $b['overall_score']);
