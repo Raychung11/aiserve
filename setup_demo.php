@@ -5,7 +5,9 @@
  * Run ONCE to create demo accounts for all 6 roles.
  * DELETE this file after use.
  *
- * Access: https://yourdomain.com/setup_demo?token=esg-demo-2024
+ * Access: https://yourdomain.com/setup_demo.php?token=esg-demo-2024
+ *                                               ^^^^
+ *         The .php extension is required — the router does not handle this file.
  */
 
 // ── Security token ──────────────────────────────────────────
@@ -32,7 +34,7 @@ $users = [
     ['Associate Tan', 'associate@demo.com',   'associate'],
     ['Manager Wong',  'manager@demo.com',     'manager'],
     ['Consultant Ng', 'consultant@demo.com',  'consultant'],
-    ['SME Owner Lim', 'owner@demo.com',       'sme_owner'],
+    ['SME Owner Lim', 'sme@demo.com',          'sme_owner'],
 ];
 
 $results = [];
@@ -228,7 +230,7 @@ if ($demoCompanyId) {
         </tr>
         <tr>
           <td><span class="role-badge role-sme_owner">SME Owner</span></td>
-          <td>owner@demo.com</td>
+          <td>sme@demo.com</td>
           <td><?= htmlspecialchars($demoPassword) ?></td>
           <td>/dashboard (has demo company)</td>
         </tr>
