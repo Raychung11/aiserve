@@ -147,6 +147,11 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
     <a href="<?= url('departments') ?>" class="nav-item <?= $currentPage === 'departments' ? 'active' : '' ?>">
       <i class="bi bi-diagram-3"></i><span>Departments</span>
     </a>
+
+    <div class="nav-section-label">Company</div>
+    <a href="<?= url('company-settings') ?>" class="nav-item <?= $currentPage === 'company-settings' ? 'active' : '' ?>">
+      <i class="bi bi-gear"></i><span>Settings</span>
+    </a>
     <?php endif; // activeCompany for hierarchy ?>
 
   <?php else: ?>
@@ -197,6 +202,11 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
     </a>
     <a href="<?= url('departments') ?>" class="nav-item <?= $currentPage === 'departments' ? 'active' : '' ?>">
       <i class="bi bi-diagram-3"></i><span>Departments</span>
+    </a>
+
+    <div class="nav-section-label">Company</div>
+    <a href="<?= url('company-settings') ?>" class="nav-item <?= $currentPage === 'company-settings' ? 'active' : '' ?>">
+      <i class="bi bi-gear"></i><span>Settings</span>
     </a>
     <?php endif; // activeCompany ?>
 
