@@ -16,6 +16,8 @@
     <span style="color:#cbd5e1">&nbsp;(1511714-V)</span>
     &nbsp;&bull;&nbsp;
     D13-07, Menara Suezcap 1, KL Gateway, Jalan Kerinchi, 59200 Kuala Lumpur
+    &nbsp;&bull;&nbsp;
+    <a href="tel:+601133184600" style="color:#94a3b8;text-decoration:none">+6011-3318 4600</a>
   </span>
   <span>&copy; <?= date('Y') ?> Adcellent Biz Sdn Bhd &bull; All rights reserved</span>
 </footer>
