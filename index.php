@@ -54,8 +54,14 @@ $routes = [
     'benchmark'    => 'pages/benchmarking.php',
     'admin'        => 'pages/admin.php',
     'pricing'      => 'pages/pricing.php',
-    'billing'      => 'pages/billing.php',
-    'team'         => 'pages/team.php',
+    'billing'       => 'pages/billing.php',
+    'team'          => 'pages/team.php',
+    'departments'   => 'pages/departments.php',
+    'action-plans'  => 'pages/action_plans.php',
+    'action_plans'  => 'pages/action_plans.php',
+    'notifications' => 'pages/notifications.php',
+    'kpi-trends'    => 'pages/kpi_trends.php',
+    'kpi_trends'    => 'pages/kpi_trends.php',
 ];
 
 // Handle logout

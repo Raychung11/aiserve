@@ -138,6 +138,15 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
     <a href="<?= url('benchmarking') ?>" class="nav-item <?= $currentPage === 'benchmarking' ? 'active' : '' ?>">
       <i class="bi bi-bar-chart-line"></i><span>Benchmarking</span>
     </a>
+    <a href="<?= url('action-plans') ?>" class="nav-item <?= $currentPage === 'action-plans' ? 'active' : '' ?>">
+      <i class="bi bi-clipboard2-check"></i><span>Action Plans</span>
+    </a>
+    <a href="<?= url('kpi-trends') ?>" class="nav-item <?= $currentPage === 'kpi-trends' ? 'active' : '' ?>">
+      <i class="bi bi-graph-up-arrow"></i><span>KPI Trends</span>
+    </a>
+    <a href="<?= url('departments') ?>" class="nav-item <?= $currentPage === 'departments' ? 'active' : '' ?>">
+      <i class="bi bi-diagram-3"></i><span>Departments</span>
+    </a>
     <?php endif; // activeCompany for hierarchy ?>
 
   <?php else: ?>
@@ -183,6 +192,12 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
     <a href="<?= url('benchmarking') ?>" class="nav-item <?= $currentPage === 'benchmarking' ? 'active' : '' ?>">
       <i class="bi bi-bar-chart-line"></i><span>Benchmarking</span>
     </a>
+    <a href="<?= url('action-plans') ?>" class="nav-item <?= $currentPage === 'action-plans' ? 'active' : '' ?>">
+      <i class="bi bi-clipboard2-check"></i><span>Action Plans</span>
+    </a>
+    <a href="<?= url('departments') ?>" class="nav-item <?= $currentPage === 'departments' ? 'active' : '' ?>">
+      <i class="bi bi-diagram-3"></i><span>Departments</span>
+    </a>
     <?php endif; // activeCompany ?>
 
     <?php if (in_array($userRole, ['consultant', 'sme_owner'])): ?>
@@ -226,6 +241,16 @@ $userRole    = $currentUser['role'] ?? 'sme_owner';
         <div class="user-role"><?= ucfirst(str_replace('_', ' ', $currentUser['role'])) ?></div>
       </div>
     </div>
+    <a href="<?= url('notifications') ?>" class="nav-item <?= $currentPage === 'notifications' ? 'active' : '' ?>" style="position:relative">
+      <i class="bi bi-bell"></i>
+      <span>Notifications</span>
+      <?php if (!empty($_notifCount) && $_notifCount > 0): ?>
+      <span style="position:absolute;top:6px;right:10px;background:#ef4444;color:#fff;
+                   font-size:10px;font-weight:800;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center">
+        <?= $_notifCount > 9 ? '9+' : $_notifCount ?>
+      </span>
+      <?php endif; ?>
+    </a>
     <a href="<?= url('logout') ?>" class="nav-item nav-logout">
       <i class="bi bi-box-arrow-right"></i>
       <span>Logout</span>

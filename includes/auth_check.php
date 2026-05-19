@@ -15,6 +15,10 @@ require_once __DIR__ . '/../src/ReportGenerator.php';
 require_once __DIR__ . '/../src/Benchmarker.php';
 require_once __DIR__ . '/../src/Subscription.php';
 require_once __DIR__ . '/../src/Hierarchy.php';
+require_once __DIR__ . '/../src/NotificationManager.php';
+require_once __DIR__ . '/../src/ActionPlanManager.php';
+require_once __DIR__ . '/../src/DepartmentManager.php';
+require_once __DIR__ . '/../src/KPITracker.php';
 
 Auth::startSession();
 Auth::requireAuth();
@@ -41,6 +45,9 @@ function isActive(string $page): string {
     $current = $_GET['page'] ?? 'dashboard';
     return $current === $page ? 'active' : '';
 }
+
+// Unread notification count for topbar bell
+$_notifCount = NotificationManager::getUnreadCount($currentUser['id']);
 
 // Helper: format number for display
 function fmtNum($val, int $dec = 2): string {
