@@ -601,7 +601,7 @@ a { text-decoration: none; }
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; <?= date('Y') ?> Adcellent Sdn Bhd &bull; hello@adcellent.com.my &bull; All prices in MYR</span>
+      <span>&copy; <?= date('Y') ?> Adcellent Biz Sdn Bhd (1511714-V) &bull; hello@adcellent.com.my &bull; All prices in MYR</span>
       <span>MyGHG 2023 &bull; DEFRA 2023 &bull; Bursa SEDG 2nd Edition 2022</span>
     </div>
   </div>
