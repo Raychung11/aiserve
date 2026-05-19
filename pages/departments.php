@@ -43,14 +43,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 DepartmentManager::update((int)$_POST['dept_id'], ['is_active' => $dept['is_active'] ? 0 : 1]);
                 $success = 'Department updated.';
             }
+
+        } elseif ($action === 'assign_member' && isset($_POST['dept_id'], $_POST['user_id'])) {
+            $dept = DepartmentManager::getById((int)$_POST['dept_id']);
+            if ($dept && $dept['company_id'] == $companyId) {
+                DepartmentManager::assignUser((int)$_POST['dept_id'], (int)$_POST['user_id'], $_POST['dept_role'] ?? 'member');
+                $success = 'Member added to ' . htmlspecialchars($dept['name']) . '.';
+            }
+
+        } elseif ($action === 'remove_member' && isset($_POST['dept_id'], $_POST['user_id'])) {
+            $dept = DepartmentManager::getById((int)$_POST['dept_id']);
+            if ($dept && $dept['company_id'] == $companyId) {
+                DepartmentManager::removeUser((int)$_POST['dept_id'], (int)$_POST['user_id']);
+                $success = 'Member removed.';
+            }
         }
     }
 }
 
-$departments = DepartmentManager::getForCompany($companyId, false);
-$hasAny      = count($departments) > 0;
-$csrf        = Auth::csrfToken();
-$types       = ['hr_admin','production','hse','energy','procurement','logistics','finance','it','custom'];
+$departments  = DepartmentManager::getForCompany($companyId, false);
+$hasAny       = count($departments) > 0;
+$csrf         = Auth::csrfToken();
+$types        = ['hr_admin','production','hse','energy','procurement','logistics','finance','it','custom'];
+
+// Company users for member assignment
+$companyUsers = Database::fetchAll(
+    'SELECT u.id, u.name, u.role FROM user_companies uc JOIN users u ON u.id = uc.user_id WHERE uc.company_id = ? ORDER BY u.name',
+    [$companyId]
+);
+
+// Pre-fetch members for each department keyed by dept id
+$deptMembers = [];
+foreach ($departments as $dept) {
+    $deptMembers[$dept['id']] = DepartmentManager::getMembers($dept['id']);
+}
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -166,6 +192,11 @@ include __DIR__ . '/../includes/header.php';
               <?php if (!$dept['is_active']): ?>
               <span class="badge bg-secondary">Inactive</span>
               <?php endif; ?>
+              <button type="button" class="btn btn-sm btn-outline-primary"
+                      onclick="openMembersModal(<?= $dept['id'] ?>)"
+                      title="Manage members">
+                <i class="bi bi-people-fill"></i>
+              </button>
               <form method="POST" class="d-inline">
                 <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                 <input type="hidden" name="action"  value="toggle">
@@ -186,4 +217,137 @@ include __DIR__ . '/../includes/header.php';
 </div><!-- /main-content -->
 </div><!-- /app-layout -->
 
+<!-- ── Manage Members Modal ───────────────────────────────────────────── -->
+<div class="modal fade" id="membersModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-people-fill me-2 text-primary"></i><span id="modalDeptName">Department</span> — Members</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+
+        <!-- Current members list -->
+        <div id="membersList" style="max-height:340px;overflow-y:auto">
+          <table class="table table-sm mb-0">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th>Name</th>
+                <th>Platform Role</th>
+                <th>Dept Role</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="membersBody"></tbody>
+          </table>
+          <div id="noMembers" class="text-center text-muted py-4" style="display:none">
+            <i class="bi bi-people fs-3 mb-2"></i>
+            <p class="mb-0 small">No members yet. Add one below.</p>
+          </div>
+        </div>
+
+        <!-- Add member form -->
+        <div class="border-top p-3">
+          <form method="POST" class="row g-2 align-items-end" id="addMemberForm">
+            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+            <input type="hidden" name="action"   value="assign_member">
+            <input type="hidden" name="dept_id"  id="modalDeptId">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Add Member</label>
+              <select class="form-select" name="user_id" required id="addUserSelect">
+                <option value="">— Select user —</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold">Role</label>
+              <select class="form-select" name="dept_role">
+                <option value="member">Member</option>
+                <option value="head">Head</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-plus-circle me-1"></i>Add
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Department members data passed from PHP
+const deptData = <?= json_encode(array_map(function($dept) use ($deptMembers) {
+    return [
+        'id'      => $dept['id'],
+        'name'    => $dept['name'],
+        'members' => $deptMembers[$dept['id']] ?? [],
+    ];
+}, $departments)) ?>;
+
+const companyUsers = <?= json_encode(array_map(fn($u) => ['id' => $u['id'], 'name' => $u['name'], 'role' => $u['role']], $companyUsers)) ?>;
+const csrf = <?= json_encode($csrf) ?>;
+
+function openMembersModal(deptId) {
+    const dept = deptData.find(d => d.id == deptId);
+    if (!dept) return;
+
+    document.getElementById('modalDeptName').textContent = dept.name;
+    document.getElementById('modalDeptId').value = deptId;
+
+    // Render current members
+    const tbody = document.getElementById('membersBody');
+    tbody.innerHTML = '';
+    const noMembers = document.getElementById('noMembers');
+
+    if (dept.members.length === 0) {
+        noMembers.style.display = '';
+        document.getElementById('membersList').querySelector('table').style.display = 'none';
+    } else {
+        noMembers.style.display = 'none';
+        document.getElementById('membersList').querySelector('table').style.display = '';
+        dept.members.forEach(m => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${escHtml(m.name)}</strong></td>
+                <td><span class="badge bg-secondary">${escHtml(m.role)}</span></td>
+                <td><span class="badge ${m.dept_role === 'head' ? 'bg-primary' : 'bg-light text-dark border'}">${m.dept_role === 'head' ? 'Head' : 'Member'}</span></td>
+                <td>
+                  <form method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="${escHtml(csrf)}">
+                    <input type="hidden" name="action"   value="remove_member">
+                    <input type="hidden" name="dept_id"  value="${deptId}">
+                    <input type="hidden" name="user_id"  value="${m.id}">
+                    <button type="submit" class="btn btn-xs btn-outline-danger"
+                            onclick="return confirm('Remove ${escHtml(m.name)} from this department?')">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </form>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Populate add-user dropdown (exclude current members)
+    const memberIds = new Set(dept.members.map(m => m.id));
+    const sel = document.getElementById('addUserSelect');
+    sel.innerHTML = '<option value="">— Select user —</option>';
+    companyUsers.forEach(u => {
+        if (!memberIds.has(u.id)) {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = u.name + ' (' + u.role + ')';
+            sel.appendChild(opt);
+        }
+    });
+
+    new bootstrap.Modal(document.getElementById('membersModal')).show();
+}
+
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

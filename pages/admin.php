@@ -97,12 +97,43 @@ $stats = [
     'esg_data'     => (int)(Database::fetchOne('SELECT COUNT(*) n FROM esg_data')['n'] ?? 0),
     'reports'      => (int)(Database::fetchOne('SELECT COUNT(*) n FROM reports')['n'] ?? 0),
     'logins_today' => (int)(Database::fetchOne("SELECT COUNT(*) n FROM activity_log WHERE action='LOGIN' AND DATE(created_at)=CURDATE()")['n'] ?? 0),
+    'action_plans' => (int)(Database::fetchOne('SELECT COUNT(*) n FROM action_plans')['n'] ?? 0),
+    'signups_week' => (int)(Database::fetchOne("SELECT COUNT(*) n FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")['n'] ?? 0),
 ];
 $roleStats      = Database::fetchAll('SELECT role, COUNT(*) cnt FROM users GROUP BY role ORDER BY cnt DESC');
 $fwStats        = Database::fetchAll('SELECT framework, COUNT(*) cnt FROM companies GROUP BY framework ORDER BY cnt DESC');
 $recentActivity = Database::fetchAll(
     'SELECT al.*, u.name un, u.role ur FROM activity_log al LEFT JOIN users u ON al.user_id=u.id ORDER BY al.created_at DESC LIMIT 15'
 );
+
+// Plan distribution
+$planStats = Database::fetchAll(
+    "SELECT COALESCE(s.plan_code,'starter') plan_code, COUNT(DISTINCT c.id) cnt
+     FROM companies c
+     LEFT JOIN subscriptions s ON s.company_id = c.id AND s.status = 'active' AND (s.expires_at IS NULL OR s.expires_at > NOW())
+     GROUP BY COALESCE(s.plan_code,'starter')"
+);
+
+// Signups last 8 weeks
+$signupTrend = Database::fetchAll(
+    "SELECT DATE_FORMAT(created_at,'%Y-%u') wk, MIN(DATE(created_at)) wk_start, COUNT(*) cnt
+     FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 8 WEEK)
+     GROUP BY DATE_FORMAT(created_at,'%Y-%u') ORDER BY wk ASC"
+);
+
+// ESG data completion buckets across companies
+$completionBuckets = ['0–25%' => 0, '26–50%' => 0, '51–75%' => 0, '76–100%' => 0];
+if ($stats['companies'] > 0) {
+    $coList = Database::fetchAll('SELECT id, framework, reporting_year FROM companies');
+    foreach ($coList as $co) {
+        $cs = ESGDataManager::getCompletionStats($co['id'], $co['framework'], (string)$co['reporting_year']);
+        $overall = ESGDataManager::calcOverallScore($cs);
+        if      ($overall <= 25) $completionBuckets['0–25%']++;
+        elseif  ($overall <= 50) $completionBuckets['26–50%']++;
+        elseif  ($overall <= 75) $completionBuckets['51–75%']++;
+        else                     $completionBuckets['76–100%']++;
+    }
+}
 
 // ── Tab-specific data ─────────────────────────────────────────────────
 $allUsers = $allCompanies = $allReports = $indicators = [];
@@ -318,6 +349,8 @@ include __DIR__ . '/../includes/header.php';
             ['icon'=>'bi-database-fill',       'color'=>'#7c3aed', 'bg'=>'#faf5ff', 'val'=>$stats['esg_data'],   'lbl'=>'ESG Data Points',  'sub'=>'Across all companies'],
             ['icon'=>'bi-file-earmark-text',   'color'=>'#b45309', 'bg'=>'#fffbeb', 'val'=>$stats['reports'],    'lbl'=>'Reports Generated','sub'=>'All time'],
             ['icon'=>'bi-box-arrow-in-right',  'color'=>'#0d9488', 'bg'=>'#f0fdfa', 'val'=>$stats['logins_today'],'lbl'=>'Logins Today',   'sub'=>'Active sessions'],
+            ['icon'=>'bi-clipboard2-check',    'color'=>'#b45309', 'bg'=>'#fffbeb', 'val'=>$stats['action_plans'],'lbl'=>'Action Plans',   'sub'=>'Across all companies'],
+            ['icon'=>'bi-person-plus-fill',    'color'=>'#16a34a', 'bg'=>'#f0fdf4', 'val'=>$stats['signups_week'],'lbl'=>'New Users',      'sub'=>'Last 7 days'],
         ];
         foreach ($statItems as $si): ?>
         <div class="col-6 col-md-4 col-xl">
@@ -445,6 +478,90 @@ include __DIR__ . '/../includes/header.php';
                 <div class="act-time"><?= date('d M H:i', strtotime($log['created_at'])) ?></div>
               </div>
               <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second overview row: plan breakdown + completion + signup trend -->
+      <div class="row g-4 mt-0">
+        <div class="col-lg-4">
+          <div class="adm-section">
+            <div class="adm-section-head">
+              <span class="adm-section-title"><i class="bi bi-credit-card" style="color:#b45309"></i>Plan Distribution</span>
+            </div>
+            <div style="padding:16px 20px">
+              <?php
+              $planColors = ['starter'=>'#64748b','standard'=>'#0891b2','professional'=>'#7c3aed','trial'=>'#16a34a'];
+              $totalPlans = array_sum(array_column($planStats, 'cnt')) ?: 1;
+              foreach ($planStats as $ps):
+                $pct = round($ps['cnt'] / $totalPlans * 100);
+                $clr = $planColors[$ps['plan_code']] ?? '#94a3b8';
+              ?>
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                  <span style="font-size:12px;font-weight:700;text-transform:capitalize;color:#334155"><?= htmlspecialchars($ps['plan_code']) ?></span>
+                  <span style="font-size:12px;color:#64748b"><?= $ps['cnt'] ?> co. &bull; <?= $pct ?>%</span>
+                </div>
+                <div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:<?= $pct ?>%;background:<?= $clr ?>;border-radius:4px"></div>
+                </div>
+              </div>
+              <?php endforeach; ?>
+              <?php if (empty($planStats)): ?>
+              <p style="color:#94a3b8;font-size:13px;margin:0">No companies yet.</p>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="adm-section">
+            <div class="adm-section-head">
+              <span class="adm-section-title"><i class="bi bi-bar-chart" style="color:#7c3aed"></i>ESG Completion Spread</span>
+            </div>
+            <div style="padding:16px 20px">
+              <?php
+              $bucketColors = ['0–25%'=>'#dc2626','26–50%'=>'#ea580c','51–75%'=>'#ca8a04','76–100%'=>'#16a34a'];
+              $totalCo = $stats['companies'] ?: 1;
+              foreach ($completionBuckets as $label => $cnt):
+                $pct = round($cnt / $totalCo * 100);
+              ?>
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                  <span style="font-size:12px;font-weight:600;color:#334155"><?= $label ?></span>
+                  <span style="font-size:12px;color:#64748b"><?= $cnt ?> co. &bull; <?= $pct ?>%</span>
+                </div>
+                <div style="height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:<?= $pct ?>%;background:<?= $bucketColors[$label] ?>;border-radius:4px"></div>
+                </div>
+              </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="adm-section">
+            <div class="adm-section-head">
+              <span class="adm-section-title"><i class="bi bi-person-plus" style="color:#16a34a"></i>User Signups — Last 8 Weeks</span>
+            </div>
+            <div style="padding:16px 20px">
+              <?php if (empty($signupTrend)): ?>
+              <p style="color:#94a3b8;font-size:13px;margin:0">No signup data yet.</p>
+              <?php else:
+                $maxCnt = max(array_column($signupTrend, 'cnt')) ?: 1;
+                foreach ($signupTrend as $wk):
+                  $barPct = round($wk['cnt'] / $maxCnt * 100);
+              ?>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <span style="font-size:11px;color:#94a3b8;width:60px;flex-shrink:0"><?= date('d M', strtotime($wk['wk_start'])) ?></span>
+                <div style="flex:1;height:18px;background:#f1f5f9;border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:<?= $barPct ?>%;background:#16a34a;border-radius:4px"></div>
+                </div>
+                <span style="font-size:12px;font-weight:700;color:#334155;width:20px;text-align:right"><?= $wk['cnt'] ?></span>
+              </div>
+              <?php endforeach; endif; ?>
             </div>
           </div>
         </div>

@@ -47,9 +47,15 @@ include __DIR__ . '/../includes/header.php';
 <?php include __DIR__ . '/../includes/sidebar.php'; ?>
 <div class="main-content">
   <div class="topbar">
-    <div>
-      <div class="topbar-title">KPI Trends</div>
-      <div class="topbar-sub"><?= htmlspecialchars($activeCompany['name']) ?> — last 12 months</div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+    <div class="topbar-title">
+      <h1><i class="bi bi-graph-up-arrow me-2 text-primary"></i>KPI Trends</h1>
+      <span class="topbar-subtitle"><?= htmlspecialchars($activeCompany['name']) ?> — last 12 months</span>
+    </div>
+    <div class="topbar-actions">
+      <a href="<?= url('export-csv') ?>?format=kpi_trends" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-download me-1"></i>Export CSV
+      </a>
     </div>
   </div>
   <div class="content-body">

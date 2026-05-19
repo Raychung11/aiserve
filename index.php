@@ -66,6 +66,8 @@ $routes = [
     'company_settings' => 'pages/company_settings.php',
     'action-plan-detail'  => 'pages/action_plan_detail.php',
     'action_plan_detail'  => 'pages/action_plan_detail.php',
+    'export-csv'          => 'pages/export_csv.php',
+    'export_csv'          => 'pages/export_csv.php',
 ];
 
 // Handle logout

@@ -87,6 +87,22 @@ include __DIR__ . '/../includes/header.php';
         <span class="topbar-subtitle"><?= $framework === 'BURSA_SEDG' ? 'Bursa SEDG' : ($framework === 'GRI' ? 'GRI' : 'SEDG + GRI') ?> — <?= $period ?></span>
       </div>
       <div class="topbar-actions">
+        <div class="dropdown me-2">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-download me-1"></i>Export
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="<?= url('export-csv') ?>?format=esg&period=<?= urlencode($period) ?>">
+              <i class="bi bi-table me-2 text-success"></i>ESG Data (CSV)
+            </a></li>
+            <li><a class="dropdown-item" href="<?= url('export-csv') ?>?format=action_plans">
+              <i class="bi bi-clipboard2-check me-2 text-warning"></i>Action Plans (CSV)
+            </a></li>
+            <li><a class="dropdown-item" href="<?= url('export-csv') ?>?format=kpi_trends">
+              <i class="bi bi-graph-up me-2 text-primary"></i>KPI Trends (CSV)
+            </a></li>
+          </ul>
+        </div>
         <!-- Tab navigation for E/S/G -->
         <div class="cat-tabs">
           <a href="?cat=environment" class="cat-tab <?= $category === 'ENVIRONMENT' ? 'active' : '' ?>">
