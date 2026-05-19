@@ -12,7 +12,11 @@ $period    = (string)($activeCompany['reporting_year'] ?? date('Y'));
 
 $cmp = Benchmarker::buildComparison($activeCompanyId, $activeCompany, $period);
 
-$revLabel = Benchmarker::revenueTierLabel($cmp['revenue_tier']);
+$revLabel        = Benchmarker::revenueTierLabel($cmp['revenue_tier']);
+$isSectorBench   = $cmp['benchmark_type'] === 'sector';
+$benchSourceNote = $isSectorBench
+    ? 'Bursa Malaysia sector: ' . $cmp['benchmark_label']
+    : 'Industry: ' . $cmp['benchmark_label'];
 
 // Chart data
 $chartLabels = json_encode(['Overall', 'Environment', 'Social', 'Governance']);
@@ -35,11 +39,16 @@ include __DIR__ . '/../includes/header.php';
         <h1><i class="bi bi-bar-chart-line me-2 text-primary"></i>ESG Benchmarking</h1>
         <span class="topbar-subtitle">
           <?= htmlspecialchars($activeCompany['name']) ?> vs
-          <?= htmlspecialchars($cmp['industry']) ?> (<?= $revLabel ?>) &bull; <?= $period ?>
+          <?= htmlspecialchars($cmp['benchmark_label']) ?> (<?= $revLabel ?>) &bull; <?= $period ?>
         </span>
       </div>
       <div class="topbar-actions">
-        <span class="badge bg-secondary"><?= $cmp['peer_count'] ?> platform peers</span>
+        <?php if ($isSectorBench): ?>
+        <span class="badge bg-success me-1"><i class="bi bi-buildings me-1"></i>Bursa Sector Benchmark</span>
+        <?php else: ?>
+        <span class="badge bg-secondary me-1"><i class="bi bi-bar-chart me-1"></i>Industry Benchmark</span>
+        <?php endif; ?>
+        <span class="badge bg-light text-dark border"><?= $cmp['peer_count'] ?> platform peers</span>
       </div>
     </div>
 
@@ -62,7 +71,11 @@ include __DIR__ . '/../includes/header.php';
           ?>
           <div class="bench-rank-value" style="color:<?= $rankColor ?>"><?= $cmp['rank'] ?></div>
           <div class="bench-rank-context">
-            <?= htmlspecialchars($cmp['industry']) ?> &bull; <?= $revLabel ?> &bull; <?= $activeCompany['framework'] ?>
+            <?= htmlspecialchars($cmp['benchmark_label']) ?>
+            <?php if ($isSectorBench): ?>
+            <span class="badge bg-success ms-1" style="font-size:10px">Bursa Sector</span>
+            <?php endif; ?>
+            &bull; <?= $revLabel ?> &bull; <?= $activeCompany['framework'] ?>
           </div>
         </div>
         <div class="bench-rank-right">
@@ -110,9 +123,9 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                     <span class="bench-bar-val fw-bold" style="color:<?= $dim['color'] ?>"><?= $myScore ?>%</span>
                   </div>
-                  <!-- Industry avg -->
+                  <!-- Industry/sector avg -->
                   <div class="bench-bar-row">
-                    <span class="bench-bar-label text-muted">Industry avg</span>
+                    <span class="bench-bar-label text-muted"><?= $isSectorBench ? 'Sector avg' : 'Industry avg' ?></span>
                     <div class="bench-bar-track">
                       <div class="bench-bar-fill" style="width:<?= $indScore ?>%;background:#94a3b8"></div>
                     </div>
@@ -192,12 +205,32 @@ include __DIR__ . '/../includes/header.php';
 
       </div>
 
-      <!-- Industry average table -->
+      <!-- Benchmark reference table -->
       <div class="card mt-4">
-        <div class="card-header">
-          <i class="bi bi-table me-2"></i>
-          Malaysia Industry ESG Averages — <?= htmlspecialchars($cmp['industry']) ?> sector
-          <span class="text-muted small ms-2">Source: Bursa Sustainability Report 2023 + market research</span>
+        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div>
+            <i class="bi bi-table me-2"></i>
+            <?php if ($isSectorBench): ?>
+            Bursa Malaysia Sector Averages —
+            <strong><?= htmlspecialchars($cmp['benchmark_label']) ?></strong>
+            <?php else: ?>
+            Malaysia Industry ESG Averages —
+            <strong><?= htmlspecialchars($cmp['benchmark_label']) ?></strong>
+            <?php endif; ?>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <?php if ($isSectorBench): ?>
+            <span class="badge bg-success"><i class="bi bi-buildings me-1"></i>Bursa Sector data</span>
+            <?php else: ?>
+            <span class="badge bg-secondary">Industry data</span>
+            <?php if ($cmp['bursa_sector'] === null): ?>
+            <a href="<?= url('company-settings') ?>" class="btn btn-xs btn-outline-success">
+              <i class="bi bi-arrow-up-circle me-1"></i>Set Bursa Sector for better accuracy
+            </a>
+            <?php endif; ?>
+            <?php endif; ?>
+            <span class="text-muted small">Source: Bursa Sustainability Report 2023 + FTSE4Good</span>
+          </div>
         </div>
         <div class="table-responsive">
           <table class="table table-sm mb-0">
@@ -212,10 +245,10 @@ include __DIR__ . '/../includes/header.php';
             </thead>
             <tbody>
             <?php
-            $allTiers = ['below_10M' => '< RM10M', '10M_to_50M' => 'RM10M – RM50M', 'above_50M' => '> RM50M'];
-            $indData2 = Benchmarker::INDUSTRY_BENCHMARKS[$cmp['industry']] ?? Benchmarker::INDUSTRY_BENCHMARKS['Other'];
+            $allTiers    = ['below_10M' => '< RM10M', '10M_to_50M' => 'RM10M – RM50M', 'above_50M' => '> RM50M'];
+            $refData     = $cmp['benchmark_data'];
             foreach ($allTiers as $tierKey => $tierLabel):
-                $row    = $indData2[$tierKey];
+                $row      = $refData[$tierKey];
                 $isMyTier = $tierKey === $cmp['revenue_tier'];
             ?>
             <tr <?= $isMyTier ? 'class="table-success fw-semibold"' : '' ?>>
@@ -232,6 +265,14 @@ include __DIR__ . '/../includes/header.php';
             </tbody>
           </table>
         </div>
+        <?php if (!$isSectorBench && $cmp['bursa_sector'] === null): ?>
+        <div class="card-footer bg-light text-muted small">
+          <i class="bi bi-info-circle me-1"></i>
+          Set your <strong>Bursa Malaysia Sector</strong> in
+          <a href="<?= url('company-settings') ?>">Company Settings</a>
+          to unlock more accurate sector-level benchmarks from FTSE4Good Bursa Malaysia Index data.
+        </div>
+        <?php endif; ?>
       </div>
 
     </div>
@@ -257,7 +298,7 @@ include __DIR__ . '/../includes/header.php';
       borderWidth: 2,
     },
     {
-      label: 'Industry Average',
+      label: <?= json_encode($isSectorBench ? 'Sector Average (' . $cmp['benchmark_label'] . ')' : 'Industry Average') ?>,
       data: indData,
       borderColor: '#94a3b8',
       backgroundColor: 'rgba(148,163,184,0.1)',
