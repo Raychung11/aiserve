@@ -10,6 +10,22 @@ $pageTitle = 'Gap Analysis';
 $framework = $activeCompany['framework'];
 $period    = $activeCompany['reporting_year'];
 
+// Handle "Convert to Action Plan" POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['convert_gap_to_ap'])) {
+    if (Auth::verifyCsrf($_POST['csrf_token'] ?? '')) {
+        $apId = ActionPlanManager::create([
+            'company_id'     => $activeCompanyId,
+            'indicator_id'   => $_POST['indicator_id'] ?? null,
+            'created_by'     => $currentUser['id'],
+            'title'          => $_POST['ap_title'] ?? 'Fix gap',
+            'recommendation' => $_POST['ap_recommendation'] ?? null,
+            'priority'       => $_POST['ap_priority'] ?? 'medium',
+        ]);
+        header('Location: ' . url('action-plans') . '?created=' . $apId);
+        exit;
+    }
+}
+
 // Re-run or use cached
 $forceRefresh = isset($_GET['refresh']);
 $analysis     = ($forceRefresh || !GapAnalyzer::loadCached($activeCompanyId, $framework, $period))
@@ -162,10 +178,21 @@ include __DIR__ . '/../includes/header.php';
               <?php endif; ?>
             </div>
             <div class="gap-code"><?= htmlspecialchars($ind['code']) ?></div>
-            <a href="<?= url('data-entry') ?>?cat=<?= strtolower($ind['category']) ?>&focus=<?= $ind['indicator_id'] ?>"
-               class="btn btn-sm btn-primary gap-fix-btn">
-              <i class="bi bi-pencil me-1"></i>Enter Data
-            </a>
+            <div class="d-flex gap-2 align-items-center">
+              <a href="<?= url('data-entry') ?>?cat=<?= strtolower($ind['category']) ?>&focus=<?= $ind['indicator_id'] ?>"
+                 class="btn btn-sm btn-primary gap-fix-btn">
+                <i class="bi bi-pencil me-1"></i>Enter Data
+              </a>
+              <button type="button" class="btn btn-sm btn-outline-warning gap-fix-btn"
+                      onclick="openConvertModal(<?= htmlspecialchars(json_encode([
+                          'indicator_id' => $ind['indicator_id'],
+                          'title'        => 'Fix: ' . $ind['name'],
+                          'recommendation' => $gap['recommendation'],
+                          'priority'     => $gap['priority'],
+                      ])) ?>)">
+                <i class="bi bi-kanban me-1"></i>Action Plan
+              </button>
+            </div>
           </div>
           <h5 class="gap-name"><?= htmlspecialchars($ind['name']) ?></h5>
           <p class="gap-desc"><?= htmlspecialchars($ind['description']) ?></p>
@@ -222,4 +249,53 @@ include __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
+<!-- Convert to Action Plan modal -->
+<div class="modal fade" id="convertApModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="">
+        <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
+        <input type="hidden" name="convert_gap_to_ap" value="1">
+        <input type="hidden" name="indicator_id" id="apIndicatorId">
+        <input type="hidden" name="ap_priority" id="apPriority">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-kanban me-2 text-warning"></i>Create Action Plan from Gap</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Title</label>
+            <input type="text" class="form-control" name="ap_title" id="apTitle" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Recommendation</label>
+            <textarea class="form-control" name="ap_recommendation" id="apRecommendation" rows="3"></textarea>
+          </div>
+          <div class="mb-0">
+            <label class="form-label fw-semibold">Priority</label>
+            <select class="form-select" name="ap_priority" id="apPrioritySelect">
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning"><i class="bi bi-check2 me-1"></i>Create Action Plan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+function openConvertModal(data) {
+  document.getElementById('apIndicatorId').value = data.indicator_id;
+  document.getElementById('apTitle').value = data.title;
+  document.getElementById('apRecommendation').value = data.recommendation;
+  document.getElementById('apPrioritySelect').value = data.priority;
+  new bootstrap.Modal(document.getElementById('convertApModal')).show();
+}
+</script>
 <?php include __DIR__ . '/../includes/footer.php'; ?>

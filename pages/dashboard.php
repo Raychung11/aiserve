@@ -54,6 +54,9 @@ $recentReports = Database::fetchAll(
     [$activeCompanyId]
 );
 
+$apStats   = ActionPlanManager::getStats($activeCompanyId);
+$kpiTrend  = KPITracker::getTrendOldestFirst($activeCompanyId, 6);
+
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -216,6 +219,67 @@ include __DIR__ . '/../includes/header.php';
       </div>
 
       <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+          <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0"><i class="bi bi-graph-up me-2 text-primary"></i>ESG Score Trend</h5>
+              <a href="<?= url('kpi-trends') ?>" class="btn btn-sm btn-outline-primary">Full Report</a>
+            </div>
+            <div class="card-body">
+              <?php if (count($kpiTrend) < 2): ?>
+              <div class="text-center text-muted py-4">
+                <i class="bi bi-bar-chart fs-2"></i>
+                <p class="mt-2 mb-0 small">Not enough data yet. Score trend will appear after 2+ monthly snapshots.</p>
+                <a href="<?= url('kpi-trends') ?>" class="btn btn-sm btn-outline-primary mt-2">Take First Snapshot</a>
+              </div>
+              <?php else: ?>
+              <canvas id="kpiTrendChart" height="120"></canvas>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0"><i class="bi bi-kanban me-2 text-warning"></i>Action Plans</h5>
+              <a href="<?= url('action-plans') ?>" class="btn btn-sm btn-outline-warning">View All</a>
+            </div>
+            <div class="card-body">
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <div class="text-center p-2 rounded" style="background:#fff7ed">
+                    <div class="fw-700 fs-4 text-warning"><?= $apStats['open'] ?></div>
+                    <div class="small text-muted">Open</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="text-center p-2 rounded" style="background:#eff6ff">
+                    <div class="fw-700 fs-4 text-primary"><?= $apStats['in_progress'] ?></div>
+                    <div class="small text-muted">In Progress</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="text-center p-2 rounded" style="background:#f0fdf4">
+                    <div class="fw-700 fs-4 text-success"><?= $apStats['completed'] ?></div>
+                    <div class="small text-muted">Completed</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="text-center p-2 rounded" style="background:#fef2f2">
+                    <div class="fw-700 fs-4 text-danger"><?= $apStats['overdue'] ?></div>
+                    <div class="small text-muted">Overdue</div>
+                  </div>
+                </div>
+              </div>
+              <a href="<?= url('action-plans') ?>?action=new" class="btn btn-sm btn-warning w-100">
+                <i class="bi bi-plus-circle me-1"></i>Create Action Plan
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
         <div class="col-12">
           <div class="card">
             <div class="card-header">
@@ -317,4 +381,29 @@ new Chart(donutCtx, {
     animation: { duration: 1000 }
   }
 });
+<?php if (count($kpiTrend) >= 2): ?>
+const kpiLabels = <?= json_encode(array_map(fn($r) => date('M Y', mktime(0,0,0,$r['month'],1,$r['year'])), $kpiTrend)) ?>;
+const kpiOverall = <?= json_encode(array_map(fn($r) => (float)$r['overall_score'], $kpiTrend)) ?>;
+const kpiE = <?= json_encode(array_map(fn($r) => (float)$r['e_score'], $kpiTrend)) ?>;
+const kpiS = <?= json_encode(array_map(fn($r) => (float)$r['s_score'], $kpiTrend)) ?>;
+const kpiG = <?= json_encode(array_map(fn($r) => (float)$r['g_score'], $kpiTrend)) ?>;
+new Chart(document.getElementById('kpiTrendChart').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: kpiLabels,
+    datasets: [
+      { label: 'Overall', data: kpiOverall, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: true },
+      { label: 'E',       data: kpiE,       borderColor: '#16a34a', backgroundColor: 'transparent', tension: 0.3, borderWidth: 1.5, pointRadius: 2, borderDash: [4,3] },
+      { label: 'S',       data: kpiS,       borderColor: '#0ea5e9', backgroundColor: 'transparent', tension: 0.3, borderWidth: 1.5, pointRadius: 2, borderDash: [4,3] },
+      { label: 'G',       data: kpiG,       borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.3, borderWidth: 1.5, pointRadius: 2, borderDash: [4,3] },
+    ]
+  },
+  options: {
+    responsive: true, interaction: { mode: 'index', intersect: false },
+    scales: { y: { min: 0, max: 100, ticks: { stepSize: 25, font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } },
+    plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } },
+    animation: { duration: 800 }
+  }
+});
+<?php endif; ?>
 </script>

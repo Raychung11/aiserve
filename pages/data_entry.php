@@ -20,6 +20,24 @@ $pageTitle = $catDisplay . ' Data Entry';
 $success   = '';
 $error     = '';
 
+// Handle indicator comment add
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['add_indicator_comment'])) {
+    if (Auth::verifyCsrf($_POST['csrf_token'] ?? '') && !empty($_POST['comment_text']) && !empty($_POST['comment_indicator_id'])) {
+        IndicatorCommentManager::add($activeCompanyId, $_POST['comment_indicator_id'], $currentUser['id'], trim($_POST['comment_text']));
+    }
+    header('Location: ?cat=' . strtolower($_GET['cat'] ?? 'environment') . '&focus=' . ($_POST['comment_indicator_id'] ?? '') . '#field-' . ($_POST['comment_indicator_id'] ?? ''));
+    exit;
+}
+
+// Handle indicator comment delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['delete_indicator_comment'])) {
+    if (Auth::verifyCsrf($_POST['csrf_token'] ?? '')) {
+        IndicatorCommentManager::delete((int)$_POST['delete_indicator_comment'], $currentUser['id'], $currentUser['role']);
+    }
+    header('Location: ?cat=' . strtolower($_GET['cat'] ?? 'environment'));
+    exit;
+}
+
 // Handle bulk save
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) {
@@ -53,6 +71,7 @@ $recommended = array_values(array_filter($catIndicators, fn($i) => !$i['required
 
 $catIcons = ['ENVIRONMENT' => 'bi-tree text-success', 'SOCIAL' => 'bi-people text-info', 'GOVERNANCE' => 'bi-shield-check text-purple'];
 $catColors = ['ENVIRONMENT' => 'success', 'SOCIAL' => 'info', 'GOVERNANCE' => 'purple'];
+$commentCounts = IndicatorCommentManager::countForCompany($activeCompanyId);
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -121,7 +140,7 @@ include __DIR__ . '/../includes/header.php';
         <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
 
         <?php
-        function renderIndicatorField(array $ind, array $savedData, ?string $focusId, array|string $unlockedIds = 'all'): void {
+        function renderIndicatorField(array $ind, array $savedData, ?string $focusId, array|string $unlockedIds = 'all', array $commentCounts = []): void {
             $id       = $ind['indicator_id'];
             $isLocked = $unlockedIds !== 'all' && !in_array($id, (array)$unlockedIds, true);
             $saved    = $savedData[$id] ?? null;
@@ -224,6 +243,49 @@ include __DIR__ . '/../includes/header.php';
             <strong>Financing link:</strong> <?= htmlspecialchars($ind['financing_link']) ?>
           </div>
           <?php endif; ?>
+
+          <?php if (!$isLocked):
+            $cCount = $commentCounts[$id] ?? 0;
+          ?>
+          <div class="ind-comment-toggle mt-2">
+            <button type="button" class="btn btn-xs btn-outline-secondary"
+                    onclick="toggleComments('<?= $id ?>')">
+              <i class="bi bi-chat me-1"></i>Comments
+              <?php if ($cCount > 0): ?><span class="badge bg-secondary ms-1"><?= $cCount ?></span><?php endif; ?>
+            </button>
+          </div>
+          <div class="ind-comment-panel" id="comments-<?= $id ?>" style="display:none">
+            <?php
+            $existingComments = IndicatorCommentManager::getForIndicator($activeCompanyId ?? 0, $id);
+            foreach ($existingComments as $cm): ?>
+            <div class="ic-comment">
+              <div class="ic-meta">
+                <strong><?= htmlspecialchars($cm['author_name']) ?></strong>
+                <span class="text-muted small ms-2"><?= date('d M Y H:i', strtotime($cm['created_at'])) ?></span>
+              </div>
+              <div class="ic-text"><?= nl2br(htmlspecialchars($cm['comment'])) ?></div>
+              <?php if ($cm['user_id'] == ($GLOBALS['currentUser']['id'] ?? 0) || in_array($GLOBALS['currentUser']['role'] ?? '', ['admin','principal','associate','manager','consultant'])): ?>
+              <form method="POST" action="?cat=<?= strtolower($GLOBALS['category'] ?? '') ?>" class="d-inline">
+                <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
+                <input type="hidden" name="delete_indicator_comment" value="<?= $cm['id'] ?>">
+                <button type="submit" class="btn btn-xs btn-link text-danger p-0" onclick="return confirm('Delete this comment?')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+              <?php endif; ?>
+            </div>
+            <?php endforeach; ?>
+            <form method="POST" action="?cat=<?= strtolower($GLOBALS['category'] ?? '') ?>" class="ic-add-form">
+              <input type="hidden" name="csrf_token" value="<?= Auth::csrfToken() ?>">
+              <input type="hidden" name="add_indicator_comment" value="1">
+              <input type="hidden" name="comment_indicator_id" value="<?= $id ?>">
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" name="comment_text" placeholder="Add a comment…" required>
+                <button type="submit" class="btn btn-outline-primary">Post</button>
+              </div>
+            </form>
+          </div>
+          <?php endif; // !$isLocked ?>
         </div>
         <?php } // end renderIndicatorField ?>
 
@@ -232,7 +294,7 @@ include __DIR__ . '/../includes/header.php';
           <span><i class="bi bi-exclamation-circle-fill text-danger me-2"></i>Required Disclosures (<?= count($required) ?>)</span>
         </div>
         <?php foreach ($required as $ind): ?>
-          <?php renderIndicatorField($ind, $savedData, $focusId, $unlockedIds); ?>
+          <?php renderIndicatorField($ind, $savedData, $focusId, $unlockedIds, $commentCounts); ?>
         <?php endforeach; ?>
 
         <!-- Recommended Indicators -->
@@ -245,7 +307,7 @@ include __DIR__ . '/../includes/header.php';
         </div>
         <div id="recommendedSection">
           <?php foreach ($recommended as $ind): ?>
-            <?php renderIndicatorField($ind, $savedData, $focusId, $unlockedIds); ?>
+            <?php renderIndicatorField($ind, $savedData, $focusId, $unlockedIds, $commentCounts); ?>
           <?php endforeach; ?>
         </div>
         <?php endif; ?>
@@ -277,8 +339,20 @@ include __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
+<style>
+.ind-comment-panel { border-top: 1px solid #f0f2f5; margin-top: 10px; padding-top: 10px; }
+.ic-comment { background: #f8f9fa; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; }
+.ic-meta { margin-bottom: 4px; }
+.ic-text { font-size: 13px; color: #374151; }
+.ic-add-form { margin-top: 8px; }
+.ind-comment-toggle { border-top: 1px solid #f0f2f5; padding-top: 8px; }
+</style>
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 <script>
+function toggleComments(id) {
+  const panel = document.getElementById('comments-' + id);
+  if (panel) panel.style.display = panel.style.display === 'none' ? '' : 'none';
+}
 function toggleRecommended() {
   const sec = document.getElementById('recommendedSection');
   const icon = document.getElementById('recToggleIcon');

@@ -143,6 +143,11 @@ include __DIR__ . '/../includes/header.php';
                 <h5 class="company-name"><?= htmlspecialchars($co['name']) ?></h5>
                 <div class="company-meta-row">
                   <span class="company-badge"><?= htmlspecialchars($co['industry']) ?></span>
+                  <?php if (!empty($co['bursa_sector'])): ?>
+                  <span class="company-badge" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe">
+                    <i class="bi bi-buildings me-1" style="font-size:10px"></i><?= htmlspecialchars($co['bursa_sector']) ?>
+                  </span>
+                  <?php endif; ?>
                   <span class="company-badge"><?= $revDisplay ?></span>
                   <span class="company-badge"><?= number_format($co['employee_count']) ?> employees</span>
                   <?php if ($co['is_pre_ipo']): ?>

@@ -287,6 +287,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    placeholder="e.g. 85" required value="<?= htmlspecialchars($_POST['employee_count'] ?? '') ?>">
           </div>
         </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Bursa Malaysia Sector <span class="text-muted small">(optional)</span></label>
+            <?php $bursaSectors = require __DIR__ . '/../config/bursa_sectors.php'; ?>
+            <select class="form-select" name="bursa_sector">
+              <option value="">Not listed / N/A</option>
+              <?php foreach ($bursaSectors as $sector): ?>
+              <option value="<?= htmlspecialchars($sector) ?>"
+                <?= ($_POST['bursa_sector'] ?? '') === $sector ? 'selected' : '' ?>>
+                <?= htmlspecialchars($sector) ?>
+              </option>
+              <?php endforeach; ?>
+            </select>
+            <div class="form-text">Used for Bursa benchmarking. Select if your company is or targets Bursa listing.</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Reporting Scope</label>
+            <div class="d-flex gap-3 mt-1">
+              <?php foreach (['hq' => ['HQ Only','Headquarters operations only'], 'factory' => ['Factory / Site','Single facility reporting'], 'group' => ['Group-wide','Consolidated group reporting']] as $val => [$lbl, $desc]): ?>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reporting_scope" id="scope_<?= $val ?>"
+                       value="<?= $val ?>" <?= (($_POST['reporting_scope'] ?? 'hq') === $val) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="scope_<?= $val ?>">
+                  <strong><?= $lbl ?></strong>
+                  <div class="text-muted" style="font-size:11px"><?= $desc ?></div>
+                </label>
+              </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Step 2: Business size -->

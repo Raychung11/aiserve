@@ -19,6 +19,7 @@ require_once __DIR__ . '/../src/NotificationManager.php';
 require_once __DIR__ . '/../src/ActionPlanManager.php';
 require_once __DIR__ . '/../src/DepartmentManager.php';
 require_once __DIR__ . '/../src/KPITracker.php';
+require_once __DIR__ . '/../src/IndicatorCommentManager.php';
 
 Auth::startSession();
 Auth::requireAuth();
