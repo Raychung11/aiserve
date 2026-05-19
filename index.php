@@ -64,6 +64,8 @@ $routes = [
     'kpi_trends'    => 'pages/kpi_trends.php',
     'company-settings' => 'pages/company_settings.php',
     'company_settings' => 'pages/company_settings.php',
+    'action-plan-detail'  => 'pages/action_plan_detail.php',
+    'action_plan_detail'  => 'pages/action_plan_detail.php',
 ];
 
 // Handle logout

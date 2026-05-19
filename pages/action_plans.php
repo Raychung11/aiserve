@@ -55,6 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+if (!empty($_GET['deleted'])) $success = 'Action plan deleted.';
+if (!empty($_GET['created'])) $success = 'Action plan created from gap analysis.';
+
 $filterStatus = $_GET['status'] ?? '';
 $plans        = ActionPlanManager::getForCompany($companyId, $filterStatus ?: null);
 $stats        = ActionPlanManager::getStats($companyId);
@@ -225,7 +228,11 @@ include __DIR__ . '/../includes/header.php';
         ?>
           <tr>
             <td>
-              <div style="font-weight:600;color:#0f172a"><?= htmlspecialchars($p['title']) ?></div>
+              <a href="<?= url('action-plan-detail') ?>?id=<?= $p['id'] ?>"
+                 style="font-weight:600;color:#0f172a;text-decoration:none"
+                 class="d-block">
+                <?= htmlspecialchars($p['title']) ?>
+              </a>
               <?php if ($p['indicator_id']): ?>
               <small class="text-muted">Indicator: <?= htmlspecialchars($p['indicator_id']) ?></small>
               <?php endif; ?>
@@ -250,17 +257,10 @@ include __DIR__ . '/../includes/header.php';
             </td>
             <td><?= ActionPlanManager::statusBadge($p['status']) ?></td>
             <td>
-              <form method="POST" class="d-flex gap-1">
-                <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
-                <input type="hidden" name="action"  value="update_status">
-                <input type="hidden" name="plan_id" value="<?= $p['id'] ?>">
-                <select name="new_status" class="form-select form-select-sm" style="width:120px">
-                  <?php foreach (['open','in_progress','completed','deferred'] as $s): ?>
-                  <option value="<?= $s ?>" <?= $p['status']===$s?'selected':'' ?>><?= ucwords(str_replace('_',' ',$s)) ?></option>
-                  <?php endforeach; ?>
-                </select>
-                <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
-              </form>
+              <a href="<?= url('action-plan-detail') ?>?id=<?= $p['id'] ?>"
+                 class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-arrow-right me-1"></i>View
+              </a>
             </td>
           </tr>
         <?php endforeach; ?>
