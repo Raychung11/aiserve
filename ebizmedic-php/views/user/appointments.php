@@ -24,10 +24,11 @@
         <?php foreach ($appointments as $appt): ?>
         <?php
             $c = ['pending'=>'yellow','confirmed'=>'blue','completed'=>'green','cancelled'=>'red'][$appt['status']] ?? 'gray';
-            $canRate  = $appt['status'] === 'completed' && !in_array($appt['id'], $ratedIds ?? []);
-            $canJoin  = $appt['type'] === 'online'
-                     && $appt['status'] === 'confirmed'
-                     && $appt['appointment_date'] === date('Y-m-d');
+            $canRate   = $appt['status'] === 'completed' && !in_array($appt['id'], $ratedIds ?? []);
+            $canJoin   = $appt['type'] === 'online'
+                      && $appt['status'] === 'confirmed'
+                      && $appt['appointment_date'] === date('Y-m-d');
+            $canCancel = in_array($appt['status'], ['pending', 'confirmed']);
         ?>
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div class="flex items-start justify-between">
@@ -44,6 +45,12 @@
                        class="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-full font-semibold transition-colors animate-pulse">
                         <i class="fa-solid fa-video text-xs"></i> Join Now
                     </a>
+                    <?php endif; ?>
+                    <?php if ($canCancel): ?>
+                    <button onclick="document.getElementById('cancel-<?= $appt['id'] ?>').classList.toggle('hidden')"
+                            class="text-xs px-3 py-1 border border-red-300 text-red-600 rounded-full hover:bg-red-50 transition-colors font-medium">
+                        <i class="fa-solid fa-xmark mr-1"></i>Cancel
+                    </button>
                     <?php endif; ?>
                     <?php if ($canRate): ?>
                     <button onclick="document.getElementById('rate-<?= $appt['id'] ?>').classList.toggle('hidden')"
@@ -63,6 +70,29 @@
             </div>
             <?php if ($appt['notes']): ?>
             <p class="text-xs text-gray-500 mt-2 border-t border-gray-100 pt-2"><?= e($appt['notes']) ?></p>
+            <?php endif; ?>
+
+            <?php if ($canCancel): ?>
+            <div id="cancel-<?= $appt['id'] ?>" class="hidden mt-4 pt-4 border-t border-gray-100">
+                <p class="text-sm font-medium text-red-700 mb-3"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Cancel this appointment?</p>
+                <form method="POST" action="<?= url('user/appointments/cancel') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="appointment_id" value="<?= $appt['id'] ?>">
+                    <textarea name="reason" rows="2" placeholder="Reason for cancellation (optional)…"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-400 mb-3"></textarea>
+                    <div class="flex gap-2">
+                        <button type="submit"
+                                class="px-5 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors text-sm">
+                            Confirm Cancellation
+                        </button>
+                        <button type="button"
+                                onclick="document.getElementById('cancel-<?= $appt['id'] ?>').classList.add('hidden')"
+                                class="px-5 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                            Keep Appointment
+                        </button>
+                    </div>
+                </form>
+            </div>
             <?php endif; ?>
 
             <?php if ($canRate): ?>

@@ -43,23 +43,37 @@
         <?php endforeach; ?>
     </div>
 
-    <!-- Doctor availability status -->
+    <!-- Doctor availability status + quick toggle -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between flex-wrap gap-3">
             <div>
                 <p class="font-medium text-gray-900">Your Availability</p>
-                <div class="flex gap-2 mt-1">
-                    <?php if ($doctor['is_available_online']): ?>
-                    <span class="text-xs bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full">Online consultations ON</span>
-                    <?php else: ?>
-                    <span class="text-xs bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full">Online consultations OFF</span>
-                    <?php endif; ?>
-                    <?php if ($doctor['is_available_onsite']): ?>
-                    <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full">Onsite available</span>
-                    <?php endif; ?>
-                </div>
+                <p class="text-xs text-gray-400 mt-0.5">Toggle to update patients seeing you online or onsite</p>
             </div>
-            <a href="<?= url('medic/profile') ?>" class="text-sm text-blue-600 hover:underline">Edit profile</a>
+            <div class="flex gap-2 flex-wrap">
+                <form method="POST" action="<?= url('medic/toggle-availability') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="field" value="is_available_online">
+                    <button type="submit"
+                            class="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border transition-colors <?= $doctor['is_available_online'] ? 'bg-green-500 text-white border-green-500 hover:bg-green-600' : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50' ?>">
+                        <i class="fa-solid fa-video"></i>
+                        Online: <?= $doctor['is_available_online'] ? 'ON' : 'OFF' ?>
+                    </button>
+                </form>
+                <form method="POST" action="<?= url('medic/toggle-availability') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="field" value="is_available_onsite">
+                    <button type="submit"
+                            class="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border transition-colors <?= $doctor['is_available_onsite'] ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50' ?>">
+                        <i class="fa-solid fa-hospital"></i>
+                        Onsite: <?= $doctor['is_available_onsite'] ? 'ON' : 'OFF' ?>
+                    </button>
+                </form>
+                <a href="<?= url('medic/profile') ?>"
+                   class="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+                </a>
+            </div>
         </div>
     </div>
 

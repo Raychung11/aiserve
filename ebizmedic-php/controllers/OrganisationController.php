@@ -33,21 +33,46 @@ class OrganisationController
             'doctors'      => Database::queryOne('SELECT COUNT(*) as c FROM doctors WHERE organisation_id = ?', [$orgId])['c'],
             'services'     => Database::queryOne('SELECT COUNT(*) as c FROM services WHERE organisation_id = ?', [$orgId])['c'],
             'appointments' => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE organisation_id = ?', [$orgId])['c'],
-            'pending'      => Database::queryOne(
-                'SELECT COUNT(*) as c FROM appointments WHERE organisation_id = ? AND status = "pending"', [$orgId]
-            )['c'],
+            'pending'      => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE organisation_id = ? AND status = "pending"', [$orgId])['c'],
+            'completed'    => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE organisation_id = ? AND status = "completed"', [$orgId])['c'],
+            'today'        => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE organisation_id = ? AND appointment_date = CURDATE()', [$orgId])['c'],
+            'revenue'      => Database::queryOne(
+                'SELECT COALESCE(SUM(d.consultation_fee),0) as r FROM appointments a JOIN doctors d ON a.doctor_id = d.id WHERE a.organisation_id = ? AND a.status = "completed"',
+                [$orgId]
+            )['r'],
+            'month_revenue'=> Database::queryOne(
+                'SELECT COALESCE(SUM(d.consultation_fee),0) as r FROM appointments a JOIN doctors d ON a.doctor_id = d.id WHERE a.organisation_id = ? AND a.status = "completed" AND MONTH(a.appointment_date) = MONTH(CURDATE()) AND YEAR(a.appointment_date) = YEAR(CURDATE())',
+                [$orgId]
+            )['r'],
         ];
 
         $recentAppointments = Database::query(
             'SELECT a.*, u.name AS patient_name, du.name AS doctor_name
-             FROM appointments a
-             JOIN users u ON a.patient_id = u.id
-             JOIN doctors d ON a.doctor_id = d.id
-             JOIN users du ON d.user_id = du.id
-             WHERE a.organisation_id = ?
-             ORDER BY a.created_at DESC LIMIT 8',
+         FROM appointments a
+         JOIN users u ON a.patient_id = u.id
+         JOIN doctors d ON a.doctor_id = d.id
+         JOIN users du ON d.user_id = du.id
+         WHERE a.organisation_id = ?
+         ORDER BY a.created_at DESC LIMIT 8',
             [$orgId]
         );
+
+        // Monthly chart data — last 6 months
+        $monthlyRaw = Database::query(
+            'SELECT DATE_FORMAT(a.appointment_date, "%Y-%m") as month, COUNT(*) as total
+         FROM appointments a WHERE a.organisation_id = ? AND a.appointment_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+         GROUP BY month ORDER BY month ASC',
+            [$orgId]
+        );
+        $monthMap = [];
+        foreach ($monthlyRaw as $m) $monthMap[$m['month']] = (int)$m['total'];
+        $chartLabels = [];
+        $chartData   = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $key = date('Y-m', strtotime("-$i months"));
+            $chartLabels[] = date('M', strtotime("-$i months"));
+            $chartData[]   = $monthMap[$key] ?? 0;
+        }
 
         view('layouts/app', [
             'pageTitle'          => 'Organisation Dashboard',
@@ -55,6 +80,8 @@ class OrganisationController
             'org'                => $this->org,
             'stats'              => $stats,
             'recentAppointments' => $recentAppointments,
+            'chartLabels'        => json_encode($chartLabels),
+            'chartData'          => json_encode($chartData),
         ]);
     }
 

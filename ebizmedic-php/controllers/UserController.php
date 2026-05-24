@@ -275,4 +275,42 @@ class UserController
         flash('success', 'Thank you for your feedback!');
         redirect('user/appointments');
     }
+
+    public function cancelAppointment(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/appointments'); }
+
+        $id     = (int) ($_POST['appointment_id'] ?? 0);
+        $reason = trim($_POST['reason'] ?? '');
+        $userId = Auth::id();
+
+        $appt = Database::queryOne(
+            'SELECT * FROM appointments WHERE id = ? AND patient_id = ? AND status IN ("pending","confirmed")',
+            [$id, $userId]
+        );
+        if (!$appt) {
+            flash('error', 'Appointment not found or cannot be cancelled.');
+            redirect('user/appointments');
+        }
+
+        $notes = $reason ? 'Cancelled by patient: ' . $reason : 'Cancelled by patient.';
+        Database::execute(
+            'UPDATE appointments SET status = "cancelled", notes = ? WHERE id = ?',
+            [$notes, $id]
+        );
+
+        // Notify the doctor
+        $doctor = Database::queryOne('SELECT user_id FROM doctors WHERE id = ?', [$appt['doctor_id']]);
+        if ($doctor) {
+            notify(
+                $doctor['user_id'], 'appointment',
+                'Appointment Cancelled by Patient',
+                'A patient has cancelled their appointment. ' . ($reason ? 'Reason: ' . $reason : ''),
+                'medic/appointments'
+            );
+        }
+
+        flash('success', 'Your appointment has been cancelled.');
+        redirect('user/appointments');
+    }
 }

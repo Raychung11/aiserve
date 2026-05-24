@@ -10,10 +10,18 @@ class AdminController
     public function dashboard(): void
     {
         $stats = [
-            'doctors'       => Database::queryOne('SELECT COUNT(*) as c FROM doctors')['c'],
-            'organisations' => Database::queryOne('SELECT COUNT(*) as c FROM organisations')['c'],
-            'appointments'  => Database::queryOne('SELECT COUNT(*) as c FROM appointments')['c'],
-            'users'         => Database::queryOne('SELECT COUNT(*) as c FROM users WHERE role = "user"')['c'],
+            'doctors'          => Database::queryOne('SELECT COUNT(*) as c FROM doctors')['c'],
+            'organisations'    => Database::queryOne('SELECT COUNT(*) as c FROM organisations')['c'],
+            'appointments'     => Database::queryOne('SELECT COUNT(*) as c FROM appointments')['c'],
+            'users'            => Database::queryOne('SELECT COUNT(*) as c FROM users WHERE role = "user"')['c'],
+            'today'            => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE appointment_date = CURDATE()')['c'],
+            'pending_approvals'=> Database::queryOne('SELECT COUNT(*) as c FROM users WHERE approved = 0 AND role IN ("medic","organisation")')['c'],
+            'total_revenue'    => Database::queryOne(
+                'SELECT COALESCE(SUM(d.consultation_fee),0) as r FROM appointments a JOIN doctors d ON a.doctor_id = d.id WHERE a.status = "completed"'
+            )['r'],
+            'today_revenue'    => Database::queryOne(
+                'SELECT COALESCE(SUM(d.consultation_fee),0) as r FROM appointments a JOIN doctors d ON a.doctor_id = d.id WHERE a.status = "completed" AND a.appointment_date = CURDATE()'
+            )['r'],
         ];
 
         $recentAppointments = Database::query(
@@ -26,7 +34,7 @@ class AdminController
         );
 
         $recentDoctors = Database::query(
-            'SELECT d.*, u.name, u.email FROM doctors d
+            'SELECT d.*, u.name, u.email, u.avatar FROM doctors d
              JOIN users u ON d.user_id = u.id
              ORDER BY d.created_at DESC LIMIT 5'
         );
@@ -323,30 +331,71 @@ class AdminController
 
     public function reports(): void
     {
+        $range = (int) ($_GET['range'] ?? 12); // months back
+        if (!in_array($range, [1, 3, 6, 12, 24])) $range = 12;
+
         $totalAppointments = Database::queryOne('SELECT COUNT(*) as c FROM appointments')['c'];
+        $totalRevenue = Database::queryOne(
+            'SELECT COALESCE(SUM(d.consultation_fee),0) as r
+             FROM appointments a JOIN doctors d ON a.doctor_id = d.id
+             WHERE a.status = "completed"'
+        )['r'];
+        $monthRevenue = Database::queryOne(
+            'SELECT COALESCE(SUM(d.consultation_fee),0) as r
+             FROM appointments a JOIN doctors d ON a.doctor_id = d.id
+             WHERE a.status = "completed" AND MONTH(a.appointment_date) = MONTH(CURDATE()) AND YEAR(a.appointment_date) = YEAR(CURDATE())'
+        )['r'];
+        $completedCount = Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE status = "completed"')['c'];
+
         $byStatus = Database::query(
             'SELECT status, COUNT(*) as total FROM appointments GROUP BY status'
         );
         $topDoctors = Database::query(
-            'SELECT du.name, COUNT(a.id) as total
+            'SELECT du.name, COUNT(a.id) as total, COALESCE(SUM(d.consultation_fee),0) as revenue
              FROM appointments a
              JOIN doctors d ON a.doctor_id = d.id
              JOIN users du ON d.user_id = du.id
+             WHERE a.status = "completed"
              GROUP BY a.doctor_id ORDER BY total DESC LIMIT 5'
         );
         $monthly = Database::query(
-            'SELECT DATE_FORMAT(appointment_date, "%Y-%m") as month, COUNT(*) as total
+            'SELECT DATE_FORMAT(appointment_date, "%Y-%m") as month, COUNT(*) as total,
+                    SUM(CASE WHEN status="completed" THEN 1 ELSE 0 END) as completed
              FROM appointments
-             GROUP BY month ORDER BY month DESC LIMIT 12'
+             WHERE appointment_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+             GROUP BY month ORDER BY month ASC',
+            [$range]
         );
 
+        // Build zero-filled month array for chart
+        $monthLabels = [];
+        $monthData   = [];
+        $monthCompleted = [];
+        $monthMap    = [];
+        foreach ($monthly as $m) {
+            $monthMap[$m['month']] = $m;
+        }
+        for ($i = $range - 1; $i >= 0; $i--) {
+            $key = date('Y-m', strtotime("-$i months"));
+            $monthLabels[]    = date('M Y', strtotime("-$i months"));
+            $monthData[]      = (int) ($monthMap[$key]['total'] ?? 0);
+            $monthCompleted[] = (int) ($monthMap[$key]['completed'] ?? 0);
+        }
+
         view('layouts/app', [
-            'pageTitle'         => 'Reports',
+            'pageTitle'         => 'Reports & Analytics',
             'content'           => 'admin/reports',
             'totalAppointments' => $totalAppointments,
+            'totalRevenue'      => $totalRevenue,
+            'monthRevenue'      => $monthRevenue,
+            'completedCount'    => $completedCount,
             'byStatus'          => $byStatus,
             'topDoctors'        => $topDoctors,
             'monthly'           => $monthly,
+            'monthLabels'       => json_encode($monthLabels),
+            'monthData'         => json_encode($monthData),
+            'monthCompleted'    => json_encode($monthCompleted),
+            'range'             => $range,
         ]);
     }
 

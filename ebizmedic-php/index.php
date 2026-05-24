@@ -120,6 +120,7 @@ $routes = [
 
         'medic/schedule/update'         => ['MedicController',        'updateSchedule'],
         'medic/appointments/update'     => ['MedicController',        'updateAppointment'],
+        'medic/toggle-availability'     => ['MedicController',        'toggleAvailability'],
         'medic/profile/update'          => ['MedicController',        'updateProfile'],
         'medic/profile/photo'           => ['MedicController',        'updatePhoto'],
         'medic/profile/password'        => ['MedicController',        'changePassword'],
@@ -138,6 +139,7 @@ $routes = [
         'user/profile/password'              => ['UserController',         'changePassword'],
         'user/health-profile/update'         => ['UserController',         'updateHealthProfile'],
         'user/appointments/rate'             => ['UserController',         'rateDoctor'],
+        'user/appointments/cancel'           => ['UserController',         'cancelAppointment'],
         'notifications/read'                 => ['NotificationController', 'markRead'],
 
         // Pharmacist

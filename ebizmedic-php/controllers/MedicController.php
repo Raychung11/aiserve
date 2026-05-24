@@ -72,6 +72,23 @@ class MedicController
         ]);
     }
 
+    public function toggleAvailability(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('medic/dashboard'); }
+        $field = $_POST['field'] ?? '';
+        if (!in_array($field, ['is_available_online', 'is_available_onsite'])) {
+            redirect('medic/dashboard');
+        }
+        $current = (int) ($this->doctor[$field] ?? 0);
+        Database::execute(
+            "UPDATE doctors SET $field = ? WHERE user_id = ?",
+            [$current ? 0 : 1, $this->userId]
+        );
+        $label = $field === 'is_available_online' ? 'Online availability' : 'Onsite availability';
+        flash('success', $label . ' ' . ($current ? 'turned OFF.' : 'turned ON.'));
+        redirect('medic/dashboard');
+    }
+
     public function appointments(): void
     {
         $doctorId = $this->doctor['id'];
