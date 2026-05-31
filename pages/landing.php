@@ -70,7 +70,7 @@ a { text-decoration: none; }
   position: sticky; top: 0; z-index: 100;
   background: rgba(15,23,42,0.96); backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 32px; height: 60px;
+  padding: 0 32px; height: 66px;
   border-bottom: 1px solid rgba(255,255,255,0.07);
   transition: background .3s;
 }
@@ -80,7 +80,7 @@ a { text-decoration: none; }
              display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 .nav-name  { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -.3px; }
 .nav-name span { color: #4ade80; }
-.nav-logo-img { height: 38px; width: auto; display: block; }
+.nav-logo-img { height: 50px; width: auto; display: block; }
 .nav-links { display: flex; gap: 28px; }
 .nav-links a { color: rgba(255,255,255,.7); font-size: 13px; font-weight: 500; transition: color .15s; }
 .nav-links a:hover { color: #fff; }
