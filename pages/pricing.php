@@ -18,8 +18,8 @@ $isLoggedIn = Auth::check();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Primary SEO -->
-  <title>ESG Pricing Plans | Free, RM 1,500/yr, RM 8,000/report — Adcellent ESG OS</title>
-  <meta name="description" content="Compare Adcellent ESG OS plans. Free Bursa SEDG reporting, RM 1,500/year for full ESG data collection OS, or RM 8,000 professional ESG consultation. No credit card required.">
+  <title>ESG gen Pricing | Free, RM 1,500/yr, RM 8,000/report</title>
+  <meta name="description" content="Compare ESG gen plans. Free Bursa SEDG reporting, RM 1,500/year for full ESG data collection OS, or RM 8,000 professional ESG consultation. No credit card required.">
   <meta name="keywords" content="ESG pricing Malaysia, Bursa SEDG subscription, ESG software cost Malaysia, ESG consultant Malaysia, SME ESG reporting price">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="<?= APP_URL ?>/pricing">
@@ -27,17 +27,17 @@ $isLoggedIn = Auth::check();
   <!-- Open Graph -->
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="<?= APP_URL ?>/pricing">
-  <meta property="og:site_name"   content="Adcellent ESG OS">
+  <meta property="og:site_name"   content="ESG gen">
   <meta property="og:locale"      content="en_MY">
-  <meta property="og:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — Adcellent ESG OS">
+  <meta property="og:title"       content="ESG gen Pricing | Free, RM 1,500/yr, RM 8,000/report">
   <meta property="og:description" content="Free Bursa SEDG reporting for Malaysian SMEs. Upgrade to Platform for RM 1,500/year. Professional ESG consultation at RM 8,000/report.">
-  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-adcellent.png">
+  <meta property="og:image"       content="<?= APP_URL ?>/assets/img/og-esggen.png">
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="ESG Pricing | Free, RM 1,500/yr, RM 8,000/report — Adcellent ESG OS">
+  <meta name="twitter:title"       content="ESG gen Pricing | Free, RM 1,500/yr, RM 8,000/report">
   <meta name="twitter:description" content="Free Bursa SEDG reporting. Full ESG OS at RM 1,500/yr. Professional consultation at RM 8,000/report.">
-  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-adcellent.png">
+  <meta name="twitter:image"       content="<?= APP_URL ?>/assets/img/og-esggen.png">
 
   <!-- Favicon -->
   <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
@@ -47,9 +47,9 @@ $isLoggedIn = Auth::check();
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Adcellent ESG OS Pricing",
+    "name": "ESG gen Pricing",
     "url": "<?= APP_URL ?>/pricing",
-    "description": "Pricing plans for Adcellent ESG OS — Malaysia's ESG reporting platform for SMEs.",
+    "description": "Pricing plans for ESG gen — Malaysia's ESG reporting platform for SMEs.",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": [
@@ -194,8 +194,13 @@ body { background: #f8fafc; font-family: 'Segoe UI', sans-serif; }
 <!-- Navbar -->
 <nav class="top-nav">
   <a class="top-nav-brand" href="<?= APP_URL ?>">
-    <span class="top-nav-icon"><i class="bi bi-leaf-fill"></i></span>
-    <span class="top-nav-name"><?= APP_NAME ?></span>
+    <img src="<?= APP_URL ?>/assets/img/esggen-logo.png" alt="ESG gen" height="34"
+         style="display:block"
+         onerror="this.style.display='none';document.getElementById('pricingBrandFallback').style.display='flex';">
+    <span id="pricingBrandFallback" style="display:none;align-items:center;gap:10px">
+      <span class="top-nav-icon"><i class="bi bi-leaf-fill"></i></span>
+      <span class="top-nav-name"><?= APP_NAME ?></span>
+    </span>
   </a>
   <div class="d-flex gap-2">
     <?php if ($isLoggedIn): ?>
@@ -383,7 +388,7 @@ body { background: #f8fafc; font-family: 'Segoe UI', sans-serif; }
 
 <!-- Footer -->
 <div class="pricing-footer">
-  © <?= date('Y') ?> Adcellent Sdn Bhd &bull; hello@adcellent.com.my &bull; All prices in Malaysian Ringgit (MYR) &bull; SST may apply
+  © <?= date('Y') ?> Adcellent Biz Sdn Bhd (1511714-V) &bull; hello@adcellent.com.my &bull; All prices in Malaysian Ringgit (MYR) &bull; SST may apply
 </div>
 
 </body>

@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In | Adcellent ESG OS</title>
+  <title>Sign In | ESG gen</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="<?= APP_URL ?>/login">
   <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
@@ -182,9 +182,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="login-brand">
 
     <a href="<?= APP_URL ?>/" style="text-decoration:none">
-      <div class="d-flex align-items-center gap-2 mb-4">
-        <div class="login-brand-logo"><i class="bi bi-leaf-fill"></i></div>
-        <span style="font-size:18px;font-weight:800;color:#f1f5f9">Adcellent <span style="color:#16a34a">ESG OS</span></span>
+      <div class="mb-4">
+        <img src="<?= APP_URL ?>/assets/img/esggen-logo.png" alt="ESG gen" height="44"
+             style="display:block;filter:brightness(0)invert(1)"
+             onerror="this.style.display='none';document.getElementById('loginBrandFallback').style.display='flex';">
+        <div id="loginBrandFallback" style="display:none;align-items:center;gap:10px">
+          <div class="login-brand-logo"><i class="bi bi-leaf-fill"></i></div>
+          <span style="font-size:18px;font-weight:800;color:#f1f5f9">ESG <span style="color:#16a34a">gen</span></span>
+        </div>
       </div>
     </a>
 

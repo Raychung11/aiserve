@@ -3,7 +3,7 @@
  * Application Configuration
  */
 
-define('APP_NAME', 'Adcellent ESG OS');
+define('APP_NAME', 'ESG gen');
 define('APP_VERSION', '1.0.0');
 
 // Auto-detect APP_URL — works on Hostinger, localhost, and subdirectory installs.
