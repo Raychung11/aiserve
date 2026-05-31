@@ -295,8 +295,9 @@ a{text-decoration:none}
 .container-lg{max-width:1060px;margin:0 auto}
 @media(max-width:600px){.hero{padding:80px 16px 70px}.stat-item{padding:0 20px}}
 
-/* ── MOBILE: Journey horizontal carousel ── */
+/* ── MOBILE: carousels & compact grids ── */
 @media(max-width:640px){
+  /* Journey carousel */
   .journey-steps{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
     padding:0 16px 4px;gap:14px;justify-content:flex-start;scrollbar-width:none;margin:0 -16px}
   .journey-steps::-webkit-scrollbar{display:none}
@@ -306,13 +307,19 @@ a{text-decoration:none}
   .fw-pill{flex-direction:column;align-items:flex-start;gap:6px;padding:12px 10px}
   .fw-pill-icon{width:28px;height:28px;font-size:13px}
   .fw-pill-desc{font-size:10px}
+  /* Roles carousel */
+  .roles-grid{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;padding:4px 20px;gap:14px;max-width:100%;
+    margin:0 -20px;scrollbar-width:none}
+  .roles-grid::-webkit-scrollbar{display:none}
+  .role-card{min-width:78vw;max-width:78vw;flex-shrink:0;scroll-snap-align:start}
 }
-/* Journey scroll-dot indicators — hidden on desktop */
-.j-dots{display:none}
+/* Dot indicators — hidden on desktop, shown on mobile */
+.j-dots,.r-dots{display:none}
 @media(max-width:640px){
-  .j-dots{display:flex;justify-content:center;gap:7px;margin-top:18px}
-  .j-dot{width:7px;height:7px;border-radius:50%;background:#e2e8f0;transition:width .3s,background .3s}
-  .j-dot.active{background:#16a34a;width:20px;border-radius:4px}
+  .j-dots,.r-dots{display:flex;justify-content:center;gap:7px;margin-top:18px}
+  .j-dot,.r-dot{width:7px;height:7px;border-radius:50%;background:#e2e8f0;transition:width .3s,background .3s}
+  .j-dot.active,.r-dot.active{background:#16a34a;width:20px;border-radius:4px}
 }
 </style>
 </head>
@@ -659,6 +666,12 @@ a{text-decoration:none}
       </ul>
     </div>
   </div>
+  <div class="r-dots" id="rDots">
+    <div class="r-dot active"></div>
+    <div class="r-dot"></div>
+    <div class="r-dot"></div>
+    <div class="r-dot"></div>
+  </div>
 </section>
 
 <!-- ── FAQ ── -->
@@ -998,16 +1011,18 @@ function showResult() {
   }, 80);
 }
 
-// ── Journey carousel dot tracker ──
-(function(){
-  const steps = document.querySelector('.journey-steps');
-  const dots  = document.querySelectorAll('.j-dot');
-  if (!steps || !dots.length) return;
-  steps.addEventListener('scroll', () => {
-    const idx = Math.round(steps.scrollLeft / (steps.scrollWidth / dots.length));
+// ── Carousel dot tracker (reusable) ──
+function initCarouselDots(trackSel, dotSel) {
+  const track = document.querySelector(trackSel);
+  const dots  = document.querySelectorAll(dotSel);
+  if (!track || !dots.length) return;
+  track.addEventListener('scroll', () => {
+    const idx = Math.round(track.scrollLeft / (track.scrollWidth / dots.length));
     dots.forEach((d,i) => d.classList.toggle('active', i === Math.min(idx, dots.length-1)));
   }, {passive:true});
-})();
+}
+initCarouselDots('.journey-steps', '.j-dot');
+initCarouselDots('.roles-grid',    '.r-dot');
 </script>
 </body>
 </html>
