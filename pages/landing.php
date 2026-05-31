@@ -262,8 +262,9 @@ a { text-decoration: none; }
 /* ── FOOTER ── */
 .lp-footer { background: #0f172a; padding: 48px 20px 24px; }
 .footer-inner { max-width: 1060px; margin: 0 auto; }
-.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 32px; margin-bottom: 32px; }
-@media(max-width:768px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr; gap: 28px; margin-bottom: 32px; }
+@media(max-width:900px) { .footer-top { grid-template-columns: 1fr 1fr 1fr; } }
+@media(max-width:600px) { .footer-top { grid-template-columns: 1fr 1fr; } }
 .footer-brand-name { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 8px; }
 .footer-brand-desc { font-size: 12px; color: #64748b; line-height: 1.6; }
 .footer-heading { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;
@@ -604,6 +605,13 @@ a { text-decoration: none; }
         <a href="mailto:hello@adcellent.com.my" class="footer-link">Contact Us</a>
       </div>
       <div>
+        <div class="footer-heading">Legal</div>
+        <a href="<?= APP_URL ?>/privacy"  class="footer-link">Privacy Policy</a>
+        <a href="<?= APP_URL ?>/pdpa"     class="footer-link">PDPA Notice</a>
+        <a href="<?= APP_URL ?>/terms"    class="footer-link">Terms of Use</a>
+        <a href="<?= APP_URL ?>/cookies"  class="footer-link">Cookie Policy</a>
+      </div>
+      <div>
         <div class="footer-heading">Compliance Frameworks</div>
         <div style="margin-top:8px">
           <?php foreach (['Bursa SEDG','GRI','ISSB','TCFD','CDP','ESRS','SASB','UN SDGs'] as $fw): ?>
@@ -614,7 +622,12 @@ a { text-decoration: none; }
     </div>
     <div class="footer-bottom">
       <span>&copy; <?= date('Y') ?> Adcellent Biz Sdn Bhd (1511714-V) &bull; hello@adcellent.com.my &bull; +6011-3318 4600 &bull; All prices in MYR</span>
-      <span>MyGHG 2023 &bull; DEFRA 2023 &bull; Bursa SEDG 2nd Edition 2022</span>
+      <span style="display:flex;gap:14px;flex-wrap:wrap">
+        <a href="<?= APP_URL ?>/privacy" style="color:#475569;font-size:12px;text-decoration:none">Privacy</a>
+        <a href="<?= APP_URL ?>/pdpa"    style="color:#475569;font-size:12px;text-decoration:none">PDPA</a>
+        <a href="<?= APP_URL ?>/terms"   style="color:#475569;font-size:12px;text-decoration:none">Terms</a>
+        <a href="<?= APP_URL ?>/cookies" style="color:#475569;font-size:12px;text-decoration:none">Cookies</a>
+      </span>
     </div>
   </div>
 </footer>

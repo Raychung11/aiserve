@@ -68,6 +68,12 @@ $routes = [
     'action_plan_detail'  => 'pages/action_plan_detail.php',
     'export-csv'          => 'pages/export_csv.php',
     'export_csv'          => 'pages/export_csv.php',
+    'privacy'             => 'pages/privacy.php',
+    'pdpa'                => 'pages/pdpa.php',
+    'terms'               => 'pages/terms.php',
+    'cookies'             => 'pages/cookies.php',
+    'cookie-policy'       => 'pages/cookies.php',
+    'terms-of-use'        => 'pages/terms.php',
 ];
 
 // Handle logout
