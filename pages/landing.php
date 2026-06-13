@@ -58,12 +58,7 @@ $isLoggedIn = Auth::check();
       "name": "ESG gen",
       "url": "<?= APP_URL ?>",
       "description": "Malaysia's ESG reporting platform for SMEs.",
-      "inLanguage": "en-MY",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {"@type":"EntryPoint","urlTemplate":"<?= APP_URL ?>/?q={search_term_string}"},
-        "query-input": "required name=search_term_string"
-      }
+      "inLanguage": "en-MY"
     },
     {
       "@context": "https://schema.org",

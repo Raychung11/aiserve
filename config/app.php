@@ -49,6 +49,7 @@ define('SCORE_POOR', 20);
 // Set timezone
 date_default_timezone_set(APP_TIMEZONE);
 
-// Error reporting (set to 0 in production)
+// Error reporting (production — errors logged, not displayed)
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
