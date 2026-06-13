@@ -126,7 +126,7 @@ class GapAnalyzer {
             'SEDG-G04' => 'Draft a one-page ESG Committee Terms of Reference (TOR). Board approval needed — typically 2-4 weeks.',
             'SEDG-G05' => 'Download MACC Section 17A Anti-Bribery Policy template from www.sprm.gov.my. Customize and get board approval.',
             'SEDG-G06' => 'Set up free whistleblower email (e.g., ethics@yourcompany.com) + document in HR handbook. Takes 1-2 days.',
-            'SEDG-G08' => 'Use AiServe ESG OS report generator to produce your first sustainability report in under 2 hours.',
+            'SEDG-G08' => 'Use Adcellent ESG OS report generator to produce your first sustainability report in under 2 hours.',
             'GRI-305-1'=> 'Calculate from fuel consumption records. Diesel: 2.67 kgCO2/L, Petrol: 2.31 kgCO2/L, Natural gas: use IPCC factors.',
             'GRI-305-2'=> 'Total kWh from TNB bills × 0.694 tCO2e/MWh. This is your Scope 2 figure.',
             'GRI-403-2'=> 'Document your HIRARC process (Hazard Identification, Risk Assessment, Risk Control). Template available from DOSH.',

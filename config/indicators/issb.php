@@ -1,0 +1,263 @@
+<?php
+/**
+ * ISSB / IFRS Sustainability Disclosure Standards
+ * IFRS S1: General Requirements for Disclosure of Sustainability-related Financial Information
+ * IFRS S2: Climate-related Disclosures
+ *
+ * Released June 2023 by IFRS Foundation / ISSB
+ * Bursa Malaysia is phasing in ISSB requirements for large-cap companies (2025–2026)
+ * TCFD recommendations are now embedded within IFRS S2
+ */
+
+return [
+
+    // =====================================================
+    // GOVERNANCE (IFRS S1 + S2 — Governance Pillar)
+    // =====================================================
+    'GOVERNANCE' => [
+
+        [
+            'indicator_id' => 'ISSB-GOV-01',
+            'code'         => 'S1-GOV-1',
+            'name'         => 'Board Oversight of Sustainability Risks',
+            'description'  => 'Description of board or governance body responsible for oversight of sustainability-related risks and opportunities.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Name the specific board committee responsible (e.g. Audit Committee, Risk Committee, or dedicated ESG Committee). Describe frequency of ESG reporting to board.',
+            'priority'     => 'critical',
+            'financing_link' => 'Required for ISSB-aligned green bonds',
+        ],
+        [
+            'indicator_id' => 'ISSB-GOV-02',
+            'code'         => 'S1-GOV-2',
+            'name'         => 'Management Role in Sustainability',
+            'description'  => 'Description of management\'s role in the governance of sustainability-related risks and opportunities.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Identify who at management level (CEO, CFO, dedicated Chief Sustainability Officer) is accountable. Describe how sustainability performance is linked to remuneration.',
+            'priority'     => 'high',
+            'financing_link' => null,
+        ],
+        [
+            'indicator_id' => 'ISSB-GOV-03',
+            'code'         => 'S1-GOV-3',
+            'name'         => 'Sustainability Oversight Controls and Procedures',
+            'description'  => 'Processes, controls and procedures used to monitor and manage sustainability-related risks and opportunities.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Describe the ESG risk management process: who identifies risks, how often they are reviewed, how they link to enterprise risk management (ERM).',
+            'priority'     => 'high',
+            'financing_link' => null,
+        ],
+
+        [
+            'indicator_id' => 'ISSB-GOV-04',
+            'code'         => 'S2-GOV-1',
+            'name'         => 'Board Oversight of Climate-related Risks',
+            'description'  => 'Description of the governance body responsible for oversight of climate-related risks and opportunities.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Specific to climate: name who on the board oversees climate strategy, how often climate risks are reviewed, and whether climate expertise is required at board level.',
+            'priority'     => 'critical',
+            'financing_link' => 'Mandatory for all ISSB-aligned climate financing',
+        ],
+    ],
+
+    // =====================================================
+    // ENVIRONMENT (IFRS S1 Strategy + IFRS S2 Climate)
+    // =====================================================
+    'ENVIRONMENT' => [
+
+        [
+            'indicator_id' => 'ISSB-STR-01',
+            'code'         => 'S1-STR-1',
+            'name'         => 'Material Sustainability Risks and Opportunities Identified',
+            'description'  => 'Sustainability-related risks and opportunities that could reasonably be expected to affect the entity\'s cash flows over the short, medium, and long term.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'List top 3–5 material sustainability risks (e.g. carbon tax, supply chain disruption, water scarcity) and opportunities (e.g. green financing, new green markets). Use your industry context.',
+            'priority'     => 'critical',
+            'financing_link' => 'Foundation for ISSB-aligned investor disclosure',
+        ],
+        [
+            'indicator_id' => 'ISSB-STR-02',
+            'code'         => 'S2-STR-1',
+            'name'         => 'Physical Climate Risks Identified',
+            'description'  => 'Climate-related physical risks (acute and chronic) identified that could affect the entity.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Malaysia-specific physical risks: flooding (Klang Valley, Kelantan), extreme heat, water stress. Describe which operations are affected and estimated financial exposure.',
+            'priority'     => 'critical',
+            'financing_link' => 'BNM Climate Risk requirement for financial institutions',
+        ],
+        [
+            'indicator_id' => 'ISSB-STR-03',
+            'code'         => 'S2-STR-2',
+            'name'         => 'Transition Climate Risks Identified',
+            'description'  => 'Climate-related transition risks (policy, technology, market, reputation) that could affect the entity.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Malaysia transition risks: carbon tax introduction, renewable energy mandates, changing customer preferences for low-carbon products, stranded assets. Estimate financial exposure.',
+            'priority'     => 'critical',
+            'financing_link' => 'Required for Bursa ISSB phase-in by 2026',
+        ],
+        [
+            'indicator_id' => 'ISSB-STR-04',
+            'code'         => 'S2-STR-3',
+            'name'         => 'Climate Scenario Analysis Conducted',
+            'description'  => 'Whether the entity has used climate scenario analysis to assess resilience of its strategy to climate change.',
+            'unit'         => null,
+            'data_type'    => 'boolean',
+            'required'     => true,
+            'guidance'     => 'Use at least 2 scenarios: 1.5°C or 2°C (low-carbon transition) + 3°C or 4°C (high-physical-risk). Can use NGFS, IEA, or IPCC scenarios. Disclose time horizons assessed.',
+            'priority'     => 'high',
+            'financing_link' => 'Required for green bonds and sustainability-linked loans',
+        ],
+        [
+            'indicator_id' => 'ISSB-STR-05',
+            'code'         => 'S2-STR-4',
+            'name'         => 'Climate Transition Plan',
+            'description'  => 'Whether the entity has a plan to transition to a low-carbon economy, including targets, milestones, and key dependencies.',
+            'unit'         => null,
+            'data_type'    => 'boolean',
+            'required'     => false,
+            'guidance'     => 'Describe specific actions to reduce Scope 1 & 2 emissions, timeline, capital expenditure required, and how the plan aligns with Malaysia\'s Net Zero target by 2050.',
+            'priority'     => 'high',
+            'financing_link' => 'Transition plan required for BNM transition financing',
+        ],
+        [
+            'indicator_id' => 'ISSB-MET-01',
+            'code'         => 'S2-MET-1',
+            'name'         => 'Scope 1 GHG Emissions (ISSB)',
+            'description'  => 'Absolute gross Scope 1 GHG emissions in metric tonnes of CO2 equivalent.',
+            'unit'         => 'tCO2e',
+            'data_type'    => 'number',
+            'required'     => true,
+            'guidance'     => 'Direct emissions from owned/controlled sources. Use GHG Protocol Corporate Standard. Apply IPCC AR6 GWP values. Disclose methodology and emission factors used.',
+            'priority'     => 'critical',
+            'financing_link' => 'Carbon tax baseline — mandatory Malaysia from 2026',
+        ],
+        [
+            'indicator_id' => 'ISSB-MET-02',
+            'code'         => 'S2-MET-2',
+            'name'         => 'Scope 2 GHG Emissions (ISSB)',
+            'description'  => 'Absolute gross Scope 2 GHG emissions — both location-based and market-based.',
+            'unit'         => 'tCO2e',
+            'data_type'    => 'number',
+            'required'     => true,
+            'guidance'     => 'Location-based: kWh × Malaysia grid factor (0.694 kgCO2e/kWh). Market-based: use contractual instruments (RECs, PPAs). ISSB requires disclosing BOTH methods.',
+            'priority'     => 'critical',
+            'financing_link' => 'Required for ISSB-aligned green bond issuance',
+        ],
+        [
+            'indicator_id' => 'ISSB-MET-03',
+            'code'         => 'S2-MET-3',
+            'name'         => 'Scope 3 GHG Emissions (ISSB)',
+            'description'  => 'Absolute gross Scope 3 GHG emissions across all relevant categories.',
+            'unit'         => 'tCO2e',
+            'data_type'    => 'number',
+            'required'     => false,
+            'guidance'     => 'Disclose material Scope 3 categories. For manufacturing: Cat 1 (purchased goods), Cat 4 (upstream transport), Cat 11 (use of sold products). Use GHG Protocol Scope 3 Standard.',
+            'priority'     => 'high',
+            'financing_link' => 'Required for EU CBAM and global supply chain disclosure',
+        ],
+        [
+            'indicator_id' => 'ISSB-MET-04',
+            'code'         => 'S2-MET-4',
+            'name'         => 'GHG Emissions Intensity (ISSB)',
+            'description'  => 'GHG emissions intensity per unit of physical or economic output.',
+            'unit'         => 'tCO2e/RM million',
+            'data_type'    => 'number',
+            'required'     => true,
+            'guidance'     => 'Use revenue-based intensity: (Scope 1 + Scope 2) ÷ revenue in RM million. Report consistently year-over-year to show progress against decarbonisation targets.',
+            'priority'     => 'high',
+            'financing_link' => null,
+        ],
+        [
+            'indicator_id' => 'ISSB-MET-05',
+            'code'         => 'S2-MET-5',
+            'name'         => 'Climate-related Targets',
+            'description'  => 'Quantitative climate targets set, including GHG reduction targets, interim milestones, and base year.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Example: "Reduce Scope 1 & 2 emissions by 30% by 2030 vs 2022 baseline." Align with Malaysia\'s NDC targets. State whether targets are science-based (SBTi).',
+            'priority'     => 'critical',
+            'financing_link' => 'Sustainability-linked loan KPI requirement',
+        ],
+        [
+            'indicator_id' => 'ISSB-MET-06',
+            'code'         => 'S2-MET-6',
+            'name'         => 'Carbon Credits Used',
+            'description'  => 'Volume and type of carbon credits used to meet climate targets, and whether they represent removals or reductions.',
+            'unit'         => 'tCO2e',
+            'data_type'    => 'number',
+            'required'     => false,
+            'guidance'     => 'Disclose separately from gross emissions. Use Verra VCS, Gold Standard, or Malaysia\'s Bursa Carbon Exchange (BCX) credits. State vintage year and project type.',
+            'priority'     => 'medium',
+            'financing_link' => 'Relevant for Bursa Carbon Exchange (BCX) participants',
+        ],
+        [
+            'indicator_id' => 'ISSB-MET-07',
+            'code'         => 'S2-MET-7',
+            'name'         => 'Internal Carbon Price',
+            'description'  => 'Whether an internal carbon price is used and the price applied per tonne of CO2e.',
+            'unit'         => 'RM/tCO2e',
+            'data_type'    => 'number',
+            'required'     => false,
+            'guidance'     => 'Internal carbon price signals climate risk in business decisions. Malaysia carbon tax expectation: RM30–50/tCO2e. Disclose how internal price is used in investment decisions.',
+            'priority'     => 'medium',
+            'financing_link' => 'Used in climate stress testing by banks',
+        ],
+    ],
+
+    // =====================================================
+    // SOCIAL (IFRS S1 — Social & Human Capital)
+    // =====================================================
+    'SOCIAL' => [
+
+        [
+            'indicator_id' => 'ISSB-SOC-01',
+            'code'         => 'S1-SOC-1',
+            'name'         => 'Human Capital Risks and Opportunities',
+            'description'  => 'Material human capital risks and opportunities including workforce shortages, skills gaps, labour practices, and employee wellbeing.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Identify top workforce risks: talent attraction/retention, upskilling for digital/green transition, foreign worker dependency. Describe strategy to address them.',
+            'priority'     => 'high',
+            'financing_link' => null,
+        ],
+        [
+            'indicator_id' => 'ISSB-SOC-02',
+            'code'         => 'S1-SOC-2',
+            'name'         => 'Human Capital Metrics',
+            'description'  => 'Key human capital metrics including headcount, turnover, training, safety, and diversity.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => true,
+            'guidance'     => 'Reference data already entered under Social indicators. Provide narrative context: what the numbers mean, year-on-year trends, and improvement actions taken.',
+            'priority'     => 'high',
+            'financing_link' => null,
+        ],
+        [
+            'indicator_id' => 'ISSB-SOC-03',
+            'code'         => 'S1-SOC-3',
+            'name'         => 'Supply Chain and Nature-related Risks',
+            'description'  => 'Sustainability-related risks arising from the supply chain, including nature and biodiversity dependencies.',
+            'unit'         => null,
+            'data_type'    => 'text',
+            'required'     => false,
+            'guidance'     => 'Describe top 3 supply chain sustainability risks (e.g. Tier 1 supplier concentration, geopolitical supply chain risk, raw material sourcing). Describe mitigation actions.',
+            'priority'     => 'medium',
+            'financing_link' => 'EU CSRD value chain disclosure requirement',
+        ],
+    ],
+];

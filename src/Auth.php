@@ -36,7 +36,7 @@ class Auth {
         if (strlen($password) < 8) {
             return ['success' => false, 'message' => 'Password must be at least 8 characters.'];
         }
-        if (!in_array($role, ['admin', 'consultant', 'sme_owner'])) {
+        if (!in_array($role, ['admin', 'consultant', 'sme_owner', 'principal', 'associate', 'manager'])) {
             $role = 'sme_owner';
         }
 
@@ -67,18 +67,19 @@ class Auth {
         }
 
         self::startSession();
-        $_SESSION['user_id']   = $user['id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_email']= $user['email'];
-        $_SESSION['user_role'] = $user['role'];
-        $_SESSION['logged_in'] = true;
+        $_SESSION['user_id']        = $user['id'];
+        $_SESSION['user_name']      = $user['name'];
+        $_SESSION['user_email']     = $user['email'];
+        $_SESSION['user_role']      = $user['role'];
+        $_SESSION['user_parent_id'] = $user['parent_id'] ?? null;
+        $_SESSION['logged_in']      = true;
 
-        // Set active company for SME owners
-        if ($user['role'] === 'sme_owner') {
+        // Auto-select company for roles that work with a single active company
+        if (in_array($user['role'], ['sme_owner', 'consultant'])) {
             $company = Database::fetchOne(
                 'SELECT c.id FROM companies c
                  JOIN user_companies uc ON c.id = uc.company_id
-                 WHERE uc.user_id = ? LIMIT 1',
+                 WHERE uc.user_id = ? ORDER BY c.id DESC LIMIT 1',
                 [$user['id']]
             );
             if ($company) {
@@ -89,11 +90,47 @@ class Auth {
         Database::insert('activity_log', [
             'user_id'     => $user['id'],
             'action'      => 'LOGIN',
-            'description' => 'User logged in',
+            'description' => 'User logged in from ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'),
             'ip_address'  => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
         ]);
 
         return ['success' => true, 'user' => $user, 'message' => 'Login successful.'];
+    }
+
+    /**
+     * Determine the correct post-login redirect URL for a given role
+     */
+    public static function postLoginUrl(array $user): string {
+        switch ($user['role']) {
+            case 'admin':
+                return APP_URL . '/admin';
+            case 'principal':
+            case 'associate':
+            case 'manager':
+                return APP_URL . '/dashboard';
+            case 'consultant':
+                $has = Database::fetchOne(
+                    'SELECT 1 FROM user_companies WHERE user_id = ? LIMIT 1',
+                    [$user['id']]
+                );
+                return APP_URL . ($has ? '/companies' : '/onboarding');
+            default: // sme_owner
+                $has = Database::fetchOne(
+                    'SELECT 1 FROM user_companies WHERE user_id = ? LIMIT 1',
+                    [$user['id']]
+                );
+                return APP_URL . ($has ? '/dashboard' : '/onboarding');
+        }
+    }
+
+    /**
+     * Determine the correct post-register redirect URL for a given role
+     * Hierarchy roles skip onboarding (they don't own a company directly)
+     */
+    public static function postRegisterUrl(string $role): string {
+        return in_array($role, ['principal', 'associate', 'manager', 'admin'])
+            ? APP_URL . '/dashboard'
+            : APP_URL . '/onboarding';
     }
 
     /**
@@ -138,10 +175,11 @@ class Auth {
     public static function user(): ?array {
         if (!self::check()) return null;
         return [
-            'id'    => $_SESSION['user_id'],
-            'name'  => $_SESSION['user_name'],
-            'email' => $_SESSION['user_email'],
-            'role'  => $_SESSION['user_role'],
+            'id'        => $_SESSION['user_id'],
+            'name'      => $_SESSION['user_name'],
+            'email'     => $_SESSION['user_email'],
+            'role'      => $_SESSION['user_role'],
+            'parent_id' => $_SESSION['user_parent_id'] ?? null,
         ];
     }
 

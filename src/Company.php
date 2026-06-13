@@ -16,10 +16,13 @@ class Company {
             }
         }
 
+        $validSectors = require __DIR__ . '/../config/bursa_sectors.php';
         $companyId = Database::insert('companies', [
             'name'             => htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8'),
             'registration_no'  => $data['registration_no'] ?? null,
             'industry'         => $data['industry'],
+            'bursa_sector'     => in_array($data['bursa_sector'] ?? '', $validSectors) ? $data['bursa_sector'] : null,
+            'reporting_scope'  => in_array($data['reporting_scope'] ?? '', ['hq','factory','group']) ? $data['reporting_scope'] : 'hq',
             'revenue_tier'     => $data['revenue_tier'],
             'employee_count'   => (int)$data['employee_count'],
             'framework'        => $data['framework'],
@@ -82,7 +85,8 @@ class Company {
      * Update company
      */
     public static function update(int $companyId, array $data): bool {
-        $allowed = ['name', 'registration_no', 'industry', 'revenue_tier', 'employee_count',
+        $allowed = ['name', 'registration_no', 'industry', 'bursa_sector', 'reporting_scope',
+                    'report_level', 'revenue_tier', 'employee_count',
                     'framework', 'reporting_year', 'is_pre_ipo'];
         $update  = array_intersect_key($data, array_flip($allowed));
         if (empty($update)) return false;
@@ -142,35 +146,93 @@ class Company {
     }
 
     /**
+     * Map framework ID to its indicator file(s)
+     * Returns array of [framework_id => file_key] pairs to load
+     */
+    private static function resolveIndicatorFiles(string $framework): array {
+        // Map each framework ID to its config/indicators/ filename (without .php)
+        $fileMap = [
+            'BURSA_SEDG'         => 'bursa_sedg',
+            'GRI'                => 'gri',
+            'ISSB'               => 'issb',
+            'TCFD'               => 'tcfd',
+            'UN_SDGS'            => 'un_sdgs',
+            'SASB_MANUFACTURING' => 'sasb_manufacturing',
+            'SASB_FOOD'          => 'sasb_food',
+            'SASB_TECH'          => 'sasb_tech',
+            'CDP'                => 'cdp',
+            'ESRS'               => 'esrs',
+        ];
+
+        // Legacy combined modes
+        if ($framework === 'BOTH') {
+            return ['BURSA_SEDG' => 'bursa_sedg', 'GRI' => 'gri'];
+        }
+
+        if (isset($fileMap[$framework])) {
+            return [$framework => $fileMap[$framework]];
+        }
+
+        return [];
+    }
+
+    /**
      * Flatten all indicators for a given framework
+     * Supports all 10 frameworks + legacy BOTH mode
      */
     public static function getFrameworkIndicators(string $framework): array {
-        $indicators = [];
-        $frameworks = [];
-        if ($framework === 'BURSA_SEDG' || $framework === 'BOTH') {
-            $sedg = require __DIR__ . '/../config/indicators/bursa_sedg.php';
-            foreach ($sedg as $cat => $items) {
+        $indicators  = [];
+        $usedIds     = [];
+        $files       = self::resolveIndicatorFiles($framework);
+
+        foreach ($files as $frameworkId => $fileName) {
+            $path = __DIR__ . '/../config/indicators/' . $fileName . '.php';
+            if (!file_exists($path)) continue;
+
+            $data = require $path;
+            foreach ($data as $cat => $items) {
                 foreach ($items as $item) {
+                    if (empty($item)) continue;
+                    // Skip duplicates when merging frameworks
+                    if (in_array($item['indicator_id'], $usedIds, true)) continue;
                     $item['category']  = $cat;
-                    $item['framework'] = 'BURSA_SEDG';
+                    $item['framework'] = $frameworkId;
                     $indicators[]      = $item;
+                    $usedIds[]         = $item['indicator_id'];
                 }
             }
         }
-        if ($framework === 'GRI' || $framework === 'BOTH') {
-            $gri = require __DIR__ . '/../config/indicators/gri.php';
-            foreach ($gri as $cat => $items) {
-                foreach ($items as $item) {
-                    // Avoid duplicates in BOTH mode
-                    $existing = array_search($item['indicator_id'], array_column($indicators, 'indicator_id'));
-                    if ($existing === false) {
-                        $item['category']  = $cat;
-                        $item['framework'] = 'GRI';
-                        $indicators[]      = $item;
-                    }
-                }
-            }
-        }
+
         return $indicators;
+    }
+
+    /**
+     * Get all available frameworks from registry
+     */
+    public static function getAllFrameworks(): array {
+        static $cache = null;
+        if ($cache === null) {
+            $cache = require __DIR__ . '/../config/frameworks.php';
+        }
+        return $cache;
+    }
+
+    /**
+     * Get a single framework definition by ID
+     */
+    public static function getFramework(string $frameworkId): ?array {
+        $all = self::getAllFrameworks();
+        return $all[$frameworkId] ?? null;
+    }
+
+    /**
+     * Get frameworks grouped by category for UI display
+     */
+    public static function getFrameworksByCategory(): array {
+        $grouped = [];
+        foreach (self::getAllFrameworks() as $fw) {
+            $grouped[$fw['category_label']][] = $fw;
+        }
+        return $grouped;
     }
 }

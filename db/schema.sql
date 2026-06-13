@@ -1,4 +1,4 @@
--- AiServe ESG OS Database Schema
+-- Adcellent ESG OS Database Schema
 -- Compatible with MySQL 8.0+ / MariaDB 10.4+
 -- Hostinger deployment ready
 
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `companies` (
   `industry`         ENUM('Manufacturing','Services','Trading','Construction','Other') NOT NULL,
   `revenue_tier`     ENUM('below_10M','10M_to_50M','above_50M') NOT NULL,
   `employee_count`   INT(11) NOT NULL DEFAULT 0,
-  `framework`        ENUM('BURSA_SEDG','GRI','BOTH') NOT NULL DEFAULT 'BURSA_SEDG',
+  `framework`        VARCHAR(50) NOT NULL DEFAULT 'BURSA_SEDG',
   `reporting_year`   YEAR NOT NULL DEFAULT '2024',
   `created_by`       INT(11) UNSIGNED NOT NULL,
   `is_pre_ipo`       TINYINT(1) NOT NULL DEFAULT 0,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `esg_data` (
   `id`            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id`    INT(11) UNSIGNED NOT NULL,
   `indicator_id`  VARCHAR(30) NOT NULL,
-  `framework`     ENUM('BURSA_SEDG','GRI') NOT NULL,
+  `framework`     VARCHAR(50) NOT NULL DEFAULT 'BURSA_SEDG',
   `category`      ENUM('ENVIRONMENT','SOCIAL','GOVERNANCE') NOT NULL,
   `value`         TEXT DEFAULT NULL,
   `unit`          VARCHAR(50) DEFAULT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `esg_data` (
 CREATE TABLE IF NOT EXISTS `gap_analyses` (
   `id`                    INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id`            INT(11) UNSIGNED NOT NULL,
-  `framework`             ENUM('BURSA_SEDG','GRI','BOTH') NOT NULL,
+  `framework`             VARCHAR(50) NOT NULL DEFAULT 'BURSA_SEDG',
   `period`                VARCHAR(10) NOT NULL DEFAULT '2024',
   `total_indicators`      INT(11) NOT NULL DEFAULT 0,
   `completed_indicators`  INT(11) NOT NULL DEFAULT 0,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `reports` (
   `id`            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `company_id`    INT(11) UNSIGNED NOT NULL,
   `title`         VARCHAR(300) NOT NULL,
-  `framework`     ENUM('BURSA_SEDG','GRI','BOTH') NOT NULL,
+  `framework`     VARCHAR(50) NOT NULL DEFAULT 'BURSA_SEDG',
   `period`        VARCHAR(10) NOT NULL DEFAULT '2024',
   `content_html`  LONGTEXT DEFAULT NULL,
   `score`         DECIMAL(5,2) NOT NULL DEFAULT 0.00,

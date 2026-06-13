@@ -11,14 +11,9 @@ RewriteEngine On
 # e.g. if installed at yourdomain.com/esg/ use: RewriteBase /esg/
 RewriteBase /
 
-# Serve existing files and directories directly
+# Route everything to index.php EXCEPT real files and directories (CSS, JS, images, etc.)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-
-# Exclude asset files from rewriting
-RewriteRule ^(assets|favicon\.ico)(/.*)?$ - [L]
-
-# Rewrite all other requests to index.php
 RewriteRule ^(.*)$ index.php [QSA,L]
 
 # Security headers
@@ -29,15 +24,13 @@ RewriteRule ^(.*)$ index.php [QSA,L]
   Header always set Referrer-Policy strict-origin-when-cross-origin
 </IfModule>
 
-# Protect sensitive files
-<FilesMatch "\.(sql|log|env|md|json|lock)$">
+# Protect sensitive files from direct browser access
+<FilesMatch "\.(sql|log|env|lock)$">
   Require all denied
 </FilesMatch>
 
-# Protect config directory
-<FilesMatch "^(config|src|includes|db)/">
-  Require all denied
-</FilesMatch>
+# Block direct access to backend directories
+RewriteRule ^(config|src|includes|db)(/|$) - [F,L]
 
 # PHP settings for Hostinger
 <IfModule mod_php8.c>

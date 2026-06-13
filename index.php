@@ -1,6 +1,6 @@
 <?php
 /**
- * AiServe ESG OS — Main Router
+ * Adcellent ESG OS — Main Router
  * Handles all page routing for Hostinger deployment
  *
  * URL format: /?page=dashboard (query-string mode — no .htaccess needed)
@@ -22,6 +22,39 @@ $basePath     = rtrim(dirname($scriptName), '/');
 $path         = str_replace($basePath, '', parse_url($requestUri, PHP_URL_PATH) ?? '/');
 $path         = '/' . trim($path, '/');
 
+// Special endpoints that bypass slug routing
+if ($path === '/sitemap.xml') {
+    require_once __DIR__ . '/pages/sitemap.php';
+    exit;
+}
+if ($path === '/robots.txt') {
+    header('Content-Type: text/plain; charset=utf-8');
+    $sitemapUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http')
+                  . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/sitemap.xml';
+    echo "User-agent: *\n";
+    echo "Allow: /\n";
+    echo "Disallow: /dashboard\n";
+    echo "Disallow: /admin\n";
+    echo "Disallow: /data-entry\n";
+    echo "Disallow: /gap-analysis\n";
+    echo "Disallow: /reports\n";
+    echo "Disallow: /carbon\n";
+    echo "Disallow: /benchmarking\n";
+    echo "Disallow: /kpi-trends\n";
+    echo "Disallow: /action-plans\n";
+    echo "Disallow: /action-plan-detail\n";
+    echo "Disallow: /company-settings\n";
+    echo "Disallow: /companies\n";
+    echo "Disallow: /team\n";
+    echo "Disallow: /departments\n";
+    echo "Disallow: /notifications\n";
+    echo "Disallow: /billing\n";
+    echo "Disallow: /export-csv\n";
+    echo "Disallow: /onboarding\n\n";
+    echo "Sitemap: $sitemapUrl\n";
+    exit;
+}
+
 // Extract page name from path or query string
 if ($path !== '/' && $path !== '') {
     $page = ltrim($path, '/');
@@ -36,7 +69,8 @@ $page = strtolower(preg_replace('/[^a-z0-9_-]/', '', $page));
 
 // Route table: page slug → file path
 $routes = [
-    ''             => 'pages/dashboard.php',
+    ''             => 'pages/landing.php',
+    'landing'      => 'pages/landing.php',
     'dashboard'    => 'pages/dashboard.php',
     'login'        => 'pages/login.php',
     'register'     => 'pages/register.php',
@@ -48,6 +82,31 @@ $routes = [
     'gap_analysis' => 'pages/gap_analysis.php',
     'reports'      => 'pages/reports.php',
     'companies'    => 'pages/companies.php',
+    'carbon'       => 'pages/carbon.php',
+    'benchmarking' => 'pages/benchmarking.php',
+    'benchmark'    => 'pages/benchmarking.php',
+    'admin'        => 'pages/admin.php',
+    'pricing'      => 'pages/pricing.php',
+    'billing'       => 'pages/billing.php',
+    'team'          => 'pages/team.php',
+    'departments'   => 'pages/departments.php',
+    'action-plans'  => 'pages/action_plans.php',
+    'action_plans'  => 'pages/action_plans.php',
+    'notifications' => 'pages/notifications.php',
+    'kpi-trends'    => 'pages/kpi_trends.php',
+    'kpi_trends'    => 'pages/kpi_trends.php',
+    'company-settings' => 'pages/company_settings.php',
+    'company_settings' => 'pages/company_settings.php',
+    'action-plan-detail'  => 'pages/action_plan_detail.php',
+    'action_plan_detail'  => 'pages/action_plan_detail.php',
+    'export-csv'          => 'pages/export_csv.php',
+    'export_csv'          => 'pages/export_csv.php',
+    'privacy'             => 'pages/privacy.php',
+    'pdpa'                => 'pages/pdpa.php',
+    'terms'               => 'pages/terms.php',
+    'cookies'             => 'pages/cookies.php',
+    'cookie-policy'       => 'pages/cookies.php',
+    'terms-of-use'        => 'pages/terms.php',
 ];
 
 // Handle logout
@@ -70,16 +129,6 @@ if (isset($routes[$page])) {
     }
 }
 
-// Redirect root to dashboard or login
-if ($page === '' || $page === 'index') {
-    if (Auth::check()) {
-        header('Location: ' . APP_URL . '/dashboard');
-    } else {
-        header('Location: ' . APP_URL . '/login');
-    }
-    exit;
-}
-
 // 404
 http_response_code(404);
 ?>
@@ -88,7 +137,7 @@ http_response_code(404);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 — AiServe ESG OS</title>
+  <title>404 — Adcellent ESG OS</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="d-flex align-items-center justify-content-center min-vh-100 bg-light">

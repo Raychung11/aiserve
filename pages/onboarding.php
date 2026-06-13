@@ -21,15 +21,233 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <?php include __DIR__ . '/../includes/header.php'; ?>
+<style>
+/* ── Onboarding layout ── */
+.onboarding-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+}
 
-<div class="onboarding-container">
-  <div class="onboarding-box">
+/* ── Section cards ── */
+.onboarding-section {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
 
-    <div class="onboarding-header">
-      <div class="onboarding-logo"><i class="bi bi-leaf-fill"></i></div>
-      <h2>Set Up Your Company</h2>
-      <p class="text-muted">Takes about 3 minutes. You can edit everything later.</p>
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Revenue selector ── */
+.revenue-selector {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.revenue-option {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+
+.revenue-option input[type="radio"] { display: none; }
+
+.revenue-option i {
+  font-size: 28px;
+  color: #6c757d;
+  flex-shrink: 0;
+  transition: color .15s;
+}
+
+.revenue-option div strong {
+  display: block;
+  font-size: 14px;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.revenue-option div small {
+  display: block;
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.revenue-option:hover {
+  border-color: #0d6efd;
+  background: #f0f6ff;
+}
+
+.revenue-option.selected {
+  border-color: #0d6efd;
+  background: #e8f0fe;
+  box-shadow: 0 0 0 3px rgba(13,110,253,.12);
+}
+
+.revenue-option.selected i { color: #0d6efd; }
+
+/* ── Framework selector ── */
+.fw-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #6c757d;
+  margin: 16px 0 10px;
+}
+
+.framework-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.framework-option-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  position: relative;
+}
+
+.framework-option-card input[type="radio"] { display: none; }
+
+.framework-option-card:hover {
+  border-color: var(--fw-color, #0d6efd);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.framework-option-card.selected {
+  border-color: var(--fw-color, #0d6efd);
+  background: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fw-color, #0d6efd) 15%, transparent);
+}
+
+.fwc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.fwc-top i { font-size: 22px; }
+
+.fwc-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: .04em;
+}
+
+.fwc-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 4px;
+}
+
+.fwc-desc {
+  font-size: 11px;
+  color: #6c757d;
+  line-height: 1.5;
+  flex: 1;
+  margin-bottom: 12px;
+}
+
+.fwc-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6c757d;
+  border-top: 1px solid #f0f2f5;
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+.fwc-indicators, .fwc-region {
+  display: flex;
+  align-items: center;
+}
+
+.fwc-mandatory {
+  font-size: 10px;
+  color: #dc3545;
+  background: #fff3f3;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-top: 8px;
+}
+
+/* ── Submit button area ── */
+.ob-submit {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+</style>
+
+<div class="app-layout">
+  <?php include __DIR__ . '/../includes/sidebar.php'; ?>
+
+  <div class="main-content">
+    <div class="topbar">
+      <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+      <div class="topbar-title">
+        <h1><i class="bi bi-building-add me-2 text-primary"></i>Add New Company</h1>
+        <span class="topbar-subtitle">Complete the form to create a new ESG profile</span>
+      </div>
+      <div class="topbar-actions">
+        <a href="<?= url('companies') ?>" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i>Back to Companies
+        </a>
+      </div>
     </div>
+
+    <div class="content-body">
+      <div class="onboarding-wrap">
 
     <?php if ($error): ?>
     <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i><?= htmlspecialchars($error) ?></div>
@@ -67,6 +285,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label class="form-label">Number of Employees <span class="text-danger">*</span></label>
             <input type="number" class="form-control" name="employee_count" min="1"
                    placeholder="e.g. 85" required value="<?= htmlspecialchars($_POST['employee_count'] ?? '') ?>">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Bursa Malaysia Sector <span class="text-muted small">(optional)</span></label>
+            <?php $bursaSectors = require __DIR__ . '/../config/bursa_sectors.php'; ?>
+            <select class="form-select" name="bursa_sector">
+              <option value="">Not listed / N/A</option>
+              <?php foreach ($bursaSectors as $sector): ?>
+              <option value="<?= htmlspecialchars($sector) ?>"
+                <?= ($_POST['bursa_sector'] ?? '') === $sector ? 'selected' : '' ?>>
+                <?= htmlspecialchars($sector) ?>
+              </option>
+              <?php endforeach; ?>
+            </select>
+            <div class="form-text">Used for Bursa benchmarking. Select if your company is or targets Bursa listing.</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Reporting Scope</label>
+            <div class="d-flex gap-3 mt-1">
+              <?php foreach (['hq' => ['HQ Only','Headquarters operations only'], 'factory' => ['Factory / Site','Single facility reporting'], 'group' => ['Group-wide','Consolidated group reporting']] as $val => [$lbl, $desc]): ?>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reporting_scope" id="scope_<?= $val ?>"
+                       value="<?= $val ?>" <?= (($_POST['reporting_scope'] ?? 'hq') === $val) ? 'checked' : '' ?>>
+                <label class="form-check-label" for="scope_<?= $val ?>">
+                  <strong><?= $lbl ?></strong>
+                  <div class="text-muted" style="font-size:11px"><?= $desc ?></div>
+                </label>
+              </div>
+              <?php endforeach; ?>
+            </div>
           </div>
         </div>
       </div>
@@ -121,60 +370,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <!-- Step 3: Framework selection -->
       <div class="onboarding-section">
         <div class="section-label"><span class="step-badge">3</span> ESG Reporting Framework</div>
-        <p class="text-muted small mb-3">Your consultant can change this anytime. We recommend starting with Bursa SEDG for Malaysian companies.</p>
-        <div class="framework-selector">
-          <?php
-          $frameworks = [
-              'BURSA_SEDG' => [
-                  'label' => 'Bursa Malaysia SEDG',
-                  'desc'  => 'Mandatory for Bursa-listed companies. Best for Malaysian market.',
-                  'icon'  => 'bi-graph-up',
-                  'badge' => 'Recommended for Malaysia',
-                  'indicators' => '41 indicators',
-              ],
-              'GRI' => [
-                  'label' => 'GRI Standards',
-                  'desc'  => 'Global standard. Best for international supply chains and investors.',
-                  'icon'  => 'bi-globe',
-                  'badge' => 'International Standard',
-                  'indicators' => '33 indicators',
-              ],
-              'BOTH' => [
-                  'label' => 'Bursa SEDG + GRI',
-                  'desc'  => 'Comprehensive coverage. Best for pre-IPO and export-oriented companies.',
-                  'icon'  => 'bi-layers',
-                  'badge' => 'Most Comprehensive',
-                  'indicators' => '60+ indicators',
-              ],
-          ];
-          foreach ($frameworks as $val => $fw):
-          ?>
-          <label class="framework-option <?= ($_POST['framework'] ?? 'BURSA_SEDG') === $val ? 'selected' : '' ?>">
-            <input type="radio" name="framework" value="<?= $val ?>"
-                   <?= ($_POST['framework'] ?? 'BURSA_SEDG') === $val ? 'checked' : '' ?> required>
-            <div class="fw-header">
-              <i class="bi <?= $fw['icon'] ?>"></i>
-              <div>
-                <strong><?= $fw['label'] ?></strong>
-                <span class="fw-badge"><?= $fw['badge'] ?></span>
-              </div>
-              <span class="fw-count"><?= $fw['indicators'] ?></span>
+        <p class="text-muted small mb-3">
+          Select the standard your company needs to report against. Consultants can assign a different framework per client.
+          <strong>Not sure?</strong> Start with Bursa SEDG — you can add more later.
+        </p>
+
+        <?php
+        $allFrameworks    = Company::getAllFrameworks();
+        $groupedFrameworks= Company::getFrameworksByCategory();
+        $selectedFw       = $_POST['framework'] ?? 'BURSA_SEDG';
+        ?>
+
+        <?php foreach ($groupedFrameworks as $groupLabel => $fwList): ?>
+        <div class="fw-group-label"><?= htmlspecialchars($groupLabel) ?></div>
+        <div class="framework-selector-grid">
+          <?php foreach ($fwList as $fw): ?>
+          <label class="framework-option-card <?= $selectedFw === $fw['id'] ? 'selected' : '' ?>"
+                 style="--fw-color: <?= $fw['color'] ?>">
+            <input type="radio" name="framework" value="<?= $fw['id'] ?>"
+                   <?= $selectedFw === $fw['id'] ? 'checked' : '' ?> required>
+            <div class="fwc-top">
+              <i class="bi <?= $fw['icon'] ?>" style="color:<?= $fw['color'] ?>"></i>
+              <span class="fwc-badge" style="background:<?= $fw['color'] ?>20;color:<?= $fw['color'] ?>"><?= htmlspecialchars($fw['badge']) ?></span>
             </div>
-            <p class="fw-desc"><?= $fw['desc'] ?></p>
+            <div class="fwc-name"><?= htmlspecialchars($fw['name']) ?></div>
+            <div class="fwc-desc"><?= htmlspecialchars($fw['description']) ?></div>
+            <div class="fwc-footer">
+              <span class="fwc-indicators"><i class="bi bi-list-check me-1"></i><?= $fw['indicators'] ?> indicators</span>
+              <span class="fwc-region"><i class="bi bi-geo-alt me-1"></i><?= $fw['region'] ?></span>
+            </div>
+            <?php if (!empty($fw['mandatory_for'])): ?>
+            <div class="fwc-mandatory"><i class="bi bi-info-circle me-1"></i><?= htmlspecialchars($fw['mandatory_for']) ?></div>
+            <?php endif; ?>
           </label>
           <?php endforeach; ?>
         </div>
+        <?php endforeach; ?>
       </div>
 
-      <div class="d-grid mt-4">
-        <button type="submit" class="btn btn-primary btn-lg">
-          <i class="bi bi-rocket-takeoff me-2"></i>Launch My ESG Dashboard
-        </button>
+      <div class="ob-submit">
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-rocket-takeoff me-2"></i>Launch My ESG Dashboard
+          </button>
+        </div>
+        <p class="text-center text-muted small mt-3 mb-0">You can add more companies or change the framework later.</p>
       </div>
-      <p class="text-center text-muted small mt-2">You can add more companies or change the framework later.</p>
     </form>
-  </div>
-</div>
+
+      </div><!-- /.onboarding-wrap -->
+    </div><!-- /.content-body -->
+  </div><!-- /.main-content -->
+</div><!-- /.app-layout -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
