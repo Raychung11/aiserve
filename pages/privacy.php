@@ -7,13 +7,30 @@ Auth::startSession();
 $isLoggedIn = Auth::check();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-MY">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Policy | ESG gen</title>
+<meta name="description" content="ESG gen's privacy policy — how we collect, use, and protect your personal data under Malaysia's Personal Data Protection Act 2010 (PDPA, Act 709). Adcellent Biz Sdn Bhd.">
+<meta name="keywords" content="ESG gen privacy policy, data protection Malaysia, PDPA Act 709, personal data ESG platform, Adcellent privacy">
+<meta name="author" content="ESG gen — Adcellent Biz Sdn Bhd">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="<?= APP_URL ?>/privacy">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<?= APP_URL ?>/privacy">
+<meta property="og:site_name" content="ESG gen">
+<meta property="og:locale" content="en_MY">
+<meta property="og:title" content="Privacy Policy | ESG gen">
+<meta property="og:description" content="How ESG gen collects, uses, and protects your data. PDPA-compliant. Adcellent Biz Sdn Bhd (1511714-V).">
+<meta property="og:image" content="<?= APP_URL ?>/assets/img/og-esggen.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Privacy Policy | ESG gen">
+<meta name="twitter:description" content="How ESG gen collects, uses, and protects your data. PDPA Act 709 compliant.">
+<link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"Privacy Policy","url":"<?= APP_URL ?>/privacy","description":"Privacy Policy for ESG gen by Adcellent Biz Sdn Bhd — compliant with Malaysia PDPA 2010 Act 709.","inLanguage":"en-MY","isPartOf":{"@type":"WebSite","name":"ESG gen","url":"<?= APP_URL ?>"},"publisher":{"@type":"Organization","name":"Adcellent Biz Sdn Bhd","url":"<?= APP_URL ?>"}}
+</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>

@@ -15,8 +15,12 @@ $isLoggedIn = Auth::check();
   <title>ESG gen | Free ESG Reporting Platform for Malaysian SMEs</title>
   <meta name="description" content="Malaysia's ESG reporting platform for SMEs. Start free with 15 mandatory Bursa SEDG indicators. Full data collection OS at RM 1,500/yr. Expert ESG consultation available.">
   <meta name="keywords" content="ESG reporting Malaysia, Bursa SEDG, SME ESG platform, ESG compliance Malaysia, Bursa SEDG indicators, Malaysia ESG software, sustainability reporting Malaysia, ESG report generator">
-  <meta name="author" content="ESG gen">
+  <meta name="author" content="ESG gen — Adcellent Biz Sdn Bhd">
   <meta name="robots" content="index, follow">
+  <meta name="geo.region" content="MY-14">
+  <meta name="geo.placename" content="Kuala Lumpur, Malaysia">
+  <meta name="geo.position" content="3.1390;101.6869">
+  <meta name="ICBM" content="3.1390, 101.6869">
   <link rel="canonical" href="<?= APP_URL ?>/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="<?= APP_URL ?>/">
@@ -31,7 +35,60 @@ $isLoggedIn = Auth::check();
   <meta name="twitter:image" content="<?= APP_URL ?>/assets/img/og-esggen.png">
   <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"ESG gen","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"<?= APP_URL ?>","description":"Malaysia's ESG reporting platform for SMEs.","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"MYR"},{"@type":"Offer","name":"Platform","price":"1500","priceCurrency":"MYR"}],"provider":{"@type":"Organization","name":"Adcellent Biz Sdn Bhd"}}
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "ESG gen",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": "<?= APP_URL ?>",
+      "description": "Malaysia's ESG reporting platform for SMEs. Start free with 15 mandatory Bursa SEDG indicators.",
+      "inLanguage": "en-MY",
+      "offers": [
+        {"@type":"Offer","name":"Starter","price":"0","priceCurrency":"MYR","description":"Free forever — 15 mandatory Bursa SEDG indicators"},
+        {"@type":"Offer","name":"Platform","price":"1500","priceCurrency":"MYR","priceSpecification":{"@type":"UnitPriceSpecification","price":"1500","priceCurrency":"MYR","unitCode":"ANN"}},
+        {"@type":"Offer","name":"Consultation","price":"8000","priceCurrency":"MYR","description":"Professional ESG report review per report"}
+      ],
+      "provider": {"@type":"Organization","name":"Adcellent Biz Sdn Bhd","url":"<?= APP_URL ?>"}
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ESG gen",
+      "url": "<?= APP_URL ?>",
+      "description": "Malaysia's ESG reporting platform for SMEs.",
+      "inLanguage": "en-MY",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {"@type":"EntryPoint","urlTemplate":"<?= APP_URL ?>/?q={search_term_string}"},
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Adcellent Biz Sdn Bhd",
+      "legalName": "Adcellent Biz Sdn Bhd (1511714-V)",
+      "url": "<?= APP_URL ?>",
+      "logo": "<?= APP_URL ?>/assets/img/esggen-logo.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+60113318460",
+        "contactType": "customer support",
+        "email": "hello@adcellent.com.my",
+        "availableLanguage": ["English","Malay"]
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "D13-07, Menara Suezcap 1, KL Gateway, Jalan Kerinchi",
+        "addressLocality": "Kuala Lumpur",
+        "postalCode": "59200",
+        "addressCountry": "MY"
+      },
+      "sameAs": []
+    }
+  ]
   </script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">

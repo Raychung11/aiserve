@@ -7,13 +7,30 @@ Auth::startSession();
 $isLoggedIn = Auth::check();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-MY">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cookie Policy | ESG gen</title>
+<meta name="description" content="ESG gen uses only one strictly necessary session cookie — no tracking, no advertising, no analytics cookies. Learn what we use and how to manage it.">
+<meta name="keywords" content="ESG gen cookie policy, session cookie, no tracking cookies, PDPA cookies Malaysia, Adcellent cookie notice">
+<meta name="author" content="ESG gen — Adcellent Biz Sdn Bhd">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="<?= APP_URL ?>/cookies">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<?= APP_URL ?>/cookies">
+<meta property="og:site_name" content="ESG gen">
+<meta property="og:locale" content="en_MY">
+<meta property="og:title" content="Cookie Policy | ESG gen">
+<meta property="og:description" content="ESG gen uses only one strictly necessary session cookie. No advertising or tracking cookies.">
+<meta property="og:image" content="<?= APP_URL ?>/assets/img/og-esggen.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Cookie Policy | ESG gen">
+<meta name="twitter:description" content="ESG gen uses one session cookie only — no tracking or advertising cookies.">
+<link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"Cookie Policy","url":"<?= APP_URL ?>/cookies","description":"Cookie Policy for ESG gen — one strictly necessary session cookie, no tracking or advertising.","inLanguage":"en-MY","isPartOf":{"@type":"WebSite","name":"ESG gen","url":"<?= APP_URL ?>"},"publisher":{"@type":"Organization","name":"Adcellent Biz Sdn Bhd","url":"<?= APP_URL ?>"}}
+</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>

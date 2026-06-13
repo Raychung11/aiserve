@@ -7,13 +7,30 @@ Auth::startSession();
 $isLoggedIn = Auth::check();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-MY">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terms of Use | ESG gen</title>
+<meta name="description" content="ESG gen terms of use — subscription terms, acceptable use policy, liability limitations, and governing law. Adcellent Biz Sdn Bhd (1511714-V), Kuala Lumpur, Malaysia.">
+<meta name="keywords" content="ESG gen terms of use, ESG platform terms Malaysia, acceptable use policy, Adcellent terms, SME ESG terms">
+<meta name="author" content="ESG gen — Adcellent Biz Sdn Bhd">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="<?= APP_URL ?>/terms">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<?= APP_URL ?>/terms">
+<meta property="og:site_name" content="ESG gen">
+<meta property="og:locale" content="en_MY">
+<meta property="og:title" content="Terms of Use | ESG gen">
+<meta property="og:description" content="Terms of use for ESG gen — subscription plans, acceptable use, data ownership, and governing law (Malaysia).">
+<meta property="og:image" content="<?= APP_URL ?>/assets/img/og-esggen.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Terms of Use | ESG gen">
+<meta name="twitter:description" content="ESG gen platform terms — subscription, acceptable use, liability, Malaysian law.">
+<link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"Terms of Use","url":"<?= APP_URL ?>/terms","description":"Terms of Use for ESG gen — Malaysia's ESG reporting platform by Adcellent Biz Sdn Bhd.","inLanguage":"en-MY","isPartOf":{"@type":"WebSite","name":"ESG gen","url":"<?= APP_URL ?>"},"publisher":{"@type":"Organization","name":"Adcellent Biz Sdn Bhd","url":"<?= APP_URL ?>"}}
+</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>

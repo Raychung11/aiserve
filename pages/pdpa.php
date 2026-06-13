@@ -11,10 +11,26 @@ $isLoggedIn = Auth::check();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDPA Notice | ESG gen</title>
+<meta name="description" content="ESG gen's Personal Data Protection Act (PDPA) Notice under Malaysia Act 709. Understand your data subject rights — access, correction, and withdrawal of consent.">
+<meta name="keywords" content="PDPA Malaysia, Personal Data Protection Act 709, ESG gen PDPA, data subject rights Malaysia, Adcellent PDPA notice">
+<meta name="author" content="ESG gen — Adcellent Biz Sdn Bhd">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="<?= APP_URL ?>/pdpa">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<?= APP_URL ?>/pdpa">
+<meta property="og:site_name" content="ESG gen">
+<meta property="og:locale" content="en_MY">
+<meta property="og:title" content="PDPA Notice | ESG gen">
+<meta property="og:description" content="ESG gen PDPA Notice — your rights under Malaysia's Personal Data Protection Act 2010 (Act 709).">
+<meta property="og:image" content="<?= APP_URL ?>/assets/img/og-esggen.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PDPA Notice | ESG gen">
+<meta name="twitter:description" content="Your rights under Malaysia's PDPA Act 709 when using ESG gen.">
 <link rel="icon" href="<?= APP_URL ?>/assets/img/favicon.svg" type="image/svg+xml">
-<title>PDPA Notice | ESG gen</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"PDPA Notice","url":"<?= APP_URL ?>/pdpa","description":"Personal Data Protection Act (PDPA) Notice for ESG gen under Malaysia Act 709.","inLanguage":"en-MY","isPartOf":{"@type":"WebSite","name":"ESG gen","url":"<?= APP_URL ?>"},"publisher":{"@type":"Organization","name":"Adcellent Biz Sdn Bhd","url":"<?= APP_URL ?>"}}
+</script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>

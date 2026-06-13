@@ -22,6 +22,39 @@ $basePath     = rtrim(dirname($scriptName), '/');
 $path         = str_replace($basePath, '', parse_url($requestUri, PHP_URL_PATH) ?? '/');
 $path         = '/' . trim($path, '/');
 
+// Special endpoints that bypass slug routing
+if ($path === '/sitemap.xml') {
+    require_once __DIR__ . '/pages/sitemap.php';
+    exit;
+}
+if ($path === '/robots.txt') {
+    header('Content-Type: text/plain; charset=utf-8');
+    $sitemapUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http')
+                  . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/sitemap.xml';
+    echo "User-agent: *\n";
+    echo "Allow: /\n";
+    echo "Disallow: /dashboard\n";
+    echo "Disallow: /admin\n";
+    echo "Disallow: /data-entry\n";
+    echo "Disallow: /gap-analysis\n";
+    echo "Disallow: /reports\n";
+    echo "Disallow: /carbon\n";
+    echo "Disallow: /benchmarking\n";
+    echo "Disallow: /kpi-trends\n";
+    echo "Disallow: /action-plans\n";
+    echo "Disallow: /action-plan-detail\n";
+    echo "Disallow: /company-settings\n";
+    echo "Disallow: /companies\n";
+    echo "Disallow: /team\n";
+    echo "Disallow: /departments\n";
+    echo "Disallow: /notifications\n";
+    echo "Disallow: /billing\n";
+    echo "Disallow: /export-csv\n";
+    echo "Disallow: /onboarding\n\n";
+    echo "Sitemap: $sitemapUrl\n";
+    exit;
+}
+
 // Extract page name from path or query string
 if ($path !== '/' && $path !== '') {
     $page = ltrim($path, '/');
