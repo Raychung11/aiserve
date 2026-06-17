@@ -1,0 +1,316 @@
+<?php
+
+class UserController
+{
+    public function __construct()
+    {
+        Auth::requireRole('user');
+    }
+
+    public function dashboard(): void
+    {
+        $userId = Auth::id();
+        $stats = [
+            'total'     => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE patient_id = ?', [$userId])['c'],
+            'pending'   => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE patient_id = ? AND status = "pending"', [$userId])['c'],
+            'completed' => Database::queryOne('SELECT COUNT(*) as c FROM appointments WHERE patient_id = ? AND status = "completed"', [$userId])['c'],
+        ];
+
+        $recent = Database::query(
+            'SELECT a.*, du.name AS doctor_name, d.speciality
+             FROM appointments a
+             JOIN doctors d ON a.doctor_id = d.id
+             JOIN users du ON d.user_id = du.id
+             WHERE a.patient_id = ?
+             ORDER BY a.created_at DESC LIMIT 5',
+            [$userId]
+        );
+
+        $todayOnline = Database::query(
+            'SELECT a.*, du.name AS doctor_name, d.speciality
+             FROM appointments a
+             JOIN doctors d ON a.doctor_id = d.id
+             JOIN users du ON d.user_id = du.id
+             WHERE a.patient_id = ? AND a.type = "online" AND a.status = "confirmed"
+               AND a.appointment_date = CURDATE()
+             ORDER BY a.appointment_time ASC',
+            [$userId]
+        );
+
+        view('layouts/app', [
+            'pageTitle'   => 'My Dashboard',
+            'content'     => 'user/dashboard',
+            'stats'       => $stats,
+            'recent'      => $recent,
+            'todayOnline' => $todayOnline,
+        ]);
+    }
+
+    public function appointments(): void
+    {
+        $userId = Auth::id();
+        $status = $_GET['status'] ?? '';
+        $page   = max(1, (int) ($_GET['page'] ?? 1));
+
+        $where  = 'WHERE a.patient_id = ?';
+        $params = [$userId];
+        if ($status) { $where .= ' AND a.status = ?'; $params[] = $status; }
+
+        $paging = paginate(
+            Database::queryOne("SELECT COUNT(*) as c FROM appointments a $where", $params)['c'],
+            10, $page
+        );
+
+        $appointments = Database::query(
+            "SELECT a.*, du.name AS doctor_name, d.speciality, o.name AS org_name
+             FROM appointments a
+             JOIN doctors d ON a.doctor_id = d.id
+             JOIN users du ON d.user_id = du.id
+             LEFT JOIN organisations o ON a.organisation_id = o.id
+             $where ORDER BY a.appointment_date DESC, a.appointment_time DESC
+             LIMIT ? OFFSET ?",
+            array_merge($params, [$paging['per_page'], $paging['offset']])
+        );
+
+        $ratedIds = array_column(
+            Database::query('SELECT appointment_id FROM ratings WHERE patient_id = ?', [$userId]),
+            'appointment_id'
+        );
+
+        view('layouts/app', [
+            'pageTitle'    => 'My Appointments',
+            'content'      => 'user/appointments',
+            'appointments' => $appointments,
+            'paging'       => $paging,
+            'status'       => $status,
+            'ratedIds'     => $ratedIds,
+        ]);
+    }
+
+    public function profile(): void
+    {
+        $user = Database::queryOne('SELECT * FROM users WHERE id = ?', [Auth::id()]);
+        view('layouts/app', [
+            'pageTitle' => 'My Profile',
+            'content'   => 'user/profile',
+            'user'      => $user,
+        ]);
+    }
+
+    public function updateProfile(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/profile'); }
+
+        $name  = trim($_POST['name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+
+        if (strlen($name) < 2) { flash('error', 'Name is too short.'); redirect('user/profile'); }
+
+        Database::execute('UPDATE users SET name=?, phone=? WHERE id=?', [$name, $phone, Auth::id()]);
+
+        // Update session name
+        $_SESSION['user_name'] = $name;
+
+        flash('success', 'Profile updated.');
+        redirect('user/profile');
+    }
+
+    public function updatePhoto(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/profile'); }
+        $path = uploadPhoto('photo', 'users');
+        if ($path) {
+            Database::execute('UPDATE users SET avatar = ? WHERE id = ?', [$path, Auth::id()]);
+            Auth::refreshAvatar($path);
+            flash('success', 'Photo updated.');
+        }
+        redirect('user/profile');
+    }
+
+    public function changePassword(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/profile'); }
+
+        $current = $_POST['current_password'] ?? '';
+        $new     = $_POST['new_password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
+
+        $user = Database::queryOne('SELECT password FROM users WHERE id = ?', [Auth::id()]);
+        if (!password_verify($current, $user['password'])) {
+            flash('error', 'Current password is incorrect.'); redirect('user/profile');
+        }
+        if (strlen($new) < 8) {
+            flash('error', 'New password must be at least 8 characters.'); redirect('user/profile');
+        }
+        if ($new !== $confirm) {
+            flash('error', 'Passwords do not match.'); redirect('user/profile');
+        }
+
+        Database::execute('UPDATE users SET password = ? WHERE id = ?', [password_hash($new, PASSWORD_BCRYPT), Auth::id()]);
+        flash('success', 'Password changed successfully.');
+        redirect('user/profile');
+    }
+
+    public function dispensary(): void
+    {
+        $userId    = Auth::id();
+        $dispensings = Database::query(
+            'SELECT d.*, o.name AS org_name, du.name AS dispensed_by_name
+             FROM dispensings d
+             JOIN organisations o ON d.organisation_id = o.id
+             JOIN users du        ON d.dispensed_by     = du.id
+             WHERE d.patient_id = ?
+             ORDER BY d.created_at DESC',
+            [$userId]
+        );
+
+        // Fetch items for each dispensing
+        foreach ($dispensings as &$disp) {
+            $disp['items'] = Database::query(
+                'SELECT di.*, m.name AS medicine_name, m.unit FROM dispensing_items di
+                 JOIN medicines m ON di.medicine_id = m.id
+                 WHERE di.dispensing_id = ?',
+                [$disp['id']]
+            );
+        }
+
+        view('layouts/app', [
+            'pageTitle'   => 'My Dispensing History',
+            'content'     => 'user/dispensary',
+            'dispensings' => $dispensings,
+        ]);
+    }
+
+    public function records(): void
+    {
+        $userId  = Auth::id();
+        $records = Database::query(
+            'SELECT mr.*, du.name AS doctor_name, d.speciality,
+                    a.appointment_date, a.appointment_time, a.type
+             FROM medical_records mr
+             JOIN doctors d ON mr.doctor_id = d.id
+             JOIN users du ON d.user_id = du.id
+             JOIN appointments a ON mr.appointment_id = a.id
+             WHERE mr.patient_id = ?
+             ORDER BY mr.created_at DESC',
+            [$userId]
+        );
+
+        view('layouts/app', [
+            'pageTitle' => 'My Medical Records',
+            'content'   => 'user/records',
+            'records'   => $records,
+        ]);
+    }
+
+    public function healthProfile(): void
+    {
+        $userId  = Auth::id();
+        $profile = Database::queryOne('SELECT * FROM health_profiles WHERE user_id = ?', [$userId]);
+
+        view('layouts/app', [
+            'pageTitle' => 'My Health Profile',
+            'content'   => 'user/health_profile',
+            'profile'   => $profile,
+        ]);
+    }
+
+    public function updateHealthProfile(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/health-profile'); }
+
+        $userId = Auth::id();
+        $data   = [
+            trim($_POST['blood_type'] ?? 'Unknown'),
+            trim($_POST['allergies'] ?? ''),
+            trim($_POST['chronic_conditions'] ?? ''),
+            trim($_POST['current_medications'] ?? ''),
+            trim($_POST['emergency_contact_name'] ?? ''),
+            trim($_POST['emergency_contact_phone'] ?? ''),
+        ];
+
+        $existing = Database::queryOne('SELECT id FROM health_profiles WHERE user_id = ?', [$userId]);
+
+        if ($existing) {
+            Database::execute(
+                'UPDATE health_profiles SET blood_type=?,allergies=?,chronic_conditions=?,current_medications=?,emergency_contact_name=?,emergency_contact_phone=? WHERE user_id=?',
+                array_merge($data, [$userId])
+            );
+        } else {
+            Database::insert(
+                'INSERT INTO health_profiles (user_id,blood_type,allergies,chronic_conditions,current_medications,emergency_contact_name,emergency_contact_phone) VALUES (?,?,?,?,?,?,?)',
+                array_merge([$userId], $data)
+            );
+        }
+
+        flash('success', 'Health profile updated.');
+        redirect('user/health-profile');
+    }
+
+    public function rateDoctor(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/appointments'); }
+
+        $appointmentId = (int) ($_POST['appointment_id'] ?? 0);
+        $rating        = (int) ($_POST['rating'] ?? 0);
+        $comment       = trim($_POST['comment'] ?? '');
+        $userId        = Auth::id();
+
+        if ($rating < 1 || $rating > 5) { flash('error', 'Please select a rating between 1 and 5.'); redirect('user/appointments'); }
+
+        $appt = Database::queryOne(
+            'SELECT * FROM appointments WHERE id = ? AND patient_id = ? AND status = "completed"',
+            [$appointmentId, $userId]
+        );
+        if (!$appt) { flash('error', 'Appointment not found.'); redirect('user/appointments'); }
+
+        $already = Database::queryOne('SELECT id FROM ratings WHERE appointment_id = ?', [$appointmentId]);
+        if ($already) { flash('error', 'You have already rated this appointment.'); redirect('user/appointments'); }
+
+        Database::insert(
+            'INSERT INTO ratings (appointment_id, doctor_id, patient_id, rating, comment) VALUES (?,?,?,?,?)',
+            [$appointmentId, $appt['doctor_id'], $userId, $rating, $comment]
+        );
+
+        flash('success', 'Thank you for your feedback!');
+        redirect('user/appointments');
+    }
+
+    public function cancelAppointment(): void
+    {
+        if (!csrf_verify()) { flash('error', 'Invalid request.'); redirect('user/appointments'); }
+
+        $id     = (int) ($_POST['appointment_id'] ?? 0);
+        $reason = trim($_POST['reason'] ?? '');
+        $userId = Auth::id();
+
+        $appt = Database::queryOne(
+            'SELECT * FROM appointments WHERE id = ? AND patient_id = ? AND status IN ("pending","confirmed")',
+            [$id, $userId]
+        );
+        if (!$appt) {
+            flash('error', 'Appointment not found or cannot be cancelled.');
+            redirect('user/appointments');
+        }
+
+        $notes = $reason ? 'Cancelled by patient: ' . $reason : 'Cancelled by patient.';
+        Database::execute(
+            'UPDATE appointments SET status = "cancelled", notes = ? WHERE id = ?',
+            [$notes, $id]
+        );
+
+        // Notify the doctor
+        $doctor = Database::queryOne('SELECT user_id FROM doctors WHERE id = ?', [$appt['doctor_id']]);
+        if ($doctor) {
+            notify(
+                $doctor['user_id'], 'appointment',
+                'Appointment Cancelled by Patient',
+                'A patient has cancelled their appointment. ' . ($reason ? 'Reason: ' . $reason : ''),
+                'medic/appointments'
+            );
+        }
+
+        flash('success', 'Your appointment has been cancelled.');
+        redirect('user/appointments');
+    }
+}
