@@ -1,0 +1,29 @@
+Options -Indexes
+Options -MultiViews
+
+RewriteEngine On
+RewriteBase /
+
+# Block direct access to sensitive directories
+RewriteRule ^(config|includes|db)/  - [F,L]
+
+# Route clean URLs to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?_route=$1 [QSA,L]
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# PHP config
+<IfModule mod_php.c>
+  php_flag display_errors Off
+  php_value upload_max_filesize 10M
+  php_value post_max_size 12M
+  php_value max_execution_time 60
+</IfModule>
