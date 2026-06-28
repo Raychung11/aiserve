@@ -100,6 +100,17 @@ include __DIR__ . '/../includes/landing_header.php';
 .price-check { color:#6366f1; margin-right:.5rem; }
 .popular-badge { background:#6366f1; color:#fff; font-size:.7rem; font-weight:700;
                  padding:.2rem .7rem; border-radius:20px; letter-spacing:.04em; }
+@media(max-width:575.98px){
+  .price-card { padding:.85rem .7rem; border-radius:12px; }
+  .price-card .price-amt { font-size:1.5rem; }
+  .price-card .price-per { font-size:.7rem; }
+  .price-card hr { margin:.6rem 0; }
+  .price-card ul { margin-bottom:.75rem !important; }
+  .price-card ul li { font-size:.7rem !important; margin-bottom:.25rem !important; }
+  .price-card .btn { font-size:.75rem !important; padding:.4rem .5rem !important; }
+  .price-card .fw-bold { font-size:.8rem !important; }
+  .popular-badge { font-size:.6rem; padding:.15rem .5rem; }
+}
 
 /* ── Testimonials ── */
 .testimonial-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:1.75rem; }
@@ -530,7 +541,7 @@ include __DIR__ . '/../includes/landing_header.php';
             <span class="price-amt">RM <?= number_format($p['price_monthly']) ?></span>
             <span class="price-per">/month</span>
           </div>
-          <div style="font-size:.75rem;color:#94a3b8;margin-bottom:1.25rem;">
+          <div class="d-none d-sm-block" style="font-size:.75rem;color:#94a3b8;margin-bottom:1.25rem;">
             or RM <?= number_format($p['price_annual']) ?>/year — save <?= round((1-$p['price_annual']/($p['price_monthly']*12))*100) ?>%
           </div>
           <hr style="border-color:#f1f5f9;">
