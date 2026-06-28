@@ -66,7 +66,7 @@ $sql = '
     FROM rooms r
     JOIN units u ON u.id=r.unit_id
     JOIN buildings b ON b.id=u.building_id
-    JOIN companies c ON c.id=r.company_id AND c.is_active=1
+    JOIN companies c ON c.id=r.company_id AND c.status IN (\'trial\',\'active\')
     LEFT JOIN tenancies t ON t.room_id=r.id AND t.status=\'active\'
     WHERE r.is_active=1 AND t.id IS NULL
 ';
