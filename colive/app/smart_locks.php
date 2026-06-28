@@ -127,7 +127,7 @@ $locks = $locks->fetchAll();
 $filterLockId = (int)($_GET['lock_id'] ?? 0);
 $logSql = 'SELECT l.*, sl.label AS lock_label, sl.device_id,
                   r.room_no, u.unit_no, b.name AS building_name,
-                  us.full_name AS staff_name
+                  us.name AS staff_name
            FROM lock_access_logs l
            JOIN smart_locks sl ON sl.id=l.lock_id
            JOIN rooms r ON r.id=sl.room_id

@@ -79,7 +79,7 @@ if ($threadId) {
         )->execute([$threadId, $threadId, $cid]);
 
         $msgStmt = $db->prepare(
-            'SELECT sm.*, us.full_name AS staff_name FROM support_messages sm
+            'SELECT sm.*, us.name AS staff_name FROM support_messages sm
              LEFT JOIN users us ON us.id=sm.sender_id AND sm.sender_type=\'staff\'
              WHERE (sm.id=? OR sm.parent_id=?) AND sm.company_id=?
              ORDER BY sm.created_at ASC'
