@@ -15,7 +15,7 @@ date_default_timezone_set(TZ);
 
 // ── Debug mode ───────────────────────────────────────────────────────────────
 // Flip to true on local/staging only.
-define('DEBUG_MODE', false);
+define('DEBUG_MODE', true); // TEMP — disable after diagnosing 500
 
 if (DEBUG_MODE) {
     ini_set('display_errors', '1');

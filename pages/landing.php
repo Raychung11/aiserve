@@ -197,6 +197,23 @@ include __DIR__ . '/../includes/landing_header.php';
   </div>
 </section>
 
+<!-- ── CoLive OS callout ── -->
+<div style="background:linear-gradient(90deg,#7c3aed 0%,#9333ea 100%);padding:1rem 0;">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <span style="background:rgba(255,255,255,.15);border-radius:8px;padding:.35rem .7rem;font-size:.75rem;font-weight:700;color:#fff;letter-spacing:.06em;">NEW</span>
+        <span style="color:#fff;font-weight:600;font-size:.95rem;">
+          Running a <strong>co-living</strong> or <strong>hostel</strong>? Try <strong>CoLive OS</strong> &mdash; built for multi-room operators.
+        </span>
+      </div>
+      <a href="/colive/" style="background:#fff;color:#7c3aed;font-weight:700;font-size:.85rem;padding:.45rem 1.25rem;border-radius:8px;text-decoration:none;white-space:nowrap;">
+        Explore CoLive OS &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════════════════════════════════════════════
      STATS BAR
 ════════════════════════════════════════════════════════ -->

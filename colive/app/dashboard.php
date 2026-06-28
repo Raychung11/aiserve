@@ -394,18 +394,21 @@ include __DIR__ . '/layout.php';
 
 <?php
 $brandHex = e($brandClr);
-$extraJs = <<<JS
-<?php if ($revChart): ?>
+$extraJs  = '';
+if ($revChart) {
+    $chartLabelsJson = json_encode($chartLabels);
+    $chartDataJson   = json_encode(array_map('floatval', $chartData));
+    $extraJs = <<<JS
 (function(){
   const ctx = document.getElementById('revChart');
   if (!ctx) return;
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: <?= json_encode($chartLabels) ?>,
+      labels: {$chartLabelsJson},
       datasets: [{
         label: 'Revenue (RM)',
-        data: <?= json_encode(array_map('floatval', $chartData)) ?>,
+        data: {$chartDataJson},
         backgroundColor: '{$brandHex}33',
         borderColor: '{$brandHex}',
         borderWidth: 2,
@@ -422,7 +425,7 @@ $extraJs = <<<JS
     }
   });
 })();
-<?php endif; ?>
 JS;
+}
 include __DIR__ . '/layout_end.php';
 ?>
