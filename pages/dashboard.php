@@ -18,7 +18,7 @@ foreach ($properties as $p) { $complianceSummary[$p['compliance_status']] = ($co
 
 // Expiring leases (within 30 days)
 $expiringLeases = Database::fetchAll(
-    'SELECT t.*, p.name AS property_name FROM tenancies t
+    'SELECT t.*, p.name AS property_name FROM str_tenancies t
      LEFT JOIN properties p ON p.id = t.property_id
      WHERE t.tenant_id=? AND t.status="active"
        AND t.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)

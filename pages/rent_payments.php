@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $notes      = trim($_POST['notes'] ?? '');
 
         // Verify tenancy belongs to this tenant
-        $tenancy = Database::fetchOne("SELECT * FROM tenancies WHERE id=? AND tenant_id=?", [$tenancyId, $_tenantId]);
+        $tenancy = Database::fetchOne("SELECT * FROM str_tenancies WHERE id=? AND tenant_id=?", [$tenancyId, $_tenantId]);
         if (!$tenancy) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Tenancy not found.']; header('Location: '.APP_URL.'/rent-payments'); exit; }
 
         $status = 'pending';
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ── Generate schedule for a tenancy ──────────────────────────────────────
     if ($action === 'generate_schedule') {
         $tenancyId = (int)$_POST['tenancy_id'];
-        $tenancy   = Database::fetchOne("SELECT * FROM tenancies WHERE id=? AND tenant_id=?", [$tenancyId, $_tenantId]);
+        $tenancy   = Database::fetchOne("SELECT * FROM str_tenancies WHERE id=? AND tenant_id=?", [$tenancyId, $_tenantId]);
         if (!$tenancy) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Tenancy not found.']; header('Location: '.APP_URL.'/rent-payments'); exit; }
 
         $start   = new DateTime($tenancy['start_date']);
@@ -124,7 +124,7 @@ $summary     = [];
 if ($tenancyId) {
     $tenancy = Database::fetchOne(
         "SELECT t.*, p.name AS property_name, r.name AS renter_name, r.id AS renter_id_val
-         FROM tenancies t
+         FROM str_tenancies t
          LEFT JOIN properties p ON p.id = t.property_id
          LEFT JOIN renter_profiles r ON r.id = t.renter_id
          WHERE t.id=? AND t.tenant_id=? AND t.deleted_at IS NULL",
@@ -152,7 +152,7 @@ if ($tenancyId) {
 $overdueAll = Database::fetchAll(
     "SELECT rp.*, t.tenant_name, t.monthly_rent, p.name AS property_name
      FROM rent_payments rp
-     JOIN tenancies t ON t.id = rp.tenancy_id
+     JOIN str_tenancies t ON t.id = rp.tenancy_id
      JOIN properties p ON p.id = t.property_id
      WHERE rp.tenant_id=? AND rp.status='overdue'
      ORDER BY rp.period ASC LIMIT 50",
@@ -185,7 +185,7 @@ include __DIR__.'/../includes/header.php'; ?>
         <?php
         $allTenancies = Database::fetchAll(
             "SELECT t.id, t.tenant_name, t.start_date, t.end_date, t.status, p.name AS property_name
-             FROM tenancies t LEFT JOIN properties p ON p.id=t.property_id
+             FROM str_tenancies t LEFT JOIN properties p ON p.id=t.property_id
              WHERE t.tenant_id=? AND t.deleted_at IS NULL ORDER BY t.start_date DESC",
             [$_tenantId]
         );

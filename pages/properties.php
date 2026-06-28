@@ -85,11 +85,11 @@ if (isset($_GET['view'])) {
     $compliance   = ComplianceEngine::evaluate($property);
     $strategy     = StrategyEngine::recommend($property);
     $investment   = Database::fetchOne('SELECT * FROM investments WHERE property_id=? AND tenant_id=?', [$property['id'], $_tenantId]);
-    $activeTenancy = Database::fetchOne('SELECT * FROM tenancies WHERE property_id=? AND tenant_id=? AND status="active" AND deleted_at IS NULL ORDER BY id DESC LIMIT 1', [$property['id'], $_tenantId]);
+    $activeTenancy = Database::fetchOne('SELECT * FROM str_tenancies WHERE property_id=? AND tenant_id=? AND status="active" AND deleted_at IS NULL ORDER BY id DESC LIMIT 1', [$property['id'], $_tenantId]);
     $period       = date('Y-m');
     $monthRevenue = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND property_id=? AND period=? AND type="income"',  [$_tenantId,$property['id'],$period])['s']??0);
     $monthExpense = (float)(Database::fetchOne('SELECT SUM(amount) s FROM revenue_entries WHERE tenant_id=? AND property_id=? AND period=? AND type="expense"', [$_tenantId,$property['id'],$period])['s']??0);
-    $agents       = Database::fetchAll('SELECT id,name FROM users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
+    $agents       = Database::fetchAll('SELECT id,name FROM str_users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
     $propertyOwner = $property['owner_id'] ? Database::fetchOne('SELECT * FROM owners WHERE id=?', [$property['owner_id']]) : null;
     $propertyDocs = Database::fetchAll('SELECT * FROM owner_documents WHERE property_id=? AND tenant_id=? ORDER BY created_at DESC', [$property['id'], $_tenantId]);
 
@@ -115,7 +115,7 @@ if (isset($_GET['action']) && in_array($_GET['action'], ['create','edit'])) {
             header('Location: ' . APP_URL . '/properties'); exit;
         }
     }
-    $agents    = Database::fetchAll('SELECT id,name FROM users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
+    $agents    = Database::fetchAll('SELECT id,name FROM str_users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
     $owners    = Database::fetchAll('SELECT id,name,phone FROM owners WHERE tenant_id=? AND is_active=1 ORDER BY name', [$_tenantId]);
     $pageTitle = $property ? 'Edit Property' : 'Add Property';
     $pageSubtitle = $property ? $property['name'] : 'Register a new portfolio unit';
@@ -135,7 +135,7 @@ if (!empty($_GET['compliance'])) { $where .= ' AND p.compliance_status=?'; $para
 if (!empty($_GET['strategy']))   { $where .= ' AND p.strategy_mode=?';     $params[] = $_GET['strategy']; }
 if (!empty($_GET['status']))     { $where .= ' AND p.listing_status=?';    $params[] = $_GET['status']; }
 
-$properties = Database::fetchAll("SELECT p.*, u.name AS agent_name FROM properties p LEFT JOIN users u ON u.id=p.agent_id AND u.tenant_id=p.tenant_id WHERE $where ORDER BY p.created_at DESC", $params);
+$properties = Database::fetchAll("SELECT p.*, u.name AS agent_name FROM properties p LEFT JOIN str_users u ON u.id=p.agent_id AND u.tenant_id=p.tenant_id WHERE $where ORDER BY p.created_at DESC", $params);
 
 require_once __DIR__ . '/../includes/header.php';
 ?>

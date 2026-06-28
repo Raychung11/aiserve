@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Save / update a CP58 record
     if ($action === 'save') {
         $agentId = (int)$_POST['agent_id'];
-        $agent   = Database::fetchOne("SELECT * FROM users WHERE id=? AND tenant_id=? AND role='agent'", [$agentId, $_tenantId]);
+        $agent   = Database::fetchOne("SELECT * FROM str_users WHERE id=? AND tenant_id=? AND role='agent'", [$agentId, $_tenantId]);
         if (!$agent) { $_SESSION['flash']=['error'=>'Agent not found.']; header('Location: '.APP_URL.'/cp58?year='.$year); exit; }
 
         $months = ['jan','feb','mar','apr','may_amt','jun','jul','aug','sep','oct','nov','dec_amt'];
@@ -202,7 +202,7 @@ if (isset($_GET['print'])) {
 }
 
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
-$agents  = Database::fetchAll("SELECT id,name,phone,agent_code FROM users WHERE tenant_id=? AND role='agent' AND is_active=1 ORDER BY name", [$_tenantId]);
+$agents  = Database::fetchAll("SELECT id,name,phone,agent_code FROM str_users WHERE tenant_id=? AND role='agent' AND is_active=1 ORDER BY name", [$_tenantId]);
 $records = Database::fetchAll("SELECT * FROM cp58_records WHERE tenant_id=? AND year=? ORDER BY agent_name", [$_tenantId, $year]);
 $recMap  = array_column($records, null, 'agent_id');
 

@@ -149,7 +149,7 @@ if ($propIds) {
 
     // Active tenancies
     $activeTenancies = Database::fetchAll(
-        "SELECT t.*, p.name AS property_name FROM tenancies t
+        "SELECT t.*, p.name AS property_name FROM str_tenancies t
          JOIN properties p ON p.id = t.property_id
          WHERE t.tenant_id=? AND t.property_id IN ($ph) AND t.status='active' AND t.end_date >= CURDATE()
          ORDER BY t.end_date ASC",
