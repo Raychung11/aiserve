@@ -80,6 +80,10 @@ body  { background:#f8fafc; font-family:'Segoe UI',sans-serif; }
     <li class="nav-item"><a href="<?= APP_URL ?>/cp58" class="nav-link <?= ($activePage??'')==='cp58'?'active':'' ?>"><i class="bi bi-file-earmark-text-fill"></i> CP58</a></li>
     <li class="nav-section">Account</li>
     <li class="nav-item"><a href="<?= APP_URL ?>/subscription" class="nav-link <?= ($activePage??'')==='subscription'?'active':'' ?>"><i class="bi bi-credit-card-fill"></i> Subscription</a></li>
+    <li class="nav-section">Products</li>
+    <li class="nav-item"><a href="https://roomee.my/colive" class="nav-link" target="_blank" style="color:#c084fc;">
+      <i class="bi bi-house-heart-fill" style="color:#c084fc;"></i> CoLive OS <i class="bi bi-box-arrow-up-right ms-auto" style="font-size:.65rem;opacity:.6;"></i>
+    </a></li>
   </ul></div><!-- /sidebar-nav -->
   <div class="sidebar-footer">
     <div class="d-flex align-items-center gap-2 mb-2">
