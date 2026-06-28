@@ -69,18 +69,6 @@ $nav = [
     ],
 ];
 
-// Open maintenance ticket count badge
-$openTickets = (int)$db->prepare(
-    "SELECT COUNT(*) FROM maintenance_tickets WHERE 1=1" . companyWhere() . " AND status='open'"
-)->execute([companyId()]) ? $db->query(
-    "SELECT COUNT(*) FROM maintenance_tickets WHERE 1=1" . companyWhere() . " AND status='open'"
-)->fetchColumn() : 0;
-
-// Pending bookings badge
-$pendingBookings = (int)$db->query(
-    "SELECT COUNT(*) FROM bookings WHERE 1=1" . companyWhere() . " AND status='pending'"
-)->fetchColumn() ?? 0;
-// Re-execute with bind
 $stmt = $db->prepare("SELECT COUNT(*) FROM maintenance_tickets WHERE 1=1" . companyWhere() . " AND status='open'");
 $stmt->execute([companyId()]);
 $openTickets = (int)$stmt->fetchColumn();
