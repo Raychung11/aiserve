@@ -281,7 +281,7 @@ if (isset($_GET['view'])) {
 // ── CREATE FORM ───────────────────────────────────────────────────────────────
 if (isset($_GET['action']) && $_GET['action'] === 'create') {
     $allProperties = Database::fetchAll("SELECT id,name FROM properties WHERE tenant_id=? AND deleted_at IS NULL ORDER BY name", [$_tenantId]);
-    $allOwners     = Database::fetchAll("SELECT id,name,email,phone,ic_number,bank_name FROM owners WHERE tenant_id=? AND is_active=1 ORDER BY name", [$_tenantId]);
+    $allOwners     = Database::fetchAll("SELECT id,name,email,phone,ic_number,bank_name FROM str_owners WHERE tenant_id=? AND is_active=1 ORDER BY name", [$_tenantId]);
     $allRenters    = Database::fetchAll("SELECT id,name,email,phone,ic_number FROM renter_profiles WHERE tenant_id=? ORDER BY name", [$_tenantId]);
     $pageTitle     = 'New Invoice';
     include __DIR__.'/../includes/header.php'; ?>

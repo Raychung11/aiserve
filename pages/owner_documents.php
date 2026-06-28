@@ -109,7 +109,7 @@ if (isset($_SESSION['flash'])) { $flash = $_SESSION['flash']; unset($_SESSION['f
 // ── LOAD DATA ─────────────────────────────────────────────────────────────────
 $allProperties = Database::fetchAll(
     "SELECT p.id, p.name, o.name AS owner_name FROM properties p
-     LEFT JOIN owners o ON o.id = p.owner_id
+     LEFT JOIN str_owners o ON o.id = p.owner_id
      WHERE p.tenant_id=? AND p.deleted_at IS NULL ORDER BY p.name",
     [$_tenantId]
 );
@@ -144,8 +144,8 @@ $docs = Database::fetchAll(
             r.name AS renter_name
      FROM owner_documents d
      LEFT JOIN properties p ON p.id = d.property_id
-     LEFT JOIN owners o ON o.id = p.owner_id
-     LEFT JOIN users u ON u.id = d.uploaded_by
+     LEFT JOIN str_owners o ON o.id = p.owner_id
+     LEFT JOIN str_users u ON u.id = d.uploaded_by
      LEFT JOIN renter_profiles r ON r.id = d.renter_id
      WHERE $where
      ORDER BY d.created_at DESC",

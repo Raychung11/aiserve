@@ -7,7 +7,7 @@ ALTER TABLE str_users
   ADD COLUMN IF NOT EXISTS owner_id INT UNSIGNED NULL DEFAULT NULL AFTER role;
 
 -- 2. Owners master table
-CREATE TABLE IF NOT EXISTS owners (
+CREATE TABLE IF NOT EXISTS str_owners (
   id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tenant_id    INT UNSIGNED NOT NULL,
   name         VARCHAR(255) NOT NULL,

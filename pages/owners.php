@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = strtolower(trim($_POST['email'] ?? ''));
         if (!$name) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Name is required.']; header('Location: '.APP_URL.'/owners?action=create'); exit; }
 
-        $ownerId = Database::insert('owners', [
+        $ownerId = Database::insert('str_owners', [
             'tenant_id'    => $_tenantId,
             'name'         => $name,
             'email'        => $email ?: null,
@@ -59,10 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ── EDIT ─────────────────────────────────────────────────────────────────
     if ($action === 'edit') {
         $id    = (int)$_POST['id'];
-        $owner = Database::fetchOne("SELECT id FROM owners WHERE id=? AND tenant_id=?", [$id, $_tenantId]);
+        $owner = Database::fetchOne("SELECT id FROM str_owners WHERE id=? AND tenant_id=?", [$id, $_tenantId]);
         if (!$owner) { header('Location: '.APP_URL.'/owners'); exit; }
 
-        Database::update('owners', [
+        Database::update('str_owners', [
             'name'         => trim($_POST['name'] ?? ''),
             'email'        => strtolower(trim($_POST['email'] ?? '')) ?: null,
             'phone'        => trim($_POST['phone'] ?? '') ?: null,
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ── CREATE LOGIN (if not done at creation) ────────────────────────────────
     if ($action === 'create_login') {
         $id    = (int)$_POST['id'];
-        $owner = Database::fetchOne("SELECT * FROM owners WHERE id=? AND tenant_id=?", [$id, $_tenantId]);
+        $owner = Database::fetchOne("SELECT * FROM str_owners WHERE id=? AND tenant_id=?", [$id, $_tenantId]);
         $email = strtolower(trim($_POST['login_email'] ?? $owner['email'] ?? ''));
         $pw    = trim($_POST['login_password'] ?? '');
         if (!$owner || !$email || strlen($pw) < 6) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Email and password (min 6 chars) required.']; header('Location: '.APP_URL.'/owners?view='.$id); exit; }
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete') {
         $id = (int)$_POST['id'];
         // Soft-delete: mark inactive and unlink from properties
-        Database::update('owners', ['is_active'=>0, 'updated_at'=>date('Y-m-d H:i:s')], 'id=? AND tenant_id=?', [$id, $_tenantId]);
+        Database::update('str_owners', ['is_active'=>0, 'updated_at'=>date('Y-m-d H:i:s')], 'id=? AND tenant_id=?', [$id, $_tenantId]);
         Database::query("UPDATE properties SET owner_id=NULL WHERE owner_id=? AND tenant_id=?", [$id, $_tenantId]);
         Database::query("UPDATE str_users SET is_active=0, updated_at=? WHERE owner_id=? AND tenant_id=?", [date('Y-m-d H:i:s'), $id, $_tenantId]);
         ActivityLog::record('owner.delete', "Deactivated owner #$id", $_tenantId, $_user['id']);
@@ -142,7 +142,7 @@ $editId  = (int)($_GET['id'] ?? 0);
 
 // ── VIEW: single owner profile ────────────────────────────────────────────────
 if ($viewId) {
-    $owner = Database::fetchOne("SELECT * FROM owners WHERE id=? AND tenant_id=?", [$viewId, $_tenantId]);
+    $owner = Database::fetchOne("SELECT * FROM str_owners WHERE id=? AND tenant_id=?", [$viewId, $_tenantId]);
     if (!$owner) { header('Location: '.APP_URL.'/owners'); exit; }
     $ownerProperties = Database::fetchAll("SELECT * FROM properties WHERE owner_id=? AND tenant_id=? AND deleted_at IS NULL ORDER BY name", [$viewId, $_tenantId]);
     $ownerUser       = Database::fetchOne("SELECT id, email, is_active FROM str_users WHERE owner_id=? AND tenant_id=? ORDER BY id ASC LIMIT 1", [$viewId, $_tenantId]);
@@ -314,7 +314,7 @@ if ($viewId) {
 if ($action === 'create' || ($action === 'edit' && $editId)) {
     $owner = null;
     if ($action === 'edit') {
-        $owner = Database::fetchOne("SELECT * FROM owners WHERE id=? AND tenant_id=?", [$editId, $_tenantId]);
+        $owner = Database::fetchOne("SELECT * FROM str_owners WHERE id=? AND tenant_id=?", [$editId, $_tenantId]);
         if (!$owner) { header('Location: '.APP_URL.'/owners'); exit; }
     }
     $pageTitle = $owner ? 'Edit Owner' : 'New Owner';
@@ -422,7 +422,7 @@ if ($action === 'create' || ($action === 'edit' && $editId)) {
 $owners = Database::fetchAll(
     "SELECT o.*, COUNT(p.id) AS property_count,
             u.email AS login_email, u.is_active AS login_active
-     FROM owners o
+     FROM str_owners o
      LEFT JOIN properties p ON p.owner_id = o.id AND p.deleted_at IS NULL
      LEFT JOIN str_users u ON u.owner_id = o.id AND u.tenant_id = o.tenant_id
      WHERE o.tenant_id=? AND o.is_active=1

@@ -6,7 +6,7 @@ $tab = $_GET['tab'] ?? 'dashboard';
 // Load owner's properties
 $properties = Database::fetchAll(
     "SELECT p.*, o.name AS owner_name FROM properties p
-     LEFT JOIN owners o ON o.id = p.owner_id
+     LEFT JOIN str_owners o ON o.id = p.owner_id
      WHERE p.owner_id=? AND p.tenant_id=? AND p.deleted_at IS NULL
      ORDER BY p.name",
     [$_ownerId, $_tenantId]
