@@ -10,20 +10,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'create') {
         // Check plan agent limit
-        $agentCount = Database::count('users','tenant_id=? AND role="agent" AND is_active=1',[$_tenantId]);
+        $agentCount = Database::count('str_users','tenant_id=? AND role="agent" AND is_active=1',[$_tenantId]);
         $limit = (int)PLAN_LIMITS[$_user['plan']??'starter']['agents'];
         if ($agentCount >= $limit) {
             $_SESSION['flash'] = ['error' => "Agent limit ($limit) reached. Upgrade your plan."];
             header('Location: ' . APP_URL . '/agents'); exit;
         }
-        if (Database::count('users','email=?',[strtolower($_POST['email'])])) {
+        if (Database::count('str_users','email=?',[strtolower($_POST['email'])])) {
             $_SESSION['flash'] = ['error' => 'Email already registered.'];
             header('Location: ' . APP_URL . '/agents?action=create'); exit;
         }
         // Generate unique agent code
-        do { $code = strtoupper(substr(md5(uniqid()),0,8)); } while(Database::count('users','agent_code=?',[$code]));
+        do { $code = strtoupper(substr(md5(uniqid()),0,8)); } while(Database::count('str_users','agent_code=?',[$code]));
 
-        Database::insert('users',[
+        Database::insert('str_users',[
             'tenant_id'       => $_tenantId,
             'name'            => trim($_POST['name']),
             'email'           => strtolower(trim($_POST['email'])),
@@ -58,7 +58,7 @@ if (!empty($_GET['leaderboard'])) {
     $agents = Database::fetchAll(
         'SELECT u.*, (SELECT COUNT(*) FROM properties p WHERE p.agent_id=u.id AND p.deleted_at IS NULL) AS prop_count,
                 (SELECT COALESCE(SUM(commission_amount),0) FROM commission_logs cl WHERE cl.agent_id=u.id AND cl.status="paid") AS total_earned
-         FROM users u WHERE u.tenant_id=? AND u.role="agent" AND u.is_active=1 ORDER BY total_earned DESC',
+         FROM str_users u WHERE u.tenant_id=? AND u.role="agent" AND u.is_active=1 ORDER BY total_earned DESC',
         [$_tenantId]
     );
     require_once __DIR__ . '/../includes/header.php'; ?>
@@ -84,7 +84,7 @@ if (!empty($_GET['leaderboard'])) {
 
 // ── View agent ─────────────────────────────────────────────────────────
 if (!empty($_GET['view'])) {
-    $agent = Database::fetchOne('SELECT * FROM users WHERE id=? AND tenant_id=? AND role="agent"',[(int)$_GET['view'],$_tenantId]);
+    $agent = Database::fetchOne('SELECT * FROM str_users WHERE id=? AND tenant_id=? AND role="agent"',[(int)$_GET['view'],$_tenantId]);
     if (!$agent) { header('Location: ' . APP_URL . '/agents'); exit; }
     $pageTitle    = $agent['name'];
     $pageSubtitle = 'Agent Profile';
@@ -182,7 +182,7 @@ $agents = Database::fetchAll(
        (SELECT COUNT(*) FROM properties p WHERE p.agent_id=u.id AND p.deleted_at IS NULL) AS prop_count,
        (SELECT COALESCE(SUM(commission_amount),0) FROM commission_logs cl WHERE cl.agent_id=u.id AND cl.status="pending") AS pending_comm,
        (SELECT COALESCE(SUM(commission_amount),0) FROM commission_logs cl WHERE cl.agent_id=u.id AND cl.status="paid") AS total_earned
-     FROM users u WHERE u.tenant_id=? AND u.role="agent" ORDER BY u.created_at DESC',
+     FROM str_users u WHERE u.tenant_id=? AND u.role="agent" ORDER BY u.created_at DESC',
     [$_tenantId]
 );
 require_once __DIR__ . '/../includes/header.php'; ?>

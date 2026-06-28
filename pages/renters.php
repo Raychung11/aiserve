@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete') {
         $id = (int)$_POST['id'];
         // Unlink from tenancies before deleting
-        Database::query("UPDATE tenancies SET renter_id=NULL WHERE renter_id=? AND tenant_id=?", [$id, $_tenantId]);
+        Database::query("UPDATE str_tenancies SET renter_id=NULL WHERE renter_id=? AND tenant_id=?", [$id, $_tenantId]);
         Database::delete('renter_profiles', 'id=? AND tenant_id=?', [$id, $_tenantId]);
         ActivityLog::record('renter.delete', "Deleted renter #$id", $_tenantId, $_user['id']);
         $_SESSION['flash'] = ['type'=>'success','msg'=>'Renter profile deleted.'];
@@ -69,7 +69,7 @@ if ($viewId) {
 
     // Tenancy history
     $tenancies = Database::fetchAll(
-        "SELECT t.*, p.name AS property_name FROM tenancies t
+        "SELECT t.*, p.name AS property_name FROM str_tenancies t
          LEFT JOIN properties p ON p.id = t.property_id
          WHERE t.renter_id=? AND t.tenant_id=? AND t.deleted_at IS NULL
          ORDER BY t.start_date DESC",
@@ -89,7 +89,7 @@ if ($viewId) {
                 SUM(CASE WHEN status='overdue' THEN 1 ELSE 0 END) AS overdue,
                 SUM(amount_paid) AS total_paid
          FROM rent_payments rp
-         JOIN tenancies t ON t.id = rp.tenancy_id
+         JOIN str_tenancies t ON t.id = rp.tenancy_id
          WHERE rp.tenant_id=? AND t.renter_id=?",
         [$_tenantId, $viewId]
     );
@@ -391,7 +391,7 @@ $renters = Database::fetchAll(
             SUM(CASE WHEN t.status='active' AND t.deleted_at IS NULL THEN 1 ELSE 0 END) AS active_count,
             MAX(t.monthly_rent) AS latest_rent
      FROM renter_profiles r
-     LEFT JOIN tenancies t ON t.renter_id = r.id AND t.tenant_id = r.tenant_id
+     LEFT JOIN str_tenancies t ON t.renter_id = r.id AND t.tenant_id = r.tenant_id
      WHERE $where
      GROUP BY r.id
      ORDER BY r.name",

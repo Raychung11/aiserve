@@ -2,7 +2,7 @@
 -- Run via phpMyAdmin
 
 -- 1. Add role + owner_id to users table
-ALTER TABLE users
+ALTER TABLE str_users
   ADD COLUMN IF NOT EXISTS role ENUM('admin','owner') NOT NULL DEFAULT 'admin' AFTER email,
   ADD COLUMN IF NOT EXISTS owner_id INT UNSIGNED NULL DEFAULT NULL AFTER role;
 

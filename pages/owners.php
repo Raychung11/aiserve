@@ -33,10 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $createLogin = !empty($_POST['create_login']) && $email;
         $password    = trim($_POST['portal_password'] ?? '');
         if ($createLogin && $password) {
-            if (Database::count('users', 'email=?', [$email])) {
+            if (Database::count('str_users', 'email=?', [$email])) {
                 $_SESSION['flash'] = ['type'=>'danger','msg'=>'Owner created but login not set up — that email is already registered.'];
             } else {
-                Database::insert('users', [
+                Database::insert('str_users', [
                     'tenant_id'     => $_tenantId,
                     'name'          => $name,
                     'email'         => $email,
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ], 'id=?', [$id]);
 
         // Update linked user name if exists
-        Database::query("UPDATE users SET name=?, updated_at=? WHERE owner_id=? AND tenant_id=?",
+        Database::query("UPDATE str_users SET name=?, updated_at=? WHERE owner_id=? AND tenant_id=?",
             [trim($_POST['name']), date('Y-m-d H:i:s'), $id, $_tenantId]);
 
         ActivityLog::record('owner.update', "Updated owner #$id", $_tenantId, $_user['id']);
@@ -88,9 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id  = (int)$_POST['id'];
         $pw  = trim($_POST['new_password'] ?? '');
         if (strlen($pw) < 6) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Password must be at least 6 characters.']; header('Location: '.APP_URL.'/owners?view='.$id); exit; }
-        Database::query("UPDATE users SET password_hash=?, updated_at=? WHERE owner_id=? AND tenant_id=?",
+        Database::query("UPDATE str_users SET password_hash=?, updated_at=? WHERE owner_id=? AND tenant_id=?",
             [password_hash($pw, PASSWORD_BCRYPT), date('Y-m-d H:i:s'), $id, $_tenantId]);
-        Database::query("DELETE FROM users WHERE owner_id=? AND tenant_id=? AND id IN (SELECT id FROM (SELECT id FROM users WHERE owner_id=? ORDER BY id DESC LIMIT 99999) x)", [$id, $_tenantId, $id]);
+        Database::query("DELETE FROM str_users WHERE owner_id=? AND tenant_id=? AND id IN (SELECT id FROM (SELECT id FROM str_users WHERE owner_id=? ORDER BY id DESC LIMIT 99999) x)", [$id, $_tenantId, $id]);
         ActivityLog::record('owner.password_reset', "Reset portal password for owner #$id", $_tenantId, $_user['id']);
         $_SESSION['flash'] = ['type'=>'success','msg'=>'Portal password updated.'];
         header('Location: '.APP_URL.'/owners?view='.$id); exit;
@@ -103,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = strtolower(trim($_POST['login_email'] ?? $owner['email'] ?? ''));
         $pw    = trim($_POST['login_password'] ?? '');
         if (!$owner || !$email || strlen($pw) < 6) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'Email and password (min 6 chars) required.']; header('Location: '.APP_URL.'/owners?view='.$id); exit; }
-        if (Database::count('users', 'email=?', [$email])) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'That email is already registered.']; header('Location: '.APP_URL.'/owners?view='.$id); exit; }
-        Database::insert('users', [
+        if (Database::count('str_users', 'email=?', [$email])) { $_SESSION['flash'] = ['type'=>'danger','msg'=>'That email is already registered.']; header('Location: '.APP_URL.'/owners?view='.$id); exit; }
+        Database::insert('str_users', [
             'tenant_id'     => $_tenantId,
             'name'          => $owner['name'],
             'email'         => $email,
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Soft-delete: mark inactive and unlink from properties
         Database::update('owners', ['is_active'=>0, 'updated_at'=>date('Y-m-d H:i:s')], 'id=? AND tenant_id=?', [$id, $_tenantId]);
         Database::query("UPDATE properties SET owner_id=NULL WHERE owner_id=? AND tenant_id=?", [$id, $_tenantId]);
-        Database::query("UPDATE users SET is_active=0, updated_at=? WHERE owner_id=? AND tenant_id=?", [date('Y-m-d H:i:s'), $id, $_tenantId]);
+        Database::query("UPDATE str_users SET is_active=0, updated_at=? WHERE owner_id=? AND tenant_id=?", [date('Y-m-d H:i:s'), $id, $_tenantId]);
         ActivityLog::record('owner.delete', "Deactivated owner #$id", $_tenantId, $_user['id']);
         $_SESSION['flash'] = ['type'=>'success','msg'=>'Owner deactivated.'];
         header('Location: '.APP_URL.'/owners'); exit;
@@ -145,7 +145,7 @@ if ($viewId) {
     $owner = Database::fetchOne("SELECT * FROM owners WHERE id=? AND tenant_id=?", [$viewId, $_tenantId]);
     if (!$owner) { header('Location: '.APP_URL.'/owners'); exit; }
     $ownerProperties = Database::fetchAll("SELECT * FROM properties WHERE owner_id=? AND tenant_id=? AND deleted_at IS NULL ORDER BY name", [$viewId, $_tenantId]);
-    $ownerUser       = Database::fetchOne("SELECT id, email, is_active FROM users WHERE owner_id=? AND tenant_id=? ORDER BY id ASC LIMIT 1", [$viewId, $_tenantId]);
+    $ownerUser       = Database::fetchOne("SELECT id, email, is_active FROM str_users WHERE owner_id=? AND tenant_id=? ORDER BY id ASC LIMIT 1", [$viewId, $_tenantId]);
     $docCount        = Database::count('owner_documents', 'owner_documents.tenant_id=? AND properties.owner_id=?', [$_tenantId, $viewId]);
 
     $pageTitle = htmlspecialchars($owner['name']).' — Owner';
@@ -424,7 +424,7 @@ $owners = Database::fetchAll(
             u.email AS login_email, u.is_active AS login_active
      FROM owners o
      LEFT JOIN properties p ON p.owner_id = o.id AND p.deleted_at IS NULL
-     LEFT JOIN users u ON u.owner_id = o.id AND u.tenant_id = o.tenant_id
+     LEFT JOIN str_users u ON u.owner_id = o.id AND u.tenant_id = o.tenant_id
      WHERE o.tenant_id=? AND o.is_active=1
      GROUP BY o.id
      ORDER BY o.name",

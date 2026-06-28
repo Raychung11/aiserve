@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS tenants (
 -- -------------------------------------------------------
 -- 2. users — admins and agents, always tied to a tenant
 -- -------------------------------------------------------
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS str_users (
     id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id        INT UNSIGNED NOT NULL,
     name             VARCHAR(255) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS properties (
     created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
-    FOREIGN KEY (agent_id)  REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (agent_id)  REFERENCES str_users(id) ON DELETE SET NULL,
     INDEX idx_tenant   (tenant_id),
     INDEX idx_compliance (tenant_id, compliance_status),
     INDEX idx_strategy   (tenant_id, strategy_mode)
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS revenue_entries (
 -- -------------------------------------------------------
 -- 6. tenancies — lease records
 -- -------------------------------------------------------
-CREATE TABLE IF NOT EXISTS tenancies (
+CREATE TABLE IF NOT EXISTS str_tenancies (
     id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id           INT UNSIGNED NOT NULL,
     property_id         INT UNSIGNED NOT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS tenancies (
     updated_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (tenant_id)   REFERENCES tenants(id)    ON DELETE CASCADE,
     FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
-    FOREIGN KEY (agent_id)    REFERENCES users(id)       ON DELETE SET NULL,
+    FOREIGN KEY (agent_id)    REFERENCES str_users(id)       ON DELETE SET NULL,
     INDEX idx_tenant_status (tenant_id, status),
     INDEX idx_end_date      (tenant_id, end_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS commission_logs (
     created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (tenant_id)   REFERENCES tenants(id)    ON DELETE CASCADE,
-    FOREIGN KEY (agent_id)    REFERENCES users(id)       ON DELETE CASCADE,
+    FOREIGN KEY (agent_id)    REFERENCES str_users(id)       ON DELETE CASCADE,
     FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
     INDEX idx_agent  (agent_id, status),
     INDEX idx_tenant (tenant_id)

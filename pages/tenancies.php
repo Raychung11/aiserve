@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'create') {
             $data['created_at'] = date('Y-m-d H:i:s');
-            $id = Database::insert('tenancies', $data);
+            $id = Database::insert('str_tenancies', $data);
             ActivityLog::record('tenancy.created', 'Tenancy: ' . $data['tenant_name'], $_tenantId, $_user['id']);
             $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Tenancy created.'];
         } else {
             $id = (int)$_POST['id'];
-            Database::update('tenancies', $data, 'id=? AND tenant_id=?', [$id, $_tenantId]);
+            Database::update('str_tenancies', $data, 'id=? AND tenant_id=?', [$id, $_tenantId]);
             ActivityLog::record('tenancy.updated', 'Tenancy updated: ' . $data['tenant_name'], $_tenantId, $_user['id']);
             $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Tenancy updated.'];
         }
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'delete') {
-        Database::update('tenancies', ['deleted_at' => date('Y-m-d H:i:s')], 'id=? AND tenant_id=?', [(int)$_POST['id'], $_tenantId]);
+        Database::update('str_tenancies', ['deleted_at' => date('Y-m-d H:i:s')], 'id=? AND tenant_id=?', [(int)$_POST['id'], $_tenantId]);
         $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Tenancy removed.'];
         header('Location: ' . APP_URL . '/tenancies'); exit;
     }
@@ -66,9 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['view'])) {
     $tenancy = Database::fetchOne(
         'SELECT t.*, p.name AS property_name, u.name AS agent_name
-         FROM tenancies t
+         FROM str_tenancies t
          LEFT JOIN properties p ON p.id = t.property_id
-         LEFT JOIN users u ON u.id = t.agent_id
+         LEFT JOIN str_users u ON u.id = t.agent_id
          WHERE t.id=? AND t.tenant_id=? AND t.deleted_at IS NULL',
         [(int)$_GET['view'], $_tenantId]
     );
@@ -323,12 +323,12 @@ if (isset($_GET['view'])) {
 if (!empty($_GET['action']) && in_array($_GET['action'], ['create', 'edit'])) {
     $tenancy = null;
     if ($_GET['action'] === 'edit') {
-        $tenancy = Database::fetchOne('SELECT * FROM tenancies WHERE id=? AND tenant_id=? AND deleted_at IS NULL', [(int)($_GET['id'] ?? 0), $_tenantId]);
+        $tenancy = Database::fetchOne('SELECT * FROM str_tenancies WHERE id=? AND tenant_id=? AND deleted_at IS NULL', [(int)($_GET['id'] ?? 0), $_tenantId]);
     }
     $pageTitle    = $tenancy ? 'Edit Tenancy' : 'New Tenancy';
     $pageSubtitle = '';
     $properties   = Database::fetchAll('SELECT id,name FROM properties WHERE tenant_id=? AND deleted_at IS NULL ORDER BY name', [$_tenantId]);
-    $agents       = Database::fetchAll('SELECT id,name FROM users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
+    $agents       = Database::fetchAll('SELECT id,name FROM str_users WHERE tenant_id=? AND role="agent" AND is_active=1', [$_tenantId]);
     $renters      = Database::fetchAll('SELECT id,name,phone FROM renter_profiles WHERE tenant_id=? ORDER BY name', [$_tenantId]);
 
     // Pre-select renter if coming from renter profile page
@@ -489,8 +489,8 @@ $params = [$_tenantId];
 if (!empty($_GET['status']))      { $where .= ' AND t.status=?';      $params[] = $_GET['status']; }
 if (!empty($_GET['property_id'])) { $where .= ' AND t.property_id=?'; $params[] = (int)$_GET['property_id']; }
 
-$tenancies  = Database::fetchAll("SELECT t.*, p.name AS property_name FROM tenancies t LEFT JOIN properties p ON p.id=t.property_id WHERE $where ORDER BY t.start_date DESC LIMIT 100", $params);
-$expiring   = Database::count('tenancies', 'tenant_id=? AND status="active" AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY) AND deleted_at IS NULL', [$_tenantId]);
+$tenancies  = Database::fetchAll("SELECT t.*, p.name AS property_name FROM str_tenancies t LEFT JOIN properties p ON p.id=t.property_id WHERE $where ORDER BY t.start_date DESC LIMIT 100", $params);
+$expiring   = Database::count('str_tenancies', 'tenant_id=? AND status="active" AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY) AND deleted_at IS NULL', [$_tenantId]);
 $overdueCount = Database::count('rent_payments', 'tenant_id=? AND status="overdue"', [$_tenantId]);
 $properties = Database::fetchAll('SELECT id,name FROM properties WHERE tenant_id=? AND deleted_at IS NULL ORDER BY name', [$_tenantId]);
 

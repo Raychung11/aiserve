@@ -16,7 +16,7 @@ class Auth {
             $_SESSION['_user_cache'] = Database::fetchOne(
                 'SELECT u.*, t.name AS tenant_name, t.status AS tenant_status,
                         t.plan, t.max_properties, t.trial_ends_at, t.subscription_ends_at
-                 FROM users u
+                 FROM str_users u
                  LEFT JOIN tenants t ON t.id = u.tenant_id
                  WHERE u.id = ? AND u.is_active = 1',
                 [$_SESSION['user_id']]
@@ -50,7 +50,7 @@ class Auth {
 
     public static function login(string $email, string $password): array {
         $user = Database::fetchOne(
-            'SELECT u.*, t.status AS tenant_status FROM users u
+            'SELECT u.*, t.status AS tenant_status FROM str_users u
              LEFT JOIN tenants t ON t.id = u.tenant_id
              WHERE u.email = ? AND u.is_active = 1',
             [strtolower(trim($email))]
@@ -69,7 +69,7 @@ class Auth {
 
     public static function register(array $data): array {
         $email = strtolower(trim($data['email']));
-        if (Database::count('users', 'email = ?', [$email])) {
+        if (Database::count('str_users', 'email = ?', [$email])) {
             return ['success' => false, 'error' => 'Email already registered.'];
         }
         $plan = $data['plan'] ?? 'starter';
@@ -85,7 +85,7 @@ class Auth {
             'created_at'       => date('Y-m-d H:i:s'),
             'updated_at'       => date('Y-m-d H:i:s'),
         ]);
-        $userId = Database::insert('users', [
+        $userId = Database::insert('str_users', [
             'tenant_id'     => $tenantId,
             'name'          => trim($data['name']),
             'email'         => $email,

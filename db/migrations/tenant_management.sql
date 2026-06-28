@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS renter_profiles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2. Link tenancies to renter profiles
-ALTER TABLE tenancies
+ALTER TABLE str_tenancies
   ADD COLUMN IF NOT EXISTS renter_id INT UNSIGNED NULL DEFAULT NULL AFTER property_id,
   ADD INDEX IF NOT EXISTS idx_renter (renter_id);
 
