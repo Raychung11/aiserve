@@ -418,7 +418,7 @@ include __DIR__ . '/../includes/landing_header.php';
          'One-click revenue and expense reports filterable by property, strategy, and period. Export-ready for tax season.'],
       ];
       foreach($features as [$icon,$bg,$color,$title,$desc]): ?>
-      <div class="col-md-6 col-lg-4">
+      <div class="col-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon" style="background:<?= $bg ?>;color:<?= $color ?>;"><i class="bi <?= $icon ?>"></i></div>
           <h6 class="fw-bold mb-2"><?= $title ?></h6>
@@ -489,7 +489,7 @@ include __DIR__ . '/../includes/landing_header.php';
         ['Corporate','Long-Term Lease','Stable tenancy with full compliance tracking and owner reporting.','#dcfce7','#15803d'],
       ];
       foreach($modes as [$badge,$title,$desc,$bg,$col]): ?>
-      <div class="col-sm-6 col-lg-3">
+      <div class="col-6 col-lg-3">
         <div class="text-center p-4" style="background:<?= $bg ?>;border-radius:16px;height:100%;">
           <div style="font-size:.75rem;font-weight:800;color:<?= $col ?>;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem;"><?= $badge ?></div>
           <h6 class="fw-bold mb-2"><?= $title ?></h6>
@@ -520,7 +520,7 @@ include __DIR__ . '/../includes/landing_header.php';
           'enterprise' => ['Unlimited properties','Unlimited agents','Everything in Growth','Custom branding','Dedicated support','SLA guarantee'],
         ];
       ?>
-      <div class="col-md-6 col-lg-4">
+      <div class="col-6 col-lg-4">
         <div class="price-card <?= $popular ? 'popular' : '' ?>">
           <?php if($popular): ?>
           <div class="mb-3"><span class="popular-badge">Most Popular</span></div>
@@ -657,7 +657,7 @@ include __DIR__ . '/../includes/landing_header.php';
          'See how your unit stacks up. Compare rental yield vs area average and get operator-suggested pricing strategies backed by real data.'],
       ];
       foreach ($benefits as [$icon,$bg,$col,$title,$desc]): ?>
-      <div class="col-md-6 col-lg-4">
+      <div class="col-6 col-lg-4">
         <div class="owner-benefit">
           <div class="owner-benefit-icon" style="background:<?= $bg ?>;color:<?= $col ?>;">
             <i class="bi <?= $icon ?>"></i>
