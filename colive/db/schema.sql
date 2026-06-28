@@ -378,20 +378,24 @@ CREATE TABLE IF NOT EXISTS smart_locks (
     company_id  INT UNSIGNED NOT NULL,
     room_id     INT UNSIGNED NOT NULL,
     device_id   VARCHAR(100) NOT NULL,
-    vendor      VARCHAR(60)  NOT NULL DEFAULT 'ttlock',
+    vendor      VARCHAR(60)  DEFAULT NULL,
+    label       VARCHAR(100) DEFAULT NULL,
     is_active   TINYINT(1)   NOT NULL DEFAULT 1,
     last_sync   DATETIME     DEFAULT NULL,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_company (company_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS lock_access_logs (
-    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    company_id  INT UNSIGNED NOT NULL,
-    lock_id     INT UNSIGNED NOT NULL,
-    resident_id INT UNSIGNED DEFAULT NULL,
-    action      ENUM('issued','revoked','used','failed') NOT NULL,
-    access_code VARCHAR(20)  DEFAULT NULL,
-    event_time  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    company_id   INT UNSIGNED NOT NULL,
+    lock_id      INT UNSIGNED NOT NULL,
+    triggered_by INT UNSIGNED DEFAULT NULL  COMMENT 'users.id for staff remote unlock',
+    resident_id  INT UNSIGNED DEFAULT NULL,
+    method       VARCHAR(30)  NOT NULL DEFAULT 'pin' COMMENT 'pin,card,remote,app',
+    result       VARCHAR(20)  NOT NULL DEFAULT 'success' COMMENT 'success,failed',
+    note         VARCHAR(200) DEFAULT NULL,
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_company (company_id),
     INDEX idx_lock    (lock_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -404,16 +408,17 @@ CREATE TABLE IF NOT EXISTS support_messages (
     id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     company_id    INT UNSIGNED NOT NULL,
     resident_id   INT UNSIGNED DEFAULT NULL,
-    direction     ENUM('in','out') NOT NULL,
-    message       TEXT         NOT NULL,
-    handled_by    ENUM('ai','human') NOT NULL DEFAULT 'ai',
-    assigned_to   INT UNSIGNED DEFAULT NULL  COMMENT 'users.id when escalated',
-    confidence    DECIMAL(4,3) DEFAULT NULL,
-    session_id    VARCHAR(60)  DEFAULT NULL,
+    parent_id     INT UNSIGNED DEFAULT NULL  COMMENT 'NULL = thread root',
+    sender_type   ENUM('resident','staff','ai') NOT NULL DEFAULT 'resident',
+    sender_id     INT UNSIGNED DEFAULT NULL  COMMENT 'users.id when sender_type=staff',
+    body          TEXT         NOT NULL,
+    status        ENUM('open','closed') NOT NULL DEFAULT 'open' COMMENT 'on root message only',
+    is_read       TINYINT(1)   NOT NULL DEFAULT 0,
+    is_escalated  TINYINT(1)   NOT NULL DEFAULT 0,
     created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_company   (company_id),
     INDEX idx_resident  (resident_id),
-    INDEX idx_session   (session_id)
+    INDEX idx_parent    (parent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
