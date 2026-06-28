@@ -11,6 +11,30 @@ if (Auth::check()) {
     header('Location: ' . APP_URL . $dest); exit;
 }
 
+// Featured rooms from CoLive (same database)
+try {
+    $featRooms = Database::fetchAll("
+        SELECT r.id, r.room_no, r.room_type, r.base_rent, r.capacity,
+               r.has_attached_bath, r.deposit_months,
+               u.unit_no, b.name AS building_name, b.city, c.brand_color
+        FROM rooms r
+        JOIN units u ON u.id = r.unit_id
+        JOIN buildings b ON b.id = u.building_id
+        JOIN companies c ON c.id = r.company_id AND c.status IN ('trial','active')
+        LEFT JOIN tenancies t ON t.room_id = r.id AND t.status = 'active'
+        WHERE r.is_active = 1 AND t.id IS NULL
+        ORDER BY r.base_rent ASC
+        LIMIT 6
+    ");
+} catch (Throwable $e) {
+    $featRooms = [];
+}
+
+$roomTypeLabels = [
+    'single'=>'Single','twin'=>'Twin','master'=>'Master',
+    'studio'=>'Studio','common'=>'Common Room',
+];
+
 $pageTitle = 'Roomee — Malaysia\'s Smart Property Management Platform';
 include __DIR__ . '/../includes/landing_header.php';
 ?>
@@ -81,6 +105,48 @@ include __DIR__ . '/../includes/landing_header.php';
 .testimonial-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:1.75rem; }
 .avatar { width:44px; height:44px; border-radius:50%; background:#6366f1; color:#fff;
           font-weight:700; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+
+/* ── Room listing cards ── */
+.rooms-section { background:#fff; padding:5rem 0; }
+.rm-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden;
+           transition:box-shadow .2s,transform .2s; height:100%; display:flex; flex-direction:column; }
+.rm-card:hover { box-shadow:0 8px 32px rgba(99,102,241,.13); transform:translateY(-4px); }
+.rm-card-img { height:140px; display:flex; align-items:center; justify-content:center; position:relative; }
+.rm-type-pill { position:absolute; top:.65rem; left:.65rem; color:#fff; font-size:.68rem; font-weight:700;
+                padding:.22rem .65rem; border-radius:20px; text-transform:capitalize; }
+.rm-body { padding:1.1rem; flex:1; display:flex; flex-direction:column; }
+.rm-price { font-size:1.3rem; font-weight:800; color:#0f172a; line-height:1; }
+.rm-price span { font-size:.74rem; font-weight:400; color:#94a3b8; }
+.rm-loc { font-size:.75rem; color:#64748b; margin:.25rem 0 .6rem; }
+.rm-chips { display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:auto; }
+.rm-chip { background:#f1f5f9; color:#475569; font-size:.68rem; padding:.18rem .5rem; border-radius:20px; }
+.rm-chip.g { background:#f0fdf4; color:#166534; }
+.rm-btn { margin-top:1rem; display:block; text-align:center; border-radius:8px; padding:.52rem;
+          font-size:.83rem; font-weight:700; text-decoration:none; color:#fff;
+          background:#6366f1; transition:background .15s; }
+.rm-btn:hover { background:#4f46e5; color:#fff; }
+
+/* ── Owner partnership ── */
+.owner-section { background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); padding:5.5rem 0; }
+.owner-benefit { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+                 border-radius:16px; padding:1.75rem; height:100%; }
+.owner-benefit-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center;
+                      justify-content:center; font-size:1.4rem; margin-bottom:1.1rem; }
+.owner-stat-row { display:flex; flex-wrap:wrap; gap:2rem; justify-content:center;
+                  background:rgba(255,255,255,.04); border-radius:16px; padding:2rem;
+                  border:1px solid rgba(255,255,255,.08); margin-bottom:3rem; }
+.owner-stat { text-align:center; }
+.owner-stat .num { font-size:2rem; font-weight:900; color:#a5b4fc; line-height:1; }
+.owner-stat .lbl { font-size:.75rem; color:#64748b; margin-top:.3rem; }
+.btn-owner-primary { background:#6366f1; color:#fff; font-weight:700; padding:.8rem 2.25rem;
+                     border-radius:10px; font-size:.95rem; text-decoration:none;
+                     display:inline-flex; align-items:center; gap:.5rem; transition:background .15s; }
+.btn-owner-primary:hover { background:#4f46e5; color:#fff; }
+.btn-owner-outline { background:transparent; color:#e2e8f0; font-weight:600; padding:.8rem 2.25rem;
+                     border-radius:10px; font-size:.95rem; text-decoration:none;
+                     border:1px solid rgba(255,255,255,.2); display:inline-flex; align-items:center;
+                     gap:.5rem; transition:background .15s; }
+.btn-owner-outline:hover { background:rgba(255,255,255,.08); color:#fff; }
 
 /* ── CTA band ── */
 .cta-band { background:linear-gradient(135deg,#6366f1 0%,#4f46e5 60%,#7c3aed 100%); padding:5rem 0; }
@@ -236,6 +302,80 @@ include __DIR__ . '/../includes/landing_header.php';
     </div>
   </div>
 </div>
+
+<!-- ════════════════════════════════════════════════════════
+     FEATURED ROOMS
+════════════════════════════════════════════════════════ -->
+<section class="rooms-section" id="listings">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-5">
+      <div>
+        <div class="section-label">Available Now</div>
+        <h2 class="section-title">Find Your Next Room</h2>
+        <p class="section-sub mt-2 mb-0">Quality co-living rooms across Klang Valley — managed by verified operators on Roomee.</p>
+      </div>
+      <a href="/colive/listings.php"
+         style="background:#6366f1;color:#fff;font-weight:700;border-radius:10px;padding:.6rem 1.5rem;font-size:.875rem;text-decoration:none;white-space:nowrap;">
+        View All Rooms <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <?php if ($featRooms): ?>
+    <div class="row g-3 mb-4">
+      <?php foreach ($featRooms as $rm):
+        $brand = !empty($rm['brand_color']) ? $rm['brand_color'] : '#6366f1';
+      ?>
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="rm-card">
+          <div class="rm-card-img"
+               style="background:linear-gradient(135deg,<?= htmlspecialchars($brand) ?>18 0%,<?= htmlspecialchars($brand) ?>40 100%);">
+            <i class="bi bi-door-open-fill"
+               style="font-size:2.8rem;color:<?= htmlspecialchars($brand) ?>;opacity:.55;"></i>
+            <span class="rm-type-pill" style="background:<?= htmlspecialchars($brand) ?>;">
+              <?= htmlspecialchars($roomTypeLabels[$rm['room_type']] ?? ucfirst($rm['room_type'])) ?>
+            </span>
+          </div>
+          <div class="rm-body">
+            <div class="rm-price">
+              RM <?= number_format((float)$rm['base_rent'], 0) ?><span>/month</span>
+            </div>
+            <div class="rm-loc">
+              <i class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($rm['building_name']) ?>
+              <?php if ($rm['city']): ?>&bull; <?= htmlspecialchars($rm['city']) ?><?php endif; ?>
+            </div>
+            <div class="rm-chips">
+              <span class="rm-chip"><i class="bi bi-person me-1"></i><?= (int)$rm['capacity'] ?> pax</span>
+              <?php if ($rm['has_attached_bath']): ?>
+              <span class="rm-chip g"><i class="bi bi-droplet me-1"></i>En-suite</span>
+              <?php endif; ?>
+              <?php if ((int)$rm['deposit_months'] === 0): ?>
+              <span class="rm-chip g"><i class="bi bi-star me-1"></i>Zero deposit</span>
+              <?php else: ?>
+              <span class="rm-chip"><?= (int)$rm['deposit_months'] ?>-month deposit</span>
+              <?php endif; ?>
+            </div>
+            <a href="/colive/listings.php" class="rm-btn">
+              <i class="bi bi-send me-1"></i>Inquire Now
+            </a>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <div class="text-center">
+      <a href="/colive/listings.php"
+         style="color:#6366f1;font-size:.875rem;font-weight:600;text-decoration:none;">
+        See all available rooms &rarr;
+      </a>
+    </div>
+    <?php else: ?>
+    <div class="text-center py-5" style="color:#94a3b8;">
+      <i class="bi bi-house-slash" style="font-size:2.5rem;display:block;margin-bottom:.75rem;"></i>
+      <p style="margin:0;font-size:.9rem;">No rooms listed yet &mdash; check back soon.</p>
+    </div>
+    <?php endif; ?>
+  </div>
+</section>
 
 <!-- ════════════════════════════════════════════════════════
      FEATURES
@@ -447,6 +587,97 @@ include __DIR__ . '/../includes/landing_header.php';
       </div>
       <?php endforeach; ?>
     </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     OWNER PARTNERSHIP
+════════════════════════════════════════════════════════ -->
+<section class="owner-section" id="owners">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;border-radius:20px;padding:.3rem .9rem;font-size:.75rem;font-weight:700;margin-bottom:1rem;">
+        <i class="bi bi-buildings-fill"></i> For Property Owners
+      </div>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:#fff;line-height:1.2;margin-bottom:.75rem;">
+        Let Your Property<br><span style="color:#a5b4fc;">Work Harder for You</span>
+      </h2>
+      <p style="color:#94a3b8;font-size:1rem;max-width:520px;margin:0 auto;line-height:1.7;">
+        Partner with Roomee-managed operators. We handle everything &mdash; tenants, billing, maintenance &mdash;
+        while you earn steady passive income with full visibility.
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="owner-stat-row">
+      <?php foreach ([
+        ['RM 2M+','Revenue tracked on platform'],
+        ['500+','Units under management'],
+        ['98%','On-time payment rate'],
+        ['14 days','Average time to fill a room'],
+      ] as [$n,$l]): ?>
+      <div class="owner-stat">
+        <div class="num"><?= $n ?></div>
+        <div class="lbl"><?= $l ?></div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <!-- Benefits grid -->
+    <div class="row g-4 mb-5">
+      <?php
+      $benefits = [
+        ['bi-cash-stack','#dbeafe','#1e40af',
+         'Guaranteed Monthly Reports',
+         'Every payout comes with a detailed breakdown — gross rent, deductions, net income — downloadable from your owner portal anytime.'],
+        ['bi-shield-check','#dcfce7','#15803d',
+         'Verified Operator Network',
+         'We only partner with operators who pass our compliance checks. Your property is managed by screened professionals, not random subletters.'],
+        ['bi-eye-fill','#ede9fe','#5b21b6',
+         'Real-Time Portal Access',
+         'Log in anytime to see unit occupancy, active tenancies, maintenance status and payment history — no need to chase your manager for updates.'],
+        ['bi-tools','#fff7ed','#c2410c',
+         'Maintenance Handled',
+         'Issues are logged, assigned and tracked inside Roomee. You get visibility without being on-call. Resolution photos attached to every ticket.'],
+        ['bi-person-check-fill','#fce7f3','#9d174d',
+         'Quality Tenant Matching',
+         'Operators on Roomee keep full IC, employment and emergency contact records per tenant. No faceless subletting.'],
+        ['bi-graph-up-arrow','#f0fdf4','#166534',
+         'ROI Benchmarking',
+         'See how your unit stacks up. Compare rental yield vs area average and get operator-suggested pricing strategies backed by real data.'],
+      ];
+      foreach ($benefits as [$icon,$bg,$col,$title,$desc]): ?>
+      <div class="col-md-6 col-lg-4">
+        <div class="owner-benefit">
+          <div class="owner-benefit-icon" style="background:<?= $bg ?>;color:<?= $col ?>;">
+            <i class="bi <?= $icon ?>"></i>
+          </div>
+          <h6 class="fw-bold mb-2" style="color:#e2e8f0;font-size:.95rem;"><?= $title ?></h6>
+          <p style="color:#64748b;font-size:.84rem;line-height:1.65;margin:0;"><?= $desc ?></p>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <!-- Owner CTA -->
+    <div style="background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:20px;padding:2.5rem;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:.75rem;">&#127968;</div>
+      <h3 style="color:#fff;font-weight:800;font-size:1.6rem;margin-bottom:.5rem;">Ready to list your property?</h3>
+      <p style="color:#94a3b8;font-size:.9rem;max-width:440px;margin:0 auto 1.75rem;line-height:1.7;">
+        Connect with a Roomee-verified operator today. Fill in your details and we&rsquo;ll match you within 48 hours.
+      </p>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="<?= APP_URL ?>/owner-portal" class="btn-owner-primary">
+          <i class="bi bi-person-vcard-fill"></i> Access Owner Portal
+        </a>
+        <a href="<?= APP_URL ?>/register" class="btn-owner-outline">
+          <i class="bi bi-envelope"></i> Get in Touch
+        </a>
+      </div>
+    </div>
+
   </div>
 </section>
 
