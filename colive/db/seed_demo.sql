@@ -17,6 +17,30 @@ SET NAMES utf8mb4;
 SET time_zone = '+08:00';
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- Clear all tables before seeding (safe to re-run)
+TRUNCATE TABLE audit_logs;
+TRUNCATE TABLE support_messages;
+TRUNCATE TABLE lock_access_logs;
+TRUNCATE TABLE smart_locks;
+TRUNCATE TABLE maintenance_tickets;
+TRUNCATE TABLE owner_payouts;
+TRUNCATE TABLE utility_readings;
+TRUNCATE TABLE utility_rates;
+TRUNCATE TABLE payments;
+TRUNCATE TABLE invoice_items;
+TRUNCATE TABLE invoices;
+TRUNCATE TABLE tenancies;
+TRUNCATE TABLE bookings;
+TRUNCATE TABLE residents;
+TRUNCATE TABLE beds;
+TRUNCATE TABLE rooms;
+TRUNCATE TABLE units;
+TRUNCATE TABLE buildings;
+TRUNCATE TABLE owners;
+TRUNCATE TABLE users;
+TRUNCATE TABLE companies;
+TRUNCATE TABLE platform_admins;
+
 -- Hash for Demo@1234
 SET @pw = '$2y$10$UikqzBZZTPafEX/RDnBRdOktSIFnAIWgu5XcNRf9ZEqUVocgNh5G.';
 
