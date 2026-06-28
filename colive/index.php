@@ -139,7 +139,16 @@ footer { background:#0f172a;color:#94a3b8;padding:3.5rem 1.5rem 2rem; }
 .footer-tagline { font-size:.82rem;color:#475569;margin-bottom:2rem; }
 .footer-grid { display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;padding-bottom:2rem;border-bottom:1px solid #1e293b; }
 @media(max-width:768px){ .footer-grid{grid-template-columns:1fr 1fr;} }
-@media(max-width:480px){ .footer-grid{grid-template-columns:1fr;} }
+@media(max-width:480px){
+  .footer-grid{grid-template-columns:1fr;}
+  .room-card-body { padding:.6rem; }
+  .room-price { font-size:1rem; }
+  .room-loc { font-size:.65rem; }
+  .room-chips { gap:.25rem; }
+  .room-chip { font-size:.62rem; padding:.2rem .4rem; }
+  .room-inquire { font-size:.75rem; padding:.45rem; }
+  .room-type-pill { font-size:.62rem; padding:.2rem .5rem; }
+}
 .footer-col h6 { color:#e2e8f0;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem; }
 .footer-col a { display:block;color:#64748b;font-size:.83rem;text-decoration:none;margin-bottom:.5rem; }
 .footer-col a:hover { color:#a78bfa; }
@@ -286,7 +295,7 @@ footer { background:#0f172a;color:#94a3b8;padding:3.5rem 1.5rem 2rem; }
         $brand = !empty($rm['brand_color']) ? $rm['brand_color'] : '#7c3aed';
         $beds  = 0; // lightweight — not sub-queried here
       ?>
-      <div class="col-12 col-sm-6 col-lg-4">
+      <div class="col-6 col-lg-4">
         <div class="room-card">
           <div class="room-card-img" style="background:linear-gradient(135deg,<?= htmlspecialchars($brand) ?>18 0%,<?= htmlspecialchars($brand) ?>38 100%);">
             <i class="bi bi-door-open-fill" style="font-size:3rem;color:<?= htmlspecialchars($brand) ?>;opacity:.55;"></i>
