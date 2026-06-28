@@ -129,6 +129,13 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:#f8fafc; color:#0
 .room-type-badge { position:absolute;top:.75rem;left:.75rem;background:var(--brand);color:#fff;
                    font-size:.7rem;font-weight:700;padding:.25rem .6rem;border-radius:20px;text-transform:capitalize; }
 .room-card-body { padding:1.1rem; }
+@media(max-width:480px){
+  .room-card-body { padding:.75rem; }
+  .room-rent { font-size:1.1rem; }
+  .room-loc { font-size:.7rem; }
+  .chip { font-size:.65rem; padding:.15rem .4rem; }
+  .btn-inquire { font-size:.78rem; padding:.45rem; }
+}
 .room-rent { font-size:1.35rem;font-weight:800;color:var(--brand); }
 .room-rent span { font-size:.75rem;font-weight:400;color:#94a3b8; }
 .room-loc { font-size:.78rem;color:#64748b;margin-bottom:.6rem; }
@@ -239,7 +246,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:#f8fafc; color:#0
         $brand = !empty($rm['brand_color']) ? $rm['brand_color'] : '#7c3aed';
         $beds  = (int)$rm['bed_count'];
       ?>
-      <div class="col-12 col-sm-6 col-lg-4">
+      <div class="col-6 col-lg-4">
         <div class="room-card">
           <div class="room-card-img" style="background:linear-gradient(135deg,<?= htmlspecialchars($brand) ?>22 0%,<?= htmlspecialchars($brand) ?>44 100%);">
             <i class="bi bi-door-open-fill" style="font-size:3rem;color:<?= htmlspecialchars($brand) ?>;opacity:.6;"></i>

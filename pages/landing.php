@@ -125,6 +125,14 @@ include __DIR__ . '/../includes/landing_header.php';
           font-size:.83rem; font-weight:700; text-decoration:none; color:#fff;
           background:#6366f1; transition:background .15s; }
 .rm-btn:hover { background:#4f46e5; color:#fff; }
+@media(max-width:480px){
+  .rm-body { padding:.7rem; }
+  .rm-price { font-size:1.05rem; }
+  .rm-loc { font-size:.68rem; }
+  .rm-chip { font-size:.63rem; padding:.13rem .38rem; }
+  .rm-btn { font-size:.75rem; padding:.42rem; margin-top:.65rem; }
+  .rm-card-img { height:110px; }
+}
 
 /* ── Owner partnership ── */
 .owner-section { background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); padding:5.5rem 0; }
@@ -325,7 +333,7 @@ include __DIR__ . '/../includes/landing_header.php';
       <?php foreach ($featRooms as $rm):
         $brand = !empty($rm['brand_color']) ? $rm['brand_color'] : '#6366f1';
       ?>
-      <div class="col-12 col-sm-6 col-lg-4">
+      <div class="col-6 col-lg-4">
         <div class="rm-card">
           <div class="rm-card-img"
                style="background:linear-gradient(135deg,<?= htmlspecialchars($brand) ?>18 0%,<?= htmlspecialchars($brand) ?>40 100%);">
