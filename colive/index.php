@@ -129,10 +129,10 @@ footer { background:#0f172a;color:#94a3b8;padding:3.5rem 1.5rem 2rem; }
   <h1>Run your co-living<br>operation <span>smarter</span>.</h1>
   <p>From rooms and residents to billing, maintenance and owner payouts &mdash; everything in one clean dashboard.</p>
   <div class="hero-btns">
-    <a href="/colive/app/login.php" class="btn-hero-primary">
-      <i class="bi bi-box-arrow-in-right"></i> Operator Login
+    <a href="/colive/listings.php" class="btn-hero-primary">
+      <i class="bi bi-search"></i> Browse Available Rooms
     </a>
-    <a href="#portals" class="btn-hero-outline">View All Portals</a>
+    <a href="/colive/app/login.php" class="btn-hero-outline">Operator Login</a>
   </div>
 </section>
 
