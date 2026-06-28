@@ -3,10 +3,10 @@ declare(strict_types=1);
 // CoLive OS — database singleton
 // Usage: $db = getDB();  (call at top of every public page)
 
-define('DB_HOST',    'localhost');
-define('DB_NAME',    'colive');
-define('DB_USER',    'your_db_user');
-define('DB_PASS',    'your_db_password');
+define('DB_HOST',    '127.0.0.1');
+define('DB_NAME',    'u822252863_roomee');
+define('DB_USER',    'u822252863_roomee');
+define('DB_PASS',    'YOUR_DB_PASSWORD_HERE');
 define('DB_CHARSET', 'utf8mb4');
 
 function getDB(): PDO {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 // ── App constants ────────────────────────────────────────────────────────────
 define('APP_NAME',    'CoLive OS');
-define('APP_URL',     'https://colive.slvgroup.my');
+define('APP_URL',     'https://YOUR_DOMAIN_HERE');  // e.g. https://roomee.my or https://yourdomain.com/colive
 define('APP_VERSION', '1.0.0');
 define('BRAND_COLOR', '#9333ea');
 define('TRIAL_DAYS',  14);
