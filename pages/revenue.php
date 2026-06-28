@@ -55,13 +55,12 @@ if (!empty($_GET['report'])) {
         </tfoot>
       </table>
     </div>
-    <?php $extraJs = '<script>
+    <?php $extraJs = '
     new Chart(document.getElementById("annualChart"),{type:"bar",
       data:{labels:'.json_encode(array_column($report,"month")).',datasets:[
         {label:"Income",data:'.json_encode(array_column($report,"income")).',backgroundColor:"#6366f1",borderRadius:4},
         {label:"Expenses",data:'.json_encode(array_column($report,"expense")).',backgroundColor:"#fca5a5",borderRadius:4}]},
-      options:{responsive:true,plugins:{legend:{position:"top"}},scales:{y:{beginAtZero:true,ticks:{callback:v=>"RM "+v.toLocaleString()}}}}});
-    </script>';
+      options:{responsive:true,plugins:{legend:{position:"top"}},scales:{y:{beginAtZero:true,ticks:{callback:v=>"RM "+v.toLocaleString()}}}}}); ';
     require_once __DIR__ . '/../includes/footer.php'; exit;
 }
 

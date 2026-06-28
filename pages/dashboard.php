@@ -145,7 +145,7 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php
-$extraJs = '<script>
+$extraJs = '
 new Chart(document.getElementById("revenueChart"),{
   type:"bar",
   data:{
@@ -158,5 +158,5 @@ new Chart(document.getElementById("revenueChart"),{
   options:{responsive:true,plugins:{legend:{position:"top"}},
     scales:{y:{beginAtZero:true,ticks:{callback:v=>"RM "+v.toLocaleString()}}}}
 });
-</script>';
+';
 require_once __DIR__ . '/../includes/footer.php';
