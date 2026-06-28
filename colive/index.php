@@ -1,3 +1,29 @@
+<?php
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/helpers.php';
+$db = getDB();
+
+// Featured rooms: up to 6 vacant rooms, pick variety of types
+$featStmt = $db->prepare("
+    SELECT r.*, u.unit_no, b.name AS building_name, b.city,
+           c.brand_color
+    FROM rooms r
+    JOIN units u ON u.id = r.unit_id
+    JOIN buildings b ON b.id = u.building_id
+    JOIN companies c ON c.id = r.company_id AND c.status IN ('trial','active')
+    LEFT JOIN tenancies t ON t.room_id = r.id AND t.status = 'active'
+    WHERE r.is_active = 1 AND t.id IS NULL
+    ORDER BY r.base_rent ASC
+    LIMIT 6
+");
+$featStmt->execute();
+$featRooms = $featStmt->fetchAll();
+
+$typeLabels = [
+    'single'=>'Single','twin'=>'Twin','master'=>'Master',
+    'studio'=>'Studio','common'=>'Common Room',
+];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,6 +71,26 @@ body { font-family:'Segoe UI',system-ui,sans-serif; color:#0f172a; background:#f
 .section-tag { display:inline-block;background:var(--brand-light);color:var(--brand);border-radius:20px;padding:.25rem .85rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem; }
 .section-title { font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;margin-bottom:.5rem; }
 .section-sub { color:#64748b;font-size:.95rem;max-width:500px; }
+
+/* ROOM LISTING CARDS */
+.rooms-section { background:#f8fafc;padding:5rem 1.5rem; }
+.room-card { background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;
+             transition:box-shadow .2s,transform .2s;height:100%;display:flex;flex-direction:column; }
+.room-card:hover { box-shadow:0 8px 32px rgba(124,58,237,.13);transform:translateY(-4px); }
+.room-card-img { height:150px;display:flex;align-items:center;justify-content:center;position:relative; }
+.room-type-pill { position:absolute;top:.65rem;left:.65rem;color:#fff;font-size:.68rem;font-weight:700;
+                  padding:.2rem .6rem;border-radius:20px;text-transform:capitalize; }
+.room-card-body { padding:1.1rem;display:flex;flex-direction:column;flex:1; }
+.room-price { font-size:1.3rem;font-weight:800;color:#0f172a;line-height:1; }
+.room-price span { font-size:.75rem;font-weight:400;color:#94a3b8; }
+.room-loc { font-size:.75rem;color:#64748b;margin:.3rem 0 .65rem; }
+.room-chips { display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:auto; }
+.room-chip { background:#f1f5f9;color:#475569;font-size:.68rem;padding:.18rem .5rem;border-radius:20px; }
+.room-chip.green { background:#f0fdf4;color:#166534; }
+.room-chip.purple { background:#faf5ff;color:#6b21a8; }
+.room-inquire { margin-top:1rem;display:block;text-align:center;border-radius:8px;padding:.5rem;
+                font-size:.83rem;font-weight:700;text-decoration:none;transition:background .15s; }
+@media(max-width:600px){ .rooms-section{padding:3.5rem 1.25rem;} }
 
 /* FEATURE GRID */
 .feat-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:3rem; }
@@ -157,6 +203,74 @@ footer { background:#0f172a;color:#94a3b8;padding:3.5rem 1.5rem 2rem; }
     </div>
   </div>
 </div>
+
+<!-- FEATURED ROOMS -->
+<section class="rooms-section" id="rooms">
+  <div class="section-center">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <div>
+        <span class="section-tag">Now Available</span>
+        <h2 class="section-title mb-1">Featured Rooms</h2>
+        <p class="section-sub mb-0">Vacant rooms you can move into. Inquire directly &mdash; no agent needed.</p>
+      </div>
+      <a href="/colive/listings.php" style="white-space:nowrap;background:var(--brand);color:#fff;border-radius:10px;padding:.55rem 1.4rem;font-size:.875rem;font-weight:700;text-decoration:none;">
+        View All Rooms <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <?php if ($featRooms): ?>
+    <div class="row g-3">
+      <?php foreach ($featRooms as $rm):
+        $brand = !empty($rm['brand_color']) ? $rm['brand_color'] : '#7c3aed';
+        $beds  = 0; // lightweight — not sub-queried here
+      ?>
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="room-card">
+          <div class="room-card-img" style="background:linear-gradient(135deg,<?= htmlspecialchars($brand) ?>18 0%,<?= htmlspecialchars($brand) ?>38 100%);">
+            <i class="bi bi-door-open-fill" style="font-size:3rem;color:<?= htmlspecialchars($brand) ?>;opacity:.55;"></i>
+            <span class="room-type-pill" style="background:<?= htmlspecialchars($brand) ?>;">
+              <?= htmlspecialchars($typeLabels[$rm['room_type']] ?? ucfirst($rm['room_type'])) ?>
+            </span>
+          </div>
+          <div class="room-card-body">
+            <div class="room-price">
+              RM <?= number_format((float)$rm['base_rent'], 0) ?>
+              <span>/ month</span>
+            </div>
+            <div class="room-loc">
+              <i class="bi bi-geo-alt me-1"></i>
+              <?= htmlspecialchars($rm['building_name']) ?>
+              <?php if ($rm['city']): ?>&bull; <?= htmlspecialchars($rm['city']) ?><?php endif; ?>
+              &bull; Unit <?= htmlspecialchars($rm['unit_no']) ?>
+            </div>
+            <div class="room-chips">
+              <span class="room-chip"><i class="bi bi-person me-1"></i><?= (int)$rm['capacity'] ?> pax</span>
+              <?php if ($rm['has_attached_bath']): ?>
+              <span class="room-chip green"><i class="bi bi-droplet me-1"></i>En-suite</span>
+              <?php endif; ?>
+              <?php if ((int)$rm['deposit_months'] === 0): ?>
+              <span class="room-chip green"><i class="bi bi-star me-1"></i>Zero deposit</span>
+              <?php else: ?>
+              <span class="room-chip"><?= (int)$rm['deposit_months'] ?>-month deposit</span>
+              <?php endif; ?>
+            </div>
+            <a href="/colive/listings.php#room-<?= $rm['id'] ?>" class="room-inquire"
+               style="background:<?= htmlspecialchars($brand) ?>;color:#fff;">
+              <i class="bi bi-send me-1"></i>Inquire Now
+            </a>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php else: ?>
+    <div class="text-center py-5" style="color:#94a3b8;">
+      <i class="bi bi-house-slash" style="font-size:2.5rem;display:block;margin-bottom:.75rem;"></i>
+      <p style="margin:0;font-size:.9rem;">No rooms listed yet &mdash; check back soon.</p>
+    </div>
+    <?php endif; ?>
+  </div>
+</section>
 
 <!-- FEATURES -->
 <section class="section" style="background:#fff;">
