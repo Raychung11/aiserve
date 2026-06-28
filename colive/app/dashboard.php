@@ -178,7 +178,7 @@ include __DIR__ . '/layout.php';
      'icon'=>'bi-people-fill','bg'=>'#eff6ff','ic'=>'#3b82f6'],
     ['label'=>'Revenue This Month','val'=>money($revenueThisMonth),'sub'=>($revGrowth>=0?'+':'').$revGrowth.'% vs last month',
      'icon'=>'bi-cash-stack','bg'=>'#f0fdf4','ic'=>'#22c55e'],
-    ['label'=>'Outstanding','val'=>money($outstanding['amt']),'sub'=>$outstanding['cnt'].' invoices unpaid',
+    ['label'=>'Outstanding','val'=>money((float)$outstanding['amt']),'sub'=>$outstanding['cnt'].' invoices unpaid',
      'icon'=>'bi-receipt','bg'=>'#fff7ed','ic'=>'#f97316'],
   ];
   foreach ($kpis as $k): ?>

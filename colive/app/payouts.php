@@ -229,19 +229,19 @@ include __DIR__ . '/layout.php';
   <div class="col-md-4">
     <div class="kpi-card">
       <div class="kpi-lbl">Gross Rent</div>
-      <div class="kpi-val"><?= money($totals['gross']) ?></div>
+      <div class="kpi-val"><?= money((float)$totals['gross']) ?></div>
     </div>
   </div>
   <div class="col-md-4">
     <div class="kpi-card">
       <div class="kpi-lbl">Total Deductions</div>
-      <div class="kpi-val"><?= money($totals['ded']) ?></div>
+      <div class="kpi-val"><?= money((float)$totals['ded']) ?></div>
     </div>
   </div>
   <div class="col-md-4">
     <div class="kpi-card">
       <div class="kpi-lbl">Net Payouts</div>
-      <div class="kpi-val" style="color:var(--brand);"><?= money($totals['net']) ?></div>
+      <div class="kpi-val" style="color:var(--brand);"><?= money((float)$totals['net']) ?></div>
     </div>
   </div>
 </div>
