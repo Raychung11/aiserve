@@ -15,7 +15,7 @@ date_default_timezone_set(TZ);
 
 // ── Debug mode ───────────────────────────────────────────────────────────────
 // Flip to true on local/staging only.
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', false);
 
 if (DEBUG_MODE) {
     ini_set('display_errors', '1');
