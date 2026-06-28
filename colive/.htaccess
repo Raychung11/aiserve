@@ -1,16 +1,18 @@
-Options -Indexes
+Options -Indexes +FollowSymLinks
 
-RewriteEngine On
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
-# Block direct access to sensitive paths
-RewriteRule ^db/       - [F,L]
-RewriteRule ^config/   - [F,L]
-RewriteRule ^logs/     - [F,L]
-RewriteRule ^uploads/  - [F,L]
-RewriteRule ^cron/     - [F,L]
+    # Block direct access to sensitive paths
+    RewriteRule ^db/       - [F,L]
+    RewriteRule ^config/   - [F,L]
+    RewriteRule ^logs/     - [F,L]
+    RewriteRule ^uploads/  - [F,L]
+    RewriteRule ^cron/     - [F,L]
+</IfModule>
 
 # Block hidden files
-<FilesMatch "^\.">
+<FilesMatch "^\.|\.log$|\.sql$|\.env$">
     Order allow,deny
     Deny from all
 </FilesMatch>
@@ -19,15 +21,17 @@ RewriteRule ^cron/     - [F,L]
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# PHP settings
+# PHP settings (mod_php)
 <IfModule mod_php.c>
     php_value upload_max_filesize 10M
     php_value post_max_size 10M
     php_value max_execution_time 60
-    php_value session.cookie_httponly 1
-    php_value session.use_strict_mode 1
+</IfModule>
+
+# PHP settings (PHP-FPM / CGI — Hostinger default)
+<IfModule mod_fcgid.c>
+    FcgidMaxRequestLen 10485760
 </IfModule>
