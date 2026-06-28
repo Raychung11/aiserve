@@ -52,6 +52,9 @@ body { font-family:'Segoe UI',system-ui,sans-serif; color:var(--dark); backgroun
         <a href="#features"  class="nav-link">Features</a>
         <a href="#how"       class="nav-link">How It Works</a>
         <a href="#pricing"   class="nav-link">Pricing</a>
+        <a href="https://roomee.my/colive" class="nav-link" target="_blank" style="color:#9333ea;font-weight:600;">
+          <i class="bi bi-house-heart-fill" style="font-size:.85rem;"></i> CoLive OS
+        </a>
         <div class="ms-3 d-flex align-items-center gap-2">
           <a href="<?= APP_URL ?>/login"    class="nav-link btn-nav-login">Sign In</a>
           <a href="<?= APP_URL ?>/register" class="nav-link btn-nav-signup">Start Free Trial</a>
@@ -70,6 +73,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; color:var(--dark); backgroun
         <a href="#features"  class="nav-link">Features</a>
         <a href="#how"       class="nav-link">How It Works</a>
         <a href="#pricing"   class="nav-link">Pricing</a>
+        <a href="https://roomee.my/colive" class="nav-link" target="_blank" style="color:#9333ea;font-weight:600;"><i class="bi bi-house-heart-fill" style="font-size:.85rem;"></i> CoLive OS</a>
         <hr class="my-1">
         <a href="<?= APP_URL ?>/login"    class="nav-link btn-nav-login">Sign In</a>
         <a href="<?= APP_URL ?>/register" class="btn btn-primary btn-sm mt-1 w-100 py-2" style="border-radius:8px;">Start Free Trial</a>

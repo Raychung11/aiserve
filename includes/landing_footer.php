@@ -34,6 +34,14 @@
         <ul class="list-unstyled" style="font-size:.875rem;">
           <li class="mb-2"><a href="<?= APP_URL ?>/login"    style="color:#64748b;text-decoration:none;" onmouseover="this.style.color='#a5b4fc'" onmouseout="this.style.color='#64748b'">Sign In</a></li>
           <li class="mb-2"><a href="<?= APP_URL ?>/register" style="color:#64748b;text-decoration:none;" onmouseover="this.style.color='#a5b4fc'" onmouseout="this.style.color='#64748b'">Register</a></li>
+          <li class="mb-2 mt-3">
+            <a href="https://roomee.my/colive" target="_blank"
+               style="color:#c084fc;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:.4rem;"
+               onmouseover="this.style.color='#e879f9'" onmouseout="this.style.color='#c084fc'">
+              <i class="bi bi-house-heart-fill" style="font-size:.85rem;"></i> CoLive OS
+              <i class="bi bi-box-arrow-up-right" style="font-size:.65rem;opacity:.7;"></i>
+            </a>
+          </li>
         </ul>
       </div>
 
