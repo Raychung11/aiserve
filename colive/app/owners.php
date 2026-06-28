@@ -22,10 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $phone   = trim($_POST['phone']        ?? '');
         $bank    = trim($_POST['bank_name']    ?? '');
         $acc     = trim($_POST['bank_account'] ?? '');
-        $holder  = trim($_POST['bank_holder']  ?? '');
-        $notes   = trim($_POST['notes']        ?? '');
-        $active  = isset($_POST['is_active']) ? 1 : 0;
-        $oid     = (int)($_POST['id']          ?? 0);
+        $holder   = trim($_POST['bank_holder']       ?? '');
+        $notes    = trim($_POST['notes']             ?? '');
+        $active   = isset($_POST['is_active']) ? 1 : 0;
+        $oid      = (int)($_POST['id']               ?? 0);
+        $portalPw = trim($_POST['portal_password']   ?? '');
 
         if ($name === '') {
             flashSet('danger', 'Owner name is required.');
@@ -39,6 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $old = $db->prepare('SELECT * FROM owners WHERE id=?');
             $old->execute([$oid]);
             $oldData = (array)$old->fetch();
+            if ($portalPw !== '') {
+                $db->prepare('UPDATE owners SET portal_password=? WHERE id=? AND company_id=?')
+                   ->execute([password_hash($portalPw, PASSWORD_DEFAULT), $oid, $cid]);
+            }
             $db->prepare(
                 'UPDATE owners SET name=?,ic_number=?,email=?,phone=?,bank_name=?,bank_account=?,bank_holder=?,notes=?,is_active=?
                  WHERE id=? AND company_id=?'
@@ -46,10 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             auditLog($db, 'update', 'owners', $oid, $oldData, ['name' => $name]);
             flashSet('success', 'Owner updated.');
         } else {
+            $pwHash = $portalPw !== '' ? password_hash($portalPw, PASSWORD_DEFAULT) : null;
             $db->prepare(
-                'INSERT INTO owners (company_id,name,ic_number,email,phone,bank_name,bank_account,bank_holder,notes,is_active)
-                 VALUES (?,?,?,?,?,?,?,?,?,?)'
-            )->execute([$cid, $name, $ic, $email ?: null, $phone, $bank, $acc, $holder, $notes, $active]);
+                'INSERT INTO owners (company_id,name,ic_number,email,phone,bank_name,bank_account,bank_holder,portal_password,notes,is_active)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?)'
+            )->execute([$cid, $name, $ic, $email ?: null, $phone, $bank, $acc, $holder, $pwHash, $notes, $active]);
             $oid = (int)$db->lastInsertId();
             auditLog($db, 'create', 'owners', $oid, [], ['name' => $name]);
             flashSet('success', 'Owner added.');
@@ -162,6 +168,12 @@ include __DIR__ . '/layout.php';
         <input type="text" name="bank_holder" class="form-control form-control-sm"
                value="<?= e($editing['bank_holder'] ?? '') ?>">
       </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold" style="font-size:.85rem;">Portal Password</label>
+      <input type="password" name="portal_password" class="form-control form-control-sm"
+             placeholder="<?= $editing ? 'Leave blank to keep existing' : 'Set to enable portal access' ?>">
+      <div style="font-size:.75rem;color:#94a3b8;margin-top:.3rem;">Owner portal login at <?= e(APP_URL) ?>/portal/owner/login.php</div>
     </div>
     <div class="mb-3">
       <label class="form-label fw-semibold" style="font-size:.85rem;">Notes</label>

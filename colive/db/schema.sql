@@ -89,10 +89,12 @@ CREATE TABLE IF NOT EXISTS owners (
     bank_name      VARCHAR(100) DEFAULT NULL,
     bank_account   VARCHAR(50)  DEFAULT NULL,
     bank_holder    VARCHAR(120) DEFAULT NULL,
+    portal_password VARCHAR(255) DEFAULT NULL  COMMENT 'Hashed password for owner portal login',
     notes          TEXT         DEFAULT NULL,
     is_active      TINYINT(1)   NOT NULL DEFAULT 1,
     created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_company_email (company_id, email),
     INDEX idx_company (company_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
