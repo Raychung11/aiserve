@@ -148,6 +148,40 @@ footer { background:#0f172a;color:#94a3b8;padding:3.5rem 1.5rem 2rem; }
 .footer-login-link:hover { color:#a78bfa; }
 .footer-bottom { display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;padding-top:1.5rem;font-size:.78rem; }
 
+/* AUDIENCE SPLIT */
+.split-strip { background:#fff;border-bottom:1px solid #f1f5f9;padding:2.25rem 1.5rem; }
+.split-inner { max-width:860px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem; }
+.split-card { border-radius:14px;padding:1.5rem 1.75rem;display:flex;align-items:center;gap:1.1rem; }
+.split-card-tenant { background:linear-gradient(135deg,#7c3aed 0%,#5b21b6 100%);color:#fff; }
+.split-card-operator { background:#f8fafc;border:1.5px solid #e2e8f0;color:#0f172a; }
+.split-icon { font-size:2rem;flex-shrink:0; }
+.split-card h6 { font-weight:700;font-size:.95rem;margin-bottom:.2rem; }
+.split-card p { font-size:.78rem;margin:0;opacity:.75;line-height:1.4; }
+.split-btn-white { display:inline-flex;align-items:center;gap:.4rem;margin-top:.85rem;background:#fff;
+                   color:#7c3aed;border-radius:8px;padding:.42rem 1.1rem;font-size:.82rem;font-weight:700;
+                   text-decoration:none;transition:background .15s; }
+.split-btn-white:hover { background:#f5f3ff;color:#5b21b6; }
+.split-btn-brand { display:inline-flex;align-items:center;gap:.4rem;margin-top:.85rem;background:var(--brand);
+                   color:#fff;border-radius:8px;padding:.42rem 1.1rem;font-size:.82rem;font-weight:700;
+                   text-decoration:none;transition:background .15s; }
+.split-btn-brand:hover { background:var(--brand-dark);color:#fff; }
+@media(max-width:640px){
+  .split-inner { grid-template-columns:1fr; }
+  .split-card  { flex-direction:column;align-items:flex-start;gap:.6rem; }
+}
+
+/* STICKY MOBILE RENT CTA */
+.sticky-rent-btn { display:none; }
+@media(max-width:768px){
+  .sticky-rent-btn {
+    display:flex;align-items:center;justify-content:center;gap:.5rem;
+    position:fixed;bottom:1rem;left:1rem;right:1rem;z-index:200;
+    background:var(--brand);color:#fff;border-radius:12px;padding:.85rem;
+    font-size:.95rem;font-weight:700;text-decoration:none;
+    box-shadow:0 8px 24px rgba(124,58,237,.45);
+  }
+}
+
 /* MOBILE NAV */
 @media(max-width:600px){ .hero{padding:8rem 1.25rem 4rem;} }
 </style>
@@ -176,11 +210,39 @@ footer { background:#0f172a;color:#94a3b8;padding:3.5rem 1.5rem 2rem; }
   <p>From rooms and residents to billing, maintenance and owner payouts &mdash; everything in one clean dashboard.</p>
   <div class="hero-btns">
     <a href="/colive/listings.php" class="btn-hero-primary">
-      <i class="bi bi-search"></i> Browse Available Rooms
+      <i class="bi bi-house-heart-fill"></i> I Want to Rent
     </a>
-    <a href="/colive/app/login.php" class="btn-hero-outline">Operator Login</a>
+    <a href="/colive/app/login.php" class="btn-hero-outline">
+      <i class="bi bi-grid-fill"></i> Operator Login
+    </a>
   </div>
 </section>
+
+<!-- AUDIENCE SPLIT -->
+<div class="split-strip">
+  <div class="split-inner">
+    <div class="split-card split-card-tenant">
+      <div class="split-icon"><i class="bi bi-house-heart-fill"></i></div>
+      <div>
+        <h6>Looking for a room?</h6>
+        <p>Browse vacant rooms, check prices and inquire directly &mdash; no agent fee.</p>
+        <a href="/colive/listings.php" class="split-btn-white">
+          <i class="bi bi-search"></i> I Want to Rent
+        </a>
+      </div>
+    </div>
+    <div class="split-card split-card-operator">
+      <div class="split-icon" style="color:var(--brand);"><i class="bi bi-speedometer2"></i></div>
+      <div>
+        <h6>Managing a co-living?</h6>
+        <p>Sign in to your dashboard to manage rooms, residents, billing and more.</p>
+        <a href="/colive/app/login.php" class="split-btn-brand">
+          <i class="bi bi-box-arrow-in-right"></i> Operator Login
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- STATS BAR -->
 <div class="stats-bar">
@@ -467,6 +529,10 @@ footer { background:#0f172a;color:#94a3b8;padding:3.5rem 1.5rem 2rem; }
     </div>
   </div>
 </footer>
+
+<a href="/colive/listings.php" class="sticky-rent-btn">
+  <i class="bi bi-house-heart-fill"></i> I Want to Rent
+</a>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
