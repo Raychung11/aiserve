@@ -1,0 +1,7 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/functions.php';
+
+admin_require_login();
