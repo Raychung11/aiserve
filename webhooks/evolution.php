@@ -8,6 +8,34 @@ require_once __DIR__ . '/../inc/evolution_helper.php';
 http_response_code(200);
 header('Content-Type: application/json');
 
+/*
+|--------------------------------------------------------------------------
+| Verify a shared secret before processing anything
+|--------------------------------------------------------------------------
+| Without this, anyone who finds the URL can inject fake WhatsApp messages,
+| create contacts/conversations, and trigger AI auto-replies. Configure the
+| secret via the EVOLUTION_WEBHOOK_SECRET env var or the
+| `evolution_webhook_secret` site setting, and send it on the request as the
+| `apikey` / `X-Webhook-Secret` header or a `?secret=` query parameter.
+| If no secret is configured the webhook stays open (backwards compatible).
+*/
+$expectedSecret = aiserve_env('EVOLUTION_WEBHOOK_SECRET');
+if ($expectedSecret === '') {
+    $expectedSecret = get_setting('evolution_webhook_secret', '');
+}
+
+if ($expectedSecret !== '') {
+    $providedSecret = $_SERVER['HTTP_APIKEY']
+        ?? $_SERVER['HTTP_X_WEBHOOK_SECRET']
+        ?? ($_GET['secret'] ?? '');
+
+    if (!is_string($providedSecret) || !hash_equals($expectedSecret, $providedSecret)) {
+        http_response_code(401);
+        echo json_encode(['ok' => false, 'message' => 'Unauthorized']);
+        exit;
+    }
+}
+
 $raw = file_get_contents('php://input');
 if ($raw === false || trim($raw) === '') {
     echo json_encode(['ok' => false, 'message' => 'Empty payload']);
@@ -63,9 +91,9 @@ try {
         'wa_message_id' => $waMessageId
     ]);
 } catch (Throwable $e) {
+    error_log('[evolution webhook] ' . $e->getMessage());
     echo json_encode([
         'ok' => false,
-        'message' => 'Processing error',
-        'error' => $e->getMessage()
+        'message' => 'Processing error'
     ]);
 }

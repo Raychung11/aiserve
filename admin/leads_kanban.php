@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../inc/admin_auth.php';
 require_once __DIR__ . '/../inc/admin_layout.php';
+require_once __DIR__ . '/../inc/admin_csrf.php';
 
 $statuses = ['new', 'contacted', 'qualified', 'closed'];
 $data = [];
@@ -97,6 +98,7 @@ document.querySelectorAll('.kanban-dropzone').forEach(zone => {
         const body = new URLSearchParams();
         body.append('id', draggedId);
         body.append('status', newStatus);
+        body.append('csrf_token', <?= json_encode(csrf_token()) ?>);
 
         const res = await fetch('/admin/kanban_update.php', {
             method: 'POST',

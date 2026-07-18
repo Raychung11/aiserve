@@ -1,0 +1,17 @@
+# Serve uploaded files as static content only — never execute them.
+# Defense in depth in case a disallowed file type ever lands here.
+
+php_flag engine off
+
+<IfModule mod_php.c>
+    php_admin_flag engine off
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
+
+# Block direct execution of common server-side script extensions.
+<FilesMatch "\.(php|php3|php4|php5|php7|phtml|pht|phar|cgi|pl|py|sh|asp|aspx|jsp)$">
+    Require all denied
+</FilesMatch>

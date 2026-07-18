@@ -1,0 +1,13 @@
+# Environment / secrets
+.env
+*.env
+
+# Uploaded / user-generated content (keep the directory + its .htaccess)
+uploads/*
+!uploads/.htaccess
+uploads/media/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log

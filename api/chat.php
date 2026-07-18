@@ -11,12 +11,40 @@ try {
     require_once __DIR__ . '/../config/openai.php';
     require_once __DIR__ . '/../inc/site_knowledge_from_db.php';
 } catch (Throwable $e) {
+    error_log('[api/chat bootstrap] ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'ok' => false,
-        'error' => 'Bootstrap error: ' . $e->getMessage(),
+        'error' => 'Service temporarily unavailable.',
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
+}
+
+/**
+ * Lightweight per-IP rate limit to protect the (unauthenticated) endpoint
+ * from being abused to burn OpenAI credits. Allows $max requests per $window
+ * seconds, tracked in a temp file per client IP.
+ */
+function chat_rate_limit(int $max = 15, int $window = 60): bool {
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+    $file = sys_get_temp_dir() . '/aiserve_chat_rl_' . md5($ip) . '.json';
+
+    $now = time();
+    $hits = [];
+    if (is_file($file)) {
+        $decoded = json_decode((string)@file_get_contents($file), true);
+        if (is_array($decoded)) {
+            $hits = array_filter($decoded, fn($t) => is_int($t) && ($now - $t) < $window);
+        }
+    }
+
+    if (count($hits) >= $max) {
+        return false;
+    }
+
+    $hits[] = $now;
+    @file_put_contents($file, json_encode(array_values($hits)), LOCK_EX);
+    return true;
 }
 
 function json_out(array $data, int $status = 200): void {
@@ -374,11 +402,20 @@ try {
         json_out(['ok' => false, 'error' => 'Method not allowed.'], 405);
     }
 
+    if (!chat_rate_limit()) {
+        json_out(['ok' => false, 'error' => 'Too many requests. Please slow down.'], 429);
+    }
+
     $body = read_json_body();
     $message = trim((string)($body['message'] ?? ''));
 
     if ($message === '') {
         json_out(['ok' => false, 'error' => 'Message is required.'], 422);
+    }
+
+    // Cap message length to avoid oversized / abusive prompts.
+    if (mb_strlen($message) > 2000) {
+        $message = mb_substr($message, 0, 2000);
     }
 
     $docs = aiserve_site_knowledge_from_db();
@@ -409,8 +446,9 @@ try {
         }, $matches)
     ]);
 } catch (Throwable $e) {
+    error_log('[api/chat] ' . $e->getMessage());
     json_out([
         'ok' => false,
-        'error' => 'Chat backend error: ' . $e->getMessage(),
+        'error' => 'Chat backend error. Please try again later.',
     ], 500);
 }

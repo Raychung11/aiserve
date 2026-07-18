@@ -10,22 +10,39 @@ if (admin_logged_in()) {
 
 $error = '';
 
+// Simple throttle: block after repeated failures within a short window.
+$now = time();
+$attempts = $_SESSION['login_attempts'] ?? ['count' => 0, 'first' => $now];
+if (($now - ($attempts['first'] ?? $now)) > 900) {
+    $attempts = ['count' => 0, 'first' => $now]; // reset window after 15 min
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = (string)($_POST['password'] ?? '');
-
-    $stmt = db()->prepare("SELECT * FROM admin_users WHERE email = ? AND is_active = 1 LIMIT 1");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($password, $user['password_hash'])) {
-        $_SESSION['admin_id'] = $user['id'];
-        $_SESSION['admin_name'] = $user['full_name'];
-        $_SESSION['admin_email'] = $user['email'];
-        $_SESSION['admin_role'] = $user['role'];
-        redirect('/admin/index.php');
+    if (($attempts['count'] ?? 0) >= 5) {
+        $error = 'Too many login attempts. Please try again in a few minutes.';
     } else {
-        $error = 'Invalid login credentials.';
+        $email = trim($_POST['email'] ?? '');
+        $password = (string)($_POST['password'] ?? '');
+
+        $stmt = db()->prepare("SELECT * FROM admin_users WHERE email = ? AND is_active = 1 LIMIT 1");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password_hash'])) {
+            // Prevent session fixation: issue a fresh session id on privilege change.
+            session_regenerate_id(true);
+            unset($_SESSION['login_attempts']);
+
+            $_SESSION['admin_id'] = $user['id'];
+            $_SESSION['admin_name'] = $user['full_name'];
+            $_SESSION['admin_email'] = $user['email'];
+            $_SESSION['admin_role'] = $user['role'];
+            redirect('/admin/index.php');
+        } else {
+            $attempts['count'] = ($attempts['count'] ?? 0) + 1;
+            $_SESSION['login_attempts'] = $attempts;
+            $error = 'Invalid login credentials.';
+        }
     }
 }
 ?>

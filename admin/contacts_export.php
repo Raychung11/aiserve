@@ -39,6 +39,20 @@ header('Content-Disposition: attachment; filename=contacts_export_' . date('Ymd_
 
 $output = fopen('php://output', 'w');
 
+/*
+ * Neutralize CSV/formula injection. Contact fields come from the public
+ * contact form, so a value like "=cmd|'/c calc'!A1" could execute when the
+ * export is opened in Excel/Sheets. Prefix any value starting with a formula
+ * trigger character with a single quote.
+ */
+$csvSafe = static function ($value): string {
+    $value = (string)$value;
+    if ($value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+        return "'" . $value;
+    }
+    return $value;
+};
+
 fputcsv($output, [
     'ID',
     'Full Name',
@@ -56,15 +70,15 @@ fputcsv($output, [
 foreach ($rows as $r) {
     fputcsv($output, [
         $r['id'],
-        $r['full_name'],
-        $r['company_name'],
-        $r['email'],
-        $r['phone'],
-        $r['interest'],
-        $r['company_size'],
-        $r['message'],
-        $r['source_page'],
-        $r['status'],
+        $csvSafe($r['full_name']),
+        $csvSafe($r['company_name']),
+        $csvSafe($r['email']),
+        $csvSafe($r['phone']),
+        $csvSafe($r['interest']),
+        $csvSafe($r['company_size']),
+        $csvSafe($r['message']),
+        $csvSafe($r['source_page']),
+        $csvSafe($r['status']),
         $r['created_at']
     ]);
 }

@@ -20,28 +20,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tmpPath = $_FILES['media_file']['tmp_name'];
         $mimeType = mime_content_type($tmpPath) ?: 'application/octet-stream';
 
-        $ext = pathinfo($originalName, PATHINFO_EXTENSION);
-        $safeName = time() . '_' . bin2hex(random_bytes(4)) . ($ext ? '.' . $ext : '');
-        $targetPath = $uploadDir . $safeName;
+        // Only allow known-safe media types. This prevents uploading executable
+        // scripts (e.g. .php) into the web-accessible uploads directory.
+        $allowedExt = [
+            'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg',
+            'pdf', 'mp4', 'webm', 'mp3', 'ogg', 'wav',
+        ];
+        $allowedMime = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+            'application/pdf',
+            'video/mp4', 'video/webm',
+            'audio/mpeg', 'audio/ogg', 'audio/wav', 'audio/x-wav', 'audio/wave',
+        ];
 
-        if (move_uploaded_file($tmpPath, $targetPath)) {
-            $fileUrl = APP_URL . '/uploads/media/' . $safeName;
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
-            $stmt = db()->prepare("
-                INSERT INTO media_library (file_name, file_path, file_url, file_type, uploaded_by, created_at)
-                VALUES (?, ?, ?, ?, ?, NOW())
-            ");
-            $stmt->execute([
-                $originalName,
-                '/uploads/media/' . $safeName,
-                $fileUrl,
-                $mimeType,
-                $_SESSION['admin_id'] ?? null
-            ]);
-
-            $message = 'Media uploaded successfully.';
+        if ($ext === '' || !in_array($ext, $allowedExt, true) || !in_array($mimeType, $allowedMime, true)) {
+            $message = 'Unsupported file type. Allowed: images, PDF, audio, and video.';
         } else {
-            $message = 'Upload failed.';
+            $safeName = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+            $targetPath = $uploadDir . $safeName;
+
+            if (move_uploaded_file($tmpPath, $targetPath)) {
+                $fileUrl = APP_URL . '/uploads/media/' . $safeName;
+
+                $stmt = db()->prepare("
+                    INSERT INTO media_library (file_name, file_path, file_url, file_type, uploaded_by, created_at)
+                    VALUES (?, ?, ?, ?, ?, NOW())
+                ");
+                $stmt->execute([
+                    $originalName,
+                    '/uploads/media/' . $safeName,
+                    $fileUrl,
+                    $mimeType,
+                    $_SESSION['admin_id'] ?? null
+                ]);
+
+                $message = 'Media uploaded successfully.';
+            } else {
+                $message = 'Upload failed.';
+            }
         }
     } else {
         $message = 'Please choose a file.';
