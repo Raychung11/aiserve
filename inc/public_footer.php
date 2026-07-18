@@ -56,6 +56,7 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
                     <a href="/about.php">About</a>
                     <a href="/solutions.php">Solutions</a>
                     <a href="/industries.php">Industries</a>
+                    <a href="/projects.php">Projects</a>
                     <a href="/contact.php">Contact</a>
                 </div>
             </div>

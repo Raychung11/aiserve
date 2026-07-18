@@ -314,6 +314,7 @@ function admin_header(string $title = 'Admin Dashboard'): void {
                         <summary>CRM & Content <span>▾</span></summary>
                         <div class="menu-items">
                             <a href="/admin/contacts.php">Contacts</a>
+                            <a href="/admin/projects.php">Projects</a>
                             <a href="/admin/blog_posts.php">Blog & Cases</a>
                             <a href="/admin/landing_pages.php">Landing Pages</a>
                             <a href="/admin/content_blocks.php">Content Blocks</a>

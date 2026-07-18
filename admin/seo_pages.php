@@ -11,6 +11,7 @@ $pages = [
     'ai_bos' => 'Ai-BOS',
     'solutions' => 'Solutions',
     'industries' => 'Industries',
+    'projects' => 'Projects',
     'contact' => 'Contact',
     'blog' => 'Blog'
 ];

@@ -11,6 +11,7 @@ Contact: WhatsApp +60 13-386 6827 · Email hello@aiserve.my
 - [Ai-BOS — AI Business Operating System](https://aiserve.my/ai-bos.php): The proprietary business operating layer connecting customer interaction, workflow, reporting, and decision support.
 - [Solutions](https://aiserve.my/solutions.php): AI customer service, workflow automation, internal assistant, and reporting.
 - [Industries](https://aiserve.my/industries.php): Sectors and business types AiServe.my supports.
+- [Our Projects](https://aiserve.my/projects.php): Selected projects and systems delivered by AiServe.my.
 - [Demos](https://aiserve.my/demos.php): Live demo sites and example deployments.
 - [AI Customer Service Demo](https://aiserve.my/ai-customer-service-demo.php): Interactive demonstration of the AI customer service assistant.
 
