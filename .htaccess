@@ -1,0 +1,46 @@
+# AiServe.my — routing, canonical host, and hardening
+# Apache config. Ignored on nginx (configure equivalent rules in server block).
+
+Options -Indexes
+DirectoryIndex index.php default.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # --- Canonical: force HTTPS ---
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # --- Canonical: strip www (site is aiserve.my, no www) ---
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+    # --- Sitemap alias so /sitemap.xml resolves to the generator ---
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+    # --- Pretty URLs (only when the path is not a real file/dir) ---
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^blog/([^/]+)/?$ blog_view.php?slug=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^p/([^/]+)/?$ page.php?slug=$1 [L,QSA]
+</IfModule>
+
+# --- Do not serve include-only PHP directly over HTTP ---
+RedirectMatch 403 ^/(config|inc)/.*\.php$
+
+# --- Block dotfiles (.env, .git, etc.) ---
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# --- Basic security headers ---
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

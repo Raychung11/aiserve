@@ -21,4 +21,4 @@ Disallow: /inc/
 Disallow: /chatinbox/
 Disallow: /default.php
 
-Sitemap: https://aiserve.my/sitemap.php
+Sitemap: https://aiserve.my/sitemap.xml
