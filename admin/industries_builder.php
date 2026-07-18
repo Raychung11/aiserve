@@ -1,0 +1,118 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../inc/admin_auth.php';
+require_once __DIR__ . '/../inc/admin_layout.php';
+
+$q = trim((string)($_GET['q'] ?? ''));
+$status = trim((string)($_GET['status'] ?? ''));
+
+$sql = "SELECT * FROM industry_pages WHERE 1=1";
+$params = [];
+
+if ($q !== '') {
+    $sql .= " AND (title LIKE ? OR short_description LIKE ? OR badge_text LIKE ?)";
+    $like = '%' . $q . '%';
+    $params[] = $like;
+    $params[] = $like;
+    $params[] = $like;
+}
+
+if ($status !== '') {
+    $sql .= " AND status = ?";
+    $params[] = $status;
+}
+
+$sql .= " ORDER BY is_featured DESC, sort_order ASC, id DESC";
+
+$stmt = db()->prepare($sql);
+$stmt->execute($params);
+$rows = $stmt->fetchAll();
+
+admin_header('Industries Builder');
+?>
+
+<div class="card">
+    <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+        <div>
+            <h3 style="margin:0;">Industries Builder</h3>
+            <p class="muted" style="margin:6px 0 0;">Manage industry sections, photos, and featured cards for the public industries page.</p>
+        </div>
+        <a href="/admin/industry_edit.php" class="btn">Add Industry</a>
+    </div>
+</div>
+
+<div class="card" style="margin-top:20px;">
+    <form method="get">
+        <div class="form-grid">
+            <div class="field">
+                <label>Search</label>
+                <input type="text" name="q" value="<?= h($q) ?>" placeholder="Search industry title or text">
+            </div>
+            <div class="field">
+                <label>Status</label>
+                <select name="status">
+                    <option value="">All</option>
+                    <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>draft</option>
+                    <option value="published" <?= $status === 'published' ? 'selected' : '' ?>>published</option>
+                </select>
+            </div>
+            <div class="field" style="align-self:end;">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button type="submit" class="btn">Apply</button>
+                    <a href="/admin/industries_builder.php" class="btn-secondary">Reset</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card" style="margin-top:20px;">
+    <div class="table-wrap">
+        <table class="desktop-table">
+            <thead>
+                <tr>
+                    <th>Industry</th>
+                    <th>Badge</th>
+                    <th>Featured</th>
+                    <th>Status</th>
+                    <th>Sort</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php if (!$rows): ?>
+                <tr><td colspan="6">No industries yet.</td></tr>
+            <?php else: ?>
+                <?php foreach ($rows as $r): ?>
+                    <tr>
+                        <td>
+                            <div style="display:flex;gap:12px;align-items:flex-start;">
+                                <div style="width:72px;height:72px;flex:0 0 72px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#faf8ff;display:grid;place-items:center;">
+                                    <?php if (!empty($r['cover_image'])): ?>
+                                        <img src="<?= h($r['cover_image']) ?>" alt="<?= h($r['title']) ?>" style="width:100%;height:100%;object-fit:cover;">
+                                    <?php else: ?>
+                                        <span class="muted"><?= h($r['icon_text'] ?: 'I') ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <div>
+                                    <div style="font-weight:800;"><?= h($r['title']) ?></div>
+                                    <div class="muted" style="font-size:13px;"><?= h($r['slug']) ?></div>
+                                    <div class="muted" style="margin-top:4px;"><?= h(mb_strimwidth((string)($r['short_description'] ?? ''), 0, 90, '...')) ?></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><?= h((string)$r['badge_text']) ?></td>
+                        <td><?= (int)$r['is_featured'] === 1 ? 'Yes' : 'No' ?></td>
+                        <td><span class="pill"><?= h((string)$r['status']) ?></span></td>
+                        <td><?= (int)$r['sort_order'] ?></td>
+                        <td><a href="/admin/industry_edit.php?id=<?= (int)$r['id'] ?>">Edit</a></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<?php admin_footer(); ?>
