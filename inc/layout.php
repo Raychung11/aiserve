@@ -88,10 +88,11 @@ function layout_header(?array $user = null): void {
             ['Dashboard', '/dashboard'],
             ['Wallet', '/wallet'],
             ['_group', '💛 Emas', [
-                ['Beli Emas',     '/buy-gold'],
-                ['Jual Emas',     '/sell-gold'],
-                ['Emas Fizikal',  '/physical-gold'],
-                ['Ar Rahnu',      '/ar-rahnu'],
+                ['Beli Emas',      '/buy-gold'],
+                ['Jual Emas',      '/sell-gold'],
+                ['Emas Fizikal',   '/physical-gold'],
+                ['Deposit Emas',   '/gold-deposit'],
+                ['Ar Rahnu',       '/ar-rahnu'],
             ]],
             ['_group', '🛍️ Aktiviti', [
                 ['Pasaran',   '/marketplace'],
@@ -379,11 +380,12 @@ function layout_sidebar_admin(): void {
     echo '</div>';
 
     echo '<div class="sidebar-section"><div class="sidebar-group-label">KEWANGAN</div>';
-    _slink('/admin/payouts',      '💰', 'Permintaan Bayaran',  $cp, $app_url);
+    _slink('/admin/payouts',        '💰', 'Permintaan Bayaran',  $cp, $app_url);
     _slink('/admin/sell-gold',      '💵', 'Jual Emas',           $cp, $app_url);
+    _slink('/admin/gold-deposit',   '🏦', 'Deposit Emas',        $cp, $app_url);
     _slink('/admin/ar-rahnu',       '🕌', 'Ar Rahnu',            $cp, $app_url);
     _slink('/admin/physical-gold',  '🥇', 'Emas Fizikal',        $cp, $app_url);
-    _slink('/admin/referrals',    '📢', 'Rujukan',             $cp, $app_url);
+    _slink('/admin/referrals',      '📢', 'Rujukan',             $cp, $app_url);
     echo '</div>';
 
     echo '<div class="sidebar-section"><div class="sidebar-group-label">SISTEM</div>';

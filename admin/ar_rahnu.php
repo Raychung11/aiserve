@@ -46,14 +46,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     elseif ($action === 'redeem' && $app['status'] === 'active') {
-        $db->prepare("UPDATE ar_rahnu_applications SET status='redeemed', redeemed_at=NOW(), updated_at=NOW() WHERE id=?")
-           ->execute([$app_id]);
+        $db->beginTransaction();
+        try {
+            $db->prepare("UPDATE ar_rahnu_applications SET status='redeemed', redeemed_at=NOW(), updated_at=NOW() WHERE id=?")->execute([$app_id]);
+            if ($app['deposit_id']) {
+                $db->prepare("UPDATE gold_deposits SET status='active', updated_at=NOW() WHERE id=?")->execute([$app['deposit_id']]);
+            }
+            $db->commit();
+        } catch (\Throwable $e) { $db->rollBack(); throw $e; }
         flash_set('main', 'Permohonan #'.$app_id.' ditandakan ditebus. Emas pengguna dilepaskan.', 'success');
     }
 
     elseif ($action === 'default' && $app['status'] === 'active') {
-        $db->prepare("UPDATE ar_rahnu_applications SET status='defaulted', updated_at=NOW() WHERE id=?")
-           ->execute([$app_id]);
+        $db->beginTransaction();
+        try {
+            $db->prepare("UPDATE ar_rahnu_applications SET status='defaulted', updated_at=NOW() WHERE id=?")->execute([$app_id]);
+            if ($app['deposit_id']) {
+                // Deposit forfeited — mark as redeemed (company takes possession)
+                $db->prepare("UPDATE gold_deposits SET status='redeemed', redeemed_at=NOW(), admin_notes='Dilucuthak atas kemungkiran Ar Rahnu', updated_at=NOW() WHERE id=?")->execute([$app['deposit_id']]);
+            }
+            $db->commit();
+        } catch (\Throwable $e) { $db->rollBack(); throw $e; }
         flash_set('main', 'Permohonan #'.$app_id.' ditandakan tamat tempoh/mungkir.', 'success');
     }
 
@@ -72,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $view_id  = (int)($_GET['view'] ?? 0);
 $view_app = null;
 if ($view_id) {
-    $vs = $db->prepare("SELECT ara.*, u.full_name AS user_name, u.email AS user_email, u.phone AS user_phone FROM ar_rahnu_applications ara JOIN users u ON u.id=ara.user_id WHERE ara.id=?");
+    $vs = $db->prepare("SELECT ara.*, u.full_name AS user_name, u.email AS user_email, u.phone AS user_phone, gd.deposit_ref FROM ar_rahnu_applications ara JOIN users u ON u.id=ara.user_id LEFT JOIN gold_deposits gd ON gd.id=ara.deposit_id WHERE ara.id=?");
     $vs->execute([$view_id]);
     $view_app = $vs->fetch();
 }
@@ -142,8 +155,15 @@ layout_begin_admin('Ar Rahnu — Admin');
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
     <div><div style="font-size:0.75rem;color:#9CA3AF;">Nama Pengguna</div><div style="font-weight:600;"><?= h($view_app['user_name']) ?></div></div>
     <div><div style="font-size:0.75rem;color:#9CA3AF;">E-mel / Telefon</div><div style="font-weight:600;"><?= h($view_app['user_email']) ?> / <?= h($view_app['user_phone'] ?: '—') ?></div></div>
+    <div><div style="font-size:0.75rem;color:#9CA3AF;">Jenis Cagaran</div>
+      <div><?php if (($view_app['collateral_type']??'digital')==='physical' && $view_app['deposit_ref']): ?>
+        <span style="background:#DBEAFE;color:#1E40AF;padding:3px 10px;border-radius:999px;font-size:0.8rem;font-weight:700;">🏦 Deposit Fizikal</span>
+        <a href="<?= APP_URL ?>/admin/gold-deposit?view=<?= $view_app['deposit_id'] ?>" style="font-size:0.78rem;color:var(--gold-dark);margin-left:6px;"><?= h($view_app['deposit_ref']) ?> →</a>
+      <?php else: ?>
+        <span style="background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:999px;font-size:0.8rem;font-weight:700;">💰 Emas Digital</span>
+      <?php endif; ?></div></div>
     <div><div style="font-size:0.75rem;color:#9CA3AF;">Gram Emas Digadai</div><div style="font-weight:700;"><?= gold_format_grams($view_app['gold_grams']) ?></div></div>
-    <div><div style="font-size:0.75rem;color:#9CA3AF;">Gold Points</div><div style="font-weight:700;color:var(--gold-dark);"><?= gold_format_points($view_app['gold_points']) ?> pts</div></div>
+    <div><div style="font-size:0.75rem;color:#9CA3AF;">Gold Points</div><div style="font-weight:700;color:var(--gold-dark);"><?= ($view_app['gold_points']>0)?gold_format_points($view_app['gold_points']).' pts':'—' ?></div></div>
     <div><div style="font-size:0.75rem;color:#9CA3AF;">Ketulenan</div><div style="font-weight:600;"><?= h($view_app['gold_purity']) ?></div></div>
     <div><div style="font-size:0.75rem;color:#9CA3AF;">Nilai Pasaran (snap)</div><div style="font-weight:700;">RM <?= number_format((float)$view_app['market_value_snapshot'],2) ?></div></div>
     <div><div style="font-size:0.75rem;color:#9CA3AF;">Pembiayaan Dipohon</div><div style="font-weight:700;color:#1E40AF;">RM <?= number_format((float)$view_app['financing_requested'],2) ?></div></div>

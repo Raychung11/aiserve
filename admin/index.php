@@ -25,8 +25,9 @@ $pending['kyc']          = (int)$db->query("SELECT COUNT(*) FROM kyc_submissions
 $pending['sell_gold']    = (int)$db->query("SELECT COUNT(*) FROM gold_sell_requests WHERE status='pending'")->fetchColumn();
 $stock     = get_gold_stock();
 $stock_low = gold_stock_is_low();
-$pending['ar_rahnu']     = (int)$db->query("SELECT COUNT(*) FROM ar_rahnu_applications WHERE status='pending'")->fetchColumn();
-$pending['physical_gold']= (int)$db->query("SELECT COUNT(*) FROM gold_physical_redemptions WHERE status='pending'")->fetchColumn();
+$pending['ar_rahnu']      = (int)$db->query("SELECT COUNT(*) FROM ar_rahnu_applications WHERE status='pending'")->fetchColumn();
+$pending['physical_gold'] = (int)$db->query("SELECT COUNT(*) FROM gold_physical_redemptions WHERE status='pending'")->fetchColumn();
+$pending['gold_deposit']  = (int)$db->query("SELECT COUNT(*) FROM gold_deposits WHERE status='pending'")->fetchColumn();
 
 $total_pending = array_sum($pending) + $stats['pending_merchants'] + $stats['pending_payouts'] + ($stock_low ? 1 : 0);
 
@@ -80,6 +81,17 @@ layout_begin_admin('Admin Dashboard');
         <div style="font-size:0.75rem;color:#6B7280;">Sedia plat untuk pengguna</div>
       </div>
       <div style="margin-left:auto;color:#F59E0B;font-size:1.1rem;">→</div>
+    </a>
+    <?php endif; ?>
+
+    <?php if ($pending['gold_deposit'] > 0): ?>
+    <a href="<?= APP_URL ?>/admin/gold-deposit" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #BBF7D0;border-radius:8px;padding:12px 14px;text-decoration:none;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow=''">
+      <div style="font-size:1.8rem;">🏦</div>
+      <div>
+        <div style="font-weight:700;font-size:0.95rem;color:#065F46;"><?= $pending['gold_deposit'] ?> Deposit Emas Menunggu</div>
+        <div style="font-size:0.75rem;color:#6B7280;">Sahkan deposit fizikal di pejabat</div>
+      </div>
+      <div style="margin-left:auto;color:#10B981;font-size:1.1rem;">→</div>
     </a>
     <?php endif; ?>
 

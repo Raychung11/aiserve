@@ -59,6 +59,7 @@ $user_routes = [
     'sell-gold'     => 'public/sell_gold.php',
     'ar-rahnu'      => 'public/ar_rahnu.php',
     'physical-gold' => 'public/physical_gold.php',
+    'gold-deposit'  => 'public/gold_deposit.php',
 ];
 
 // admin pages
@@ -79,6 +80,7 @@ $admin_routes = [
     'sell-gold'     => 'admin/sell_gold.php',
     'ar-rahnu'      => 'admin/ar_rahnu.php',
     'physical-gold' => 'admin/physical_gold.php',
+    'gold-deposit'  => 'admin/gold_deposit.php',
     'settings'   => 'admin/settings.php',
     'ai-settings'=> 'admin/ai_settings.php',
     'audit-logs' => 'admin/audit_logs.php',
