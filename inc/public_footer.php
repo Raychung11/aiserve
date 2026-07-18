@@ -70,8 +70,9 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
             </div>
         </div>
 
-        <div class="footer-bottom small">
-            <?= h($footerCopyright) ?>
+        <div class="footer-bottom small" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span><?= h($footerCopyright) ?></span>
+            <a href="/admin_login.php" rel="nofollow" style="color:var(--muted);">Admin</a>
         </div>
     </div>
 </footer>
