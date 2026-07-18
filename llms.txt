@@ -1,0 +1,28 @@
+# AiServe.my
+
+> AiServe.my is the AI Business Operating System (Ai-BOS) by SLV Group Sdn Bhd — an AI solutions company in Malaysia building AI-powered systems for customer service, workflow automation, reporting, and operational intelligence.
+
+AiServe.my helps businesses move beyond static software and isolated tools by connecting AI to real operations: WhatsApp AI customer service, internal AI assistants, automated workflows, quotations, and reporting — delivered as one practical, connected system (Ai-BOS).
+
+Contact: WhatsApp +60 13-386 6827 · Email hello@aiserve.my
+
+## Core
+
+- [Ai-BOS — AI Business Operating System](https://aiserve.my/ai-bos.php): The proprietary business operating layer connecting customer interaction, workflow, reporting, and decision support.
+- [Solutions](https://aiserve.my/solutions.php): AI customer service, workflow automation, internal assistant, and reporting.
+- [Industries](https://aiserve.my/industries.php): Sectors and business types AiServe.my supports.
+- [Demos](https://aiserve.my/demos.php): Live demo sites and example deployments.
+- [AI Customer Service Demo](https://aiserve.my/ai-customer-service-demo.php): Interactive demonstration of the AI customer service assistant.
+
+## Company
+
+- [About](https://aiserve.my/about.php): About AiServe.my and SLV Group Sdn Bhd.
+- [Contact](https://aiserve.my/contact.php): Get in touch to discuss consultation, a demo, or solution setup.
+
+## Content
+
+- [Blog & Case Studies](https://aiserve.my/blog.php): Insights, use cases, and case studies on applied AI for business.
+
+## Optional
+
+- [Sitemap](https://aiserve.my/sitemap.php): Full list of indexable URLs.

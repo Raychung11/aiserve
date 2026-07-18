@@ -1,0 +1,24 @@
+# robots.txt — AiServe.my
+#
+# All crawlers, including AI search crawlers (GPTBot, OAI-SearchBot,
+# ChatGPT-User, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended,
+# CCBot, etc.), are welcome to index the public site. AI crawlers inherit the
+# rules in the "User-agent: *" group below. To exclude a specific AI crawler in
+# future, add a dedicated group for it with "Disallow: /".
+
+User-agent: *
+Allow: /
+
+# Private / non-content areas
+Disallow: /admin/
+Disallow: /admin_login.php
+Disallow: /admin_logout.php
+Disallow: /api/
+Disallow: /cron/
+Disallow: /webhooks/
+Disallow: /config/
+Disallow: /inc/
+Disallow: /chatinbox/
+Disallow: /default.php
+
+Sitemap: https://aiserve.my/sitemap.php

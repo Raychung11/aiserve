@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/seo.php';
 
 $siteLogoUrl = get_setting('site_logo_url', '');
 $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
@@ -12,6 +13,7 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
     <title><?= h($pageTitle ?? 'AiServe.my') ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="<?= h($pageDescription ?? '') ?>">
+    <?= seo_head_tags() ?>
 
     <style>
         :root{

@@ -64,6 +64,14 @@ $seo = seo_meta(
 $pageTitle = $seo['title'];
 $pageDescription = $seo['description'];
 
+// AI-search / rich-result signals for this article
+$ogType = 'article';
+$canonicalUrl = site_url('blog/' . rawurlencode($slug));
+if ($featuredImage !== '') {
+    $ogImage = site_url($featuredImage);
+}
+$pageJsonLd = seo_jsonld_block(seo_article_data($post));
+
 require_once __DIR__ . '/inc/public_header.php';
 
 /*
