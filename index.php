@@ -75,7 +75,7 @@ require_once __DIR__ . '/inc/public_header.php';
             <div class="label">What is Ai-BOS</div>
             <h2>One AI-powered business layer across service, workflow, and intelligence</h2>
             <p>
-                Ai-BOS is the proprietary business operating layer by AiServe.io.
+                Ai-BOS is the proprietary business operating layer by AiServe.my.
                 It connects customer interaction, internal workflow, business reporting,
                 and decision support into one practical AI-enabled system.
             </p>

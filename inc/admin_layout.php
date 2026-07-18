@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/brand.php';
 
 function admin_header(string $title = 'Admin Dashboard'): void {
     $user = admin_user();
@@ -11,28 +12,19 @@ function admin_header(string $title = 'Admin Dashboard'): void {
     <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title><?= h($title) ?> | AiServe.io Admin</title>
+        <title><?= h($title) ?> | AiServe.my Admin</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
+            /* Brand tokens come from inc/brand.php (single source of truth). */
             :root{
-                --bg:#f7f4ff;
-                --card:#ffffff;
-                --line:#e8defd;
-                --text:#1d1630;
-                --muted:#6f6785;
-                --primary:#6d28d9;
-                --primary2:#8b5cf6;
-                --sidebar:#130d22;
-                --sidebarText:#ddd6fe;
-                --shadow:0 18px 50px rgba(109,40,217,.10);
-                --radius:20px;
+<?= brand_css_vars() ?>
             }
 
             *{box-sizing:border-box}
             html,body{margin:0;padding:0}
             body{
-                font-family:Inter,system-ui,sans-serif;
+                font-family:var(--font-sans);
                 background:var(--bg);
                 color:var(--text);
             }
@@ -299,7 +291,7 @@ function admin_header(string $title = 'Admin Dashboard'): void {
                 <div class="logo-left">
                     <div class="logo-mark">A</div>
                     <div>
-                        <div class="logo-title">AiServe.io</div>
+                        <div class="logo-title">AiServe.my</div>
                         <div class="logo-sub">Admin Panel</div>
                     </div>
                 </div>

@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Admin Login | AiServe.io</title>
+    <title>Admin Login | AiServe.my</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php include __DIR__ . '/inc/public_header_css.php'; ?>
 </head>
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div style="text-align:center;margin-bottom:20px;">
             <div class="brand" style="justify-content:center;">
                 <span class="brand-mark">A</span>
-                <span>AiServe.io Admin</span>
+                <span>AiServe.my Admin</span>
             </div>
             <div class="small" style="margin-top:8px;"><?= h(COMPANY_NAME) ?></div>
         </div>

@@ -1,15 +1,15 @@
 <?php
-$pageTitle = 'About AiServe.io | SLV Group Sdn Bhd';
-$pageDescription = 'Learn about AiServe.io by SLV Group Sdn Bhd and our vision for AI-native business operating systems.';
+$pageTitle = 'About AiServe.my | SLV Group Sdn Bhd';
+$pageDescription = 'Learn about AiServe.my by SLV Group Sdn Bhd and our vision for AI-native business operating systems.';
 include __DIR__ . '/inc/public_header.php';
 ?>
 
 <section class="hero" style="padding-bottom:20px;">
     <div class="container">
-        <div class="eyebrow">About AiServe.io</div>
+        <div class="eyebrow">About AiServe.my</div>
         <h1 style="max-width:900px;">We build the AI business layer for modern companies</h1>
         <p style="max-width:860px;">
-            AiServe.io is the AI Business Operating System initiative by SLV Group Sdn Bhd.
+            AiServe.my is the AI Business Operating System initiative by SLV Group Sdn Bhd.
             We help businesses move beyond static software by connecting AI to real operations,
             customer journeys, workflow execution, reporting, and decision support.
         </p>
@@ -49,7 +49,7 @@ include __DIR__ . '/inc/public_header.php';
             <div class="label">Why SLV Group</div>
             <h2>Built for execution, not theory</h2>
             <p>
-                AiServe.io is backed by SLV Group Sdn Bhd, focused on building real-world AI and operational systems
+                AiServe.my is backed by SLV Group Sdn Bhd, focused on building real-world AI and operational systems
                 for growing businesses.
             </p>
         </div>

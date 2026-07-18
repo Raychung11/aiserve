@@ -82,7 +82,7 @@ TXT;
 }
 
 function wa_ai_generate_reply(array $conversation, array $message, string $intent): array {
-    $brand = get_setting('wa_ai_brand_name', 'AiServe.io');
+    $brand = get_setting('wa_ai_brand_name', 'AiServe.my');
     $company = get_setting('wa_ai_company_name', 'SLV Group Sdn Bhd');
     $language = wa_detect_language((string)$message['message_text']);
 

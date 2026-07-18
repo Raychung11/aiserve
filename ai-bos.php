@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Ai-BOS | AiServe.io';
-$pageDescription = 'Discover Ai-BOS, the AI Business Operating System by AiServe.io.';
+$pageTitle = 'Ai-BOS | AiServe.my';
+$pageDescription = 'Discover Ai-BOS, the AI Business Operating System by AiServe.my.';
 include __DIR__ . '/inc/public_header.php';
 ?>
 
@@ -9,7 +9,7 @@ include __DIR__ . '/inc/public_header.php';
         <div class="eyebrow">Ai-BOS</div>
         <h1 style="max-width:920px;">An AI-powered operating layer for service, workflow, and intelligence</h1>
         <p style="max-width:880px;">
-            Ai-BOS is the proprietary business operating framework by AiServe.io.
+            Ai-BOS is the proprietary business operating framework by AiServe.my.
             It helps businesses move beyond record-keeping systems into AI-enabled execution.
         </p>
     </div>

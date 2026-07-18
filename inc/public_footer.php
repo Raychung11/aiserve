@@ -23,7 +23,7 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
 
                     <div class="brand-text">
                         <span class="brand-title"><?= h($footerCompany) ?></span>
-                        <span class="brand-subtitle">Powered by AiServe.io</span>
+                        <span class="brand-subtitle">Powered by AiServe.my</span>
                     </div>
                 </div>
 

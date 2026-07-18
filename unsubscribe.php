@@ -21,7 +21,7 @@ if ($token !== '') {
     }
 }
 
-$pageTitle = 'Unsubscribe | AiServe.io';
+$pageTitle = 'Unsubscribe | AiServe.my';
 $pageDescription = 'Manage your email subscription preferences.';
 include __DIR__ . '/inc/public_header.php';
 ?>

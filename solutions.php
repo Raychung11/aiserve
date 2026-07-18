@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Solutions | AiServe.io';
-$pageDescription = 'Explore AiServe.io solutions for AI customer service, workflow automation, internal assistant, and reporting.';
+$pageTitle = 'Solutions | AiServe.my';
+$pageDescription = 'Explore AiServe.my solutions for AI customer service, workflow automation, internal assistant, and reporting.';
 include __DIR__ . '/inc/public_header.php';
 ?>
 
@@ -9,7 +9,7 @@ include __DIR__ . '/inc/public_header.php';
         <div class="eyebrow">Solutions</div>
         <h1 style="max-width:920px;">AI solutions built around real business use cases</h1>
         <p style="max-width:860px;">
-            AiServe.io is designed for businesses that want AI connected to real operations, not just isolated tools.
+            AiServe.my is designed for businesses that want AI connected to real operations, not just isolated tools.
         </p>
     </div>
 </section>
@@ -45,7 +45,7 @@ include __DIR__ . '/inc/public_header.php';
     <div class="container">
         <div class="section-head">
             <div class="label">Typical use cases</div>
-            <h2>Examples of where AiServe.io can help</h2>
+            <h2>Examples of where AiServe.my can help</h2>
             <p>Use AI to strengthen the business layer, not just the interface layer.</p>
         </div>
 

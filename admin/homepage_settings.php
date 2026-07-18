@@ -169,7 +169,7 @@ admin_header('Homepage Settings');
 
                         <div class="field" style="margin-top:14px;">
                             <label>Logo Alt Text</label>
-                            <input type="text" name="site_logo_alt" value="<?= h(get_setting('site_logo_alt', 'AiServe.io')) ?>">
+                            <input type="text" name="site_logo_alt" value="<?= h(get_setting('site_logo_alt', 'AiServe.my')) ?>">
                         </div>
 
                         <div class="field" style="margin-top:14px;">
@@ -217,7 +217,7 @@ admin_header('Homepage Settings');
                 <div class="form-grid">
                     <div class="field">
                         <label>Header Brand Title</label>
-                        <input type="text" name="header_brand_title" value="<?= h(get_setting('header_brand_title', 'AiServe.io')) ?>">
+                        <input type="text" name="header_brand_title" value="<?= h(get_setting('header_brand_title', 'AiServe.my')) ?>">
                     </div>
 
                     <div class="field">
@@ -322,7 +322,7 @@ admin_header('Homepage Settings');
                                 <?= h(get_setting('hero_banner_title', 'The AI Business Layer for Modern Companies')) ?>
                             </div>
                             <div id="heroPreviewSubtitle" style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.92);">
-                                <?= h(get_setting('hero_banner_subtitle', 'AiServe.io helps businesses move beyond static systems with AI-powered workflow, service, reporting, and intelligence.')) ?>
+                                <?= h(get_setting('hero_banner_subtitle', 'AiServe.my helps businesses move beyond static systems with AI-powered workflow, service, reporting, and intelligence.')) ?>
                             </div>
                         </div>
                     </div>

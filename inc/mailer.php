@@ -20,7 +20,7 @@ function send_smtp_mail(string $toEmail, string $toName, string $subject, string
         $username   = get_setting('smtp_username');
         $password   = get_setting('smtp_password');
         $encryption = get_setting('smtp_encryption', 'tls');
-        $fromEmail  = get_setting('smtp_from_email', 'no-reply@aiserve.io');
+        $fromEmail  = get_setting('smtp_from_email', 'no-reply@aiserve.my');
         $fromName   = get_setting('smtp_from_name', COMPANY_NAME);
 
         $mailer->isSMTP();

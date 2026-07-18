@@ -20,7 +20,7 @@ function wa_quote_build_text(array $quoteRequest, array $contact): string {
     $lines[] = 'Timeline Needed: ' . ($quoteRequest['timeline_needed'] ?? '');
     $lines[] = 'Special Requirements: ' . ($quoteRequest['special_requirements'] ?? '');
     $lines[] = '';
-    $lines[] = 'Prepared by AiServe.io WhatsApp workflow.';
+    $lines[] = 'Prepared by AiServe.my WhatsApp workflow.';
     return implode("\n", $lines);
 }
 

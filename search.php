@@ -3,8 +3,8 @@ require_once __DIR__ . '/inc/public_search_helper.php';
 
 $q = trim($_GET['q'] ?? '');
 
-$pageTitle = 'Search | AiServe.io';
-$pageDescription = 'Search AiServe.io content.';
+$pageTitle = 'Search | AiServe.my';
+$pageDescription = 'Search AiServe.my content.';
 include __DIR__ . '/inc/public_header.php';
 
 $results = public_search_results($q);
@@ -13,7 +13,7 @@ $results = public_search_results($q);
 <section class="hero" style="padding-bottom:20px;">
     <div class="container" style="max-width:920px;">
         <div class="eyebrow">Search</div>
-        <h1>Search AiServe.io</h1>
+        <h1>Search AiServe.my</h1>
 
         <form method="get" action="/search.php" style="margin-top:18px;">
             <div class="form-grid">

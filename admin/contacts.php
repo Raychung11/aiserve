@@ -38,7 +38,7 @@ admin_header('Contact List');
 
 <div class="card">
     <h3 style="margin-top:0;">Contact Submissions</h3>
-    <div class="muted" style="margin-bottom:14px;">All website subscription inquiries for AiServe.io</div>
+    <div class="muted" style="margin-bottom:14px;">All website subscription inquiries for AiServe.my</div>
 
     <form method="get" style="margin-bottom:16px;">
         <div class="form-grid">

@@ -51,15 +51,15 @@ admin_header('Campaigns');
                 <label>Body</label>
                 <textarea name="body" required>Dear [Name],
 
-We would like to introduce AiServe.io, the AI Business Operating System by SLV Group Sdn Bhd.
+We would like to introduce AiServe.my, the AI Business Operating System by SLV Group Sdn Bhd.
 
-AiServe.io helps businesses move beyond static software by building AI-powered systems for workflow, reporting, customer service, and operational intelligence.
+AiServe.my helps businesses move beyond static software by building AI-powered systems for workflow, reporting, customer service, and operational intelligence.
 
 If your team is exploring AI + BI transformation, we would be glad to schedule a discussion.
 
 Best regards,
 SLV Group Sdn Bhd
-AiServe.io</textarea>
+AiServe.my</textarea>
             </div>
             <div class="field">
                 <label>Status</label>

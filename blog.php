@@ -7,8 +7,8 @@ require_once __DIR__ . '/inc/seo.php';
 
 $seo = seo_meta(
     'blog',
-    'Blog | AiServe.io',
-    'Read the latest insights, case studies, and AI business transformation content from AiServe.io.'
+    'Blog | AiServe.my',
+    'Read the latest insights, case studies, and AI business transformation content from AiServe.my.'
 );
 
 $pageTitle = $seo['title'];
@@ -30,7 +30,7 @@ $rows = $stmt->fetchAll();
         <div class="eyebrow">Blog & Case Studies</div>
         <h1 style="max-width:900px;">Insights for AI-native business transformation</h1>
         <p style="max-width:820px;">
-            Read updates, use cases, and case studies from AiServe.io.
+            Read updates, use cases, and case studies from AiServe.my.
         </p>
     </div>
 </section>

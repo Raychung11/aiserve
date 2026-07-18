@@ -11,7 +11,7 @@ $page = $stmt->fetch();
 
 if (!$page) {
     http_response_code(404);
-    $pageTitle = 'Page Not Found | AiServe.io';
+    $pageTitle = 'Page Not Found | AiServe.my';
     $pageDescription = 'The requested page could not be found.';
     include __DIR__ . '/inc/public_header.php';
     echo '<section class="hero"><div class="container"><h1>Page not found</h1></div></section>';
@@ -19,7 +19,7 @@ if (!$page) {
     exit;
 }
 
-$pageTitle = !empty($page['seo_title']) ? $page['seo_title'] : $page['title'] . ' | AiServe.io';
+$pageTitle = !empty($page['seo_title']) ? $page['seo_title'] : $page['title'] . ' | AiServe.my';
 $pageDescription = !empty($page['seo_description']) ? $page['seo_description'] : ($page['hero_text'] ?? '');
 
 include __DIR__ . '/inc/public_header.php';
@@ -27,7 +27,7 @@ include __DIR__ . '/inc/public_header.php';
 
 <section class="hero" style="padding-bottom:20px;">
     <div class="container" style="max-width:920px;">
-        <div class="eyebrow">AiServe.io</div>
+        <div class="eyebrow">AiServe.my</div>
         <h1><?= h($page['hero_title'] ?: $page['title']) ?></h1>
         <p><?= h($page['hero_text']) ?></p>
     </div>

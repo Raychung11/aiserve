@@ -15,7 +15,7 @@ $defaultBlocks = [
     ],
     'home_hero_text' => [
         'title' => 'Homepage Hero Text',
-        'content' => 'AiServe.io helps businesses move beyond websites and static systems by building AI-powered business layers for service, workflow, reporting, and operational intelligence.'
+        'content' => 'AiServe.my helps businesses move beyond websites and static systems by building AI-powered business layers for service, workflow, reporting, and operational intelligence.'
     ],
     'home_product_title' => [
         'title' => 'Homepage Product Title',
@@ -23,7 +23,7 @@ $defaultBlocks = [
     ],
     'home_product_text' => [
         'title' => 'Homepage Product Text',
-        'content' => 'Ai-BOS is the proprietary business operating layer by AiServe.io. It connects customer interaction, workflow, reporting, and decision support into one practical system.'
+        'content' => 'Ai-BOS is the proprietary business operating layer by AiServe.my. It connects customer interaction, workflow, reporting, and decision support into one practical system.'
     ],
 ];
 

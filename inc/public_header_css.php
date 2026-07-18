@@ -1,28 +1,15 @@
+<?php require_once __DIR__ . '/brand.php'; ?>
 <style>
+/* Brand tokens come from inc/brand.php (single source of truth). */
 :root{
-    --bg:#f6f3ff;
-    --bg2:#ffffff;
-    --text:#1f1534;
-    --muted:#6f6487;
-    --line:#e7defc;
-    --primary:#6d28d9;
-    --primary2:#8b5cf6;
-    --primary3:#ede9fe;
-    --dark:#140f24;
-    --success:#16a34a;
-    --danger:#dc2626;
-    --shadow:0 18px 45px rgba(109,40,217,.10);
-    --shadow-lg:0 28px 70px rgba(109,40,217,.16);
-    --radius:18px;
-    --radius-lg:24px;
-    --container:1180px;
+<?= brand_css_vars() ?>
 }
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
     margin:0;
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-family:var(--font-sans);
     background:
         radial-gradient(circle at top left, rgba(139,92,246,.10), transparent 30%),
         linear-gradient(180deg,#faf8ff 0%,#f6f3ff 100%);

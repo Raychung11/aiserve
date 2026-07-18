@@ -29,7 +29,7 @@ try {
 
 if (!$post) {
     http_response_code(404);
-    $pageTitle = 'Post Not Found | AiServe.io';
+    $pageTitle = 'Post Not Found | AiServe.my';
     $pageDescription = 'The requested blog post could not be found.';
     require_once __DIR__ . '/inc/public_header.php';
     ?>
@@ -57,7 +57,7 @@ $publishedAtFormatted = $publishedAtRaw !== '' ? date('d M Y', strtotime($publis
 
 $seo = seo_meta(
     'blog_view',
-    $title . ' | AiServe.io',
+    $title . ' | AiServe.my',
     $excerpt !== '' ? $excerpt : mb_strimwidth(strip_tags($content), 0, 160, '...')
 );
 

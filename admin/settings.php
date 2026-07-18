@@ -71,7 +71,7 @@ admin_header('Settings');
 
             <div class="field">
                 <label>From Email</label>
-                <input type="email" name="smtp_from_email" value="<?= h(get_setting('smtp_from_email', 'no-reply@aiserve.io')) ?>">
+                <input type="email" name="smtp_from_email" value="<?= h(get_setting('smtp_from_email', 'no-reply@aiserve.my')) ?>">
             </div>
 
             <div class="field full">

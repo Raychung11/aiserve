@@ -19,7 +19,7 @@ function wa_business_rule_response(array $conversation, array $message, string $
     if ($intent === 'greeting') {
         return [
             'handled' => true,
-            'reply' => "Hello. Thank you for contacting AiServe.io. We help businesses build AI-powered systems for customer service, workflow automation, reporting, and operational intelligence. How can we help you today?"
+            'reply' => "Hello. Thank you for contacting AiServe.my. We help businesses build AI-powered systems for customer service, workflow automation, reporting, and operational intelligence. How can we help you today?"
         ];
     }
 

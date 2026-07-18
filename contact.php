@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Contact | AiServe.io';
-$pageDescription = 'Contact AiServe.io to discuss AI business operating system solutions.';
+$pageTitle = 'Contact | AiServe.my';
+$pageDescription = 'Contact AiServe.my to discuss AI business operating system solutions.';
 include __DIR__ . '/inc/public_header.php';
 
 $success = isset($_GET['success']) ? (int)$_GET['success'] : 0;
@@ -21,7 +21,7 @@ $error   = isset($_GET['error']) ? trim($_GET['error']) : '';
     <div class="container subscribe-wrap">
         <div>
             <div class="card">
-                <h3>AiServe.io</h3>
+                <h3>AiServe.my</h3>
                 <p>
                     The AI Business Operating System by <?= h(COMPANY_NAME) ?>.
                     Built for companies that want more than just websites, chatbots, or static software.
