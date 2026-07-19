@@ -49,14 +49,20 @@ admin_header('SEO Meta');
         <?= csrf_input() ?>
         <?php foreach ($pages as $key => $label): ?>
             <div class="card" style="margin-top:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;">
+                    <strong><?= h($label) ?></strong>
+                    <button type="button" class="btn-secondary ai-seo-btn"
+                            data-key="<?= h($key) ?>" data-label="<?= h($label) ?>"
+                            style="min-height:36px;padding:0 12px;">✨ Generate with AI</button>
+                </div>
                 <div class="form-grid">
                     <div class="field full">
                         <label><?= h($label) ?> SEO Title</label>
-                        <input type="text" name="<?= h($key) ?>_title" value="<?= h($map[$key]['seo_title'] ?? '') ?>">
+                        <input type="text" id="seo_title_<?= h($key) ?>" name="<?= h($key) ?>_title" value="<?= h($map[$key]['seo_title'] ?? '') ?>">
                     </div>
                     <div class="field full">
                         <label><?= h($label) ?> SEO Description</label>
-                        <textarea name="<?= h($key) ?>_description"><?= h($map[$key]['seo_description'] ?? '') ?></textarea>
+                        <textarea id="seo_desc_<?= h($key) ?>" name="<?= h($key) ?>_description"><?= h($map[$key]['seo_description'] ?? '') ?></textarea>
                     </div>
                 </div>
             </div>
@@ -64,8 +70,51 @@ admin_header('SEO Meta');
 
         <div style="margin-top:18px;">
             <button type="submit" class="btn">Save SEO Meta</button>
+            <span class="muted" style="margin-left:10px;font-size:13px;">Tip: use “Generate with AI”, review the text, then Save. Requires an API key in <a href="/admin/ai_settings.php">AI API Settings</a>.</span>
         </div>
     </form>
 </div>
+
+<script>
+(function(){
+    const csrf = <?= json_encode(csrf_token()) ?>;
+    document.querySelectorAll('.ai-seo-btn').forEach(function(btn){
+        btn.addEventListener('click', async function(){
+            const key = btn.dataset.key;
+            const label = btn.dataset.label;
+            const titleEl = document.getElementById('seo_title_' + key);
+            const descEl = document.getElementById('seo_desc_' + key);
+            const original = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Generating…';
+            try {
+                const body = new URLSearchParams();
+                body.append('csrf_token', csrf);
+                body.append('page_key', key);
+                body.append('label', label);
+                body.append('current_title', titleEl ? titleEl.value : '');
+                body.append('current_description', descEl ? descEl.value : '');
+                const res = await fetch('/admin/ai_seo_generate.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: body.toString()
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (titleEl && data.title) titleEl.value = data.title;
+                    if (descEl && data.description) descEl.value = data.description;
+                } else {
+                    alert('AI error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                alert('Request failed: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = original;
+            }
+        });
+    });
+})();
+</script>
 
 <?php admin_footer(); ?>

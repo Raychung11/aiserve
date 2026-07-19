@@ -375,6 +375,7 @@ function admin_header(string $title = 'Admin Dashboard'): void {
                         <summary>System <span>▾</span></summary>
                         <div class="menu-items">
                             <a href="/admin/admin_users.php">Admin Users</a>
+                            <a href="/admin/ai_settings.php">AI API Settings</a>
                             <a href="/admin/settings.php">Settings</a>
                             <a href="/admin_logout.php">Logout</a>
                         </div>
