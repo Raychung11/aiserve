@@ -66,7 +66,6 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
                 <div class="footer-links">
                     <a href="/blog.php">Blog</a>
                     <a href="/search.php">Search</a>
-                    <a href="/sitemap.xml">Sitemap</a>
                 </div>
             </div>
         </div>
