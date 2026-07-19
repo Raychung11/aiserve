@@ -177,6 +177,26 @@ admin_header($id > 0 ? 'Edit Post' : 'Create Post');
 
     <div style="display:grid;gap:20px;">
         <div class="card">
+            <h3 style="margin-top:0;">✨ AI Assistant</h3>
+            <div class="muted" style="font-size:13px;margin-bottom:12px;">
+                Uses your OpenAI key from <a href="/admin/ai_settings.php">AI API Settings</a>. Review generated text before saving.
+            </div>
+
+            <div class="field full" style="margin-bottom:12px;">
+                <label>Brief / angle (optional)</label>
+                <textarea id="ai_brief" style="min-height:80px;" placeholder="e.g. focus on how SMEs cut response time with WhatsApp AI"></textarea>
+            </div>
+
+            <div style="display:grid;gap:8px;">
+                <button type="button" class="btn ai-blog-btn" data-mode="article">Draft full article from title</button>
+                <button type="button" class="btn-secondary ai-blog-btn" data-mode="excerpt">Write excerpt from content</button>
+                <button type="button" class="btn-secondary ai-blog-btn" data-mode="seo">Generate SEO title &amp; description</button>
+            </div>
+
+            <div id="ai_blog_status" class="muted" style="font-size:13px;margin-top:10px;"></div>
+        </div>
+
+        <div class="card">
             <h3 style="margin-top:0;">Live Helpers</h3>
 
             <div style="display:grid;gap:14px;">
@@ -333,6 +353,75 @@ function openMediaPicker(targetId) {
     updateSlugPreview();
     updateFeaturedImagePreview();
     updateCounts();
+})();
+</script>
+
+<script>
+(function(){
+    const csrf = <?= json_encode(csrf_token()) ?>;
+    const statusEl = document.getElementById('ai_blog_status');
+    const titleEl = document.getElementById('post_title');
+    const contentEl = document.getElementById('content_editor');
+    const excerptEl = document.getElementById('excerpt_field');
+    const seoTitleEl = document.getElementById('seo_title_field');
+    const seoDescEl = document.getElementById('seo_description_field');
+    const typeEl = document.querySelector('select[name="post_type"]');
+    const briefEl = document.getElementById('ai_brief');
+
+    function setVal(el, v){
+        if (el && typeof v === 'string' && v !== '') {
+            el.value = v;
+            el.dispatchEvent(new Event('input'));
+        }
+    }
+
+    document.querySelectorAll('.ai-blog-btn').forEach(function(btn){
+        btn.addEventListener('click', async function(){
+            const mode = btn.dataset.mode;
+            const hasTitle = titleEl && titleEl.value.trim() !== '';
+            const hasContent = contentEl && contentEl.value.trim() !== '';
+
+            if (mode === 'article') {
+                if (!hasTitle && !(briefEl && briefEl.value.trim())) { alert('Enter a title or a brief first.'); return; }
+                if (hasContent && !confirm('This will replace the current content, excerpt and SEO fields. Continue?')) return;
+            }
+            if (mode === 'excerpt' && !hasTitle && !hasContent) { alert('Add a title or content first.'); return; }
+            if (mode === 'seo' && !hasTitle && !hasContent) { alert('Add a title or content first.'); return; }
+
+            const buttons = document.querySelectorAll('.ai-blog-btn');
+            buttons.forEach(b => b.disabled = true);
+            statusEl.textContent = 'Generating… this can take a few seconds.';
+            try {
+                const body = new URLSearchParams();
+                body.append('csrf_token', csrf);
+                body.append('mode', mode);
+                body.append('title', titleEl ? titleEl.value : '');
+                body.append('content', contentEl ? contentEl.value : '');
+                body.append('excerpt', excerptEl ? excerptEl.value : '');
+                body.append('post_type', typeEl ? typeEl.value : 'blog');
+                body.append('brief', briefEl ? briefEl.value : '');
+
+                const res = await fetch('/admin/ai_blog_generate.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: body.toString()
+                });
+                const data = await res.json();
+                if (!data.ok) { statusEl.textContent = ''; alert('AI error: ' + (data.error || 'Unknown error')); return; }
+
+                setVal(contentEl, data.content);
+                setVal(excerptEl, data.excerpt);
+                setVal(seoTitleEl, data.seo_title);
+                setVal(seoDescEl, data.seo_description);
+                statusEl.textContent = 'Done. Review the text, then click Save Post.';
+            } catch (e) {
+                statusEl.textContent = '';
+                alert('Request failed: ' + e.message);
+            } finally {
+                buttons.forEach(b => b.disabled = false);
+            }
+        });
+    });
 })();
 </script>
 
