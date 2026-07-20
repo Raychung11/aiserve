@@ -119,7 +119,11 @@ $currentStatus = (string)($row['project_status'] ?? 'in_progress');
 
             <div class="field full">
                 <label>Cover Image URL</label>
-                <input type="text" name="cover_image" value="<?= h($row['cover_image'] ?? '') ?>" placeholder="/uploads/media/project-cover.jpg">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <input type="text" id="cover_image_field" name="cover_image" value="<?= h($row['cover_image'] ?? '') ?>" placeholder="/uploads/media/project-cover.jpg">
+                    <button type="button" class="btn ai-image-btn" data-kind="project">✨ Generate with AI</button>
+                </div>
+                <div id="ai_image_status" class="muted" style="font-size:13px;margin-top:6px;"></div>
             </div>
 
             <div class="field">
@@ -162,5 +166,49 @@ $currentStatus = (string)($row['project_status'] ?? 'in_progress');
         </form>
     </div>
 <?php endif; ?>
+
+<script>
+(function(){
+    const csrf = <?= json_encode(csrf_token()) ?>;
+    const nameEl = document.querySelector('input[name="name"]');
+    const descEl = document.querySelector('textarea[name="description"]');
+    const coverEl = document.getElementById('cover_image_field');
+    const status = document.getElementById('ai_image_status');
+
+    document.querySelectorAll('.ai-image-btn').forEach(function(btn){
+        btn.addEventListener('click', async function(){
+            if (!nameEl || nameEl.value.trim() === '') { alert('Enter a project name first.'); return; }
+            if (coverEl && coverEl.value.trim() && !confirm('Replace the current cover image with an AI-generated one?')) return;
+
+            const original = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Generating image…';
+            if (status) status.textContent = 'Creating an image — this can take 10–30 seconds.';
+            try {
+                const body = new URLSearchParams();
+                body.append('csrf_token', csrf);
+                body.append('kind', 'project');
+                body.append('title', nameEl.value);
+                body.append('context', descEl ? descEl.value : '');
+                const res = await fetch('/admin/ai_image_generate.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: body.toString()
+                });
+                const data = await res.json();
+                if (!data.ok) { if (status) status.textContent = ''; alert('Image error: ' + (data.error || 'Unknown error')); return; }
+                if (coverEl) coverEl.value = data.url;
+                if (status) status.textContent = 'Image added. Remember to Save Project.';
+            } catch (e) {
+                if (status) status.textContent = '';
+                alert('Request failed: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = original;
+            }
+        });
+    });
+})();
+</script>
 
 <?php admin_footer(); ?>

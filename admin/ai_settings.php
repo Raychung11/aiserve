@@ -33,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $model = trim((string)($_POST['openai_model'] ?? ''));
     set_setting('openai_model', $model !== '' ? $model : 'gpt-4.1-mini');
 
+    $imageModel = trim((string)($_POST['openai_image_model'] ?? ''));
+    set_setting('openai_image_model', $imageModel !== '' ? $imageModel : 'gpt-image-1');
+
     $message = 'AI settings saved.';
 
     // Optional connectivity test
@@ -88,9 +91,15 @@ admin_header('AI API Settings');
             </div>
 
             <div class="field">
-                <label>Model</label>
+                <label>Text Model</label>
                 <input type="text" name="openai_model" value="<?= h($currentModel) ?>" placeholder="gpt-4.1-mini">
                 <div class="muted" style="font-size:13px;">e.g. gpt-4.1-mini, gpt-4.1, gpt-4o-mini</div>
+            </div>
+
+            <div class="field">
+                <label>Image Model</label>
+                <input type="text" name="openai_image_model" value="<?= h(get_setting('openai_image_model', 'gpt-image-1')) ?>" placeholder="gpt-image-1">
+                <div class="muted" style="font-size:13px;">gpt-image-1 (best; needs a verified OpenAI org) or dall-e-3</div>
             </div>
 
             <div class="field full">

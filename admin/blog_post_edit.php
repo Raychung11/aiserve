@@ -143,7 +143,9 @@ admin_header($id > 0 ? 'Edit Post' : 'Create Post');
                         <div style="display:flex;gap:10px;flex-wrap:wrap;">
                             <input type="text" id="featured_image_field" name="featured_image" value="<?= h($row['featured_image'] ?? '') ?>" placeholder="/uploads/media/blog-cover.jpg">
                             <button type="button" class="btn-secondary" onclick="openMediaPicker('featured_image_field')">Pick Media</button>
+                            <button type="button" class="btn ai-image-btn" data-kind="post">✨ Generate with AI</button>
                         </div>
+                        <div id="ai_image_status" class="muted" style="font-size:13px;margin-top:6px;"></div>
                     </div>
 
                     <div class="field">
@@ -419,6 +421,43 @@ function openMediaPicker(targetId) {
                 alert('Request failed: ' + e.message);
             } finally {
                 buttons.forEach(b => b.disabled = false);
+            }
+        });
+    });
+
+    // --- AI image generation ---
+    const imgStatus = document.getElementById('ai_image_status');
+    const featuredField = document.getElementById('featured_image_field');
+    document.querySelectorAll('.ai-image-btn').forEach(function(btn){
+        btn.addEventListener('click', async function(){
+            if (!titleEl || titleEl.value.trim() === '') { alert('Enter a post title first.'); return; }
+            if (featuredField && featuredField.value.trim() && !confirm('Replace the current featured image with an AI-generated one?')) return;
+
+            const original = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Generating image…';
+            if (imgStatus) imgStatus.textContent = 'Creating an image — this can take 10–30 seconds.';
+            try {
+                const body = new URLSearchParams();
+                body.append('csrf_token', csrf);
+                body.append('kind', btn.dataset.kind || 'post');
+                body.append('title', titleEl.value);
+                body.append('context', (excerptEl ? excerptEl.value : '') + '\n' + (contentEl ? contentEl.value : ''));
+                const res = await fetch('/admin/ai_image_generate.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: body.toString()
+                });
+                const data = await res.json();
+                if (!data.ok) { if (imgStatus) imgStatus.textContent = ''; alert('Image error: ' + (data.error || 'Unknown error')); return; }
+                if (featuredField) { featuredField.value = data.url; featuredField.dispatchEvent(new Event('input')); }
+                if (imgStatus) imgStatus.textContent = 'Image added. Remember to Save Post.';
+            } catch (e) {
+                if (imgStatus) imgStatus.textContent = '';
+                alert('Request failed: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = original;
             }
         });
     });
