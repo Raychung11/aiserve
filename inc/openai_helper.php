@@ -87,10 +87,9 @@ function openai_image_generate(string $prompt, string $model = '', string $size 
         'size'   => $size,
         'n'      => 1,
     ];
-    // dall-e models accept response_format; gpt-image-1 always returns base64 and rejects it.
-    if (stripos($model, 'dall-e') !== false) {
-        $payload['response_format'] = 'b64_json';
-    }
+    // Note: we intentionally do NOT send `response_format`. gpt-image-1 rejects
+    // it (always returns base64), and the current dall-e endpoint rejects it
+    // too. dall-e then returns a URL, which we download below.
 
     $ch = curl_init('https://api.openai.com/v1/images/generations');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
