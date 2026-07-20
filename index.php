@@ -22,10 +22,11 @@ require_once __DIR__ . '/inc/public_header.php';
 <section class="hero-section" style="
     padding:72px 0 48px;
     background:
-        linear-gradient(135deg, rgba(109,40,217,.92), rgba(139,92,246,.82))
+        linear-gradient(135deg, var(--primary), var(--primary2))
         <?php if ($heroBgUrl !== ''): ?>, url('<?= h($heroBgUrl) ?>')<?php endif; ?>;
     background-size:cover;
     background-position:center;
+    background-blend-mode:multiply;
     color:#fff;
 ">
     <div class="container">

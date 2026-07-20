@@ -13,6 +13,7 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
     <title><?= h($pageTitle ?? 'AiServe.my') ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="<?= h($pageDescription ?? '') ?>">
+    <script>(function(){try{var t=localStorage.getItem('aiserve_theme');if(t&&t!=='violet'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
     <?= seo_head_tags() ?>
 
     <style>

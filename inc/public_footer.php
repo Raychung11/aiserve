@@ -76,6 +76,7 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
         </div>
     </div>
 </footer>
+<?php require_once __DIR__ . '/theme_switcher.php'; ?>
 <?php require_once __DIR__ . '/chat_widget.php'; ?>
 </body>
 </html>
