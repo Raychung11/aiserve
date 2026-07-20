@@ -121,7 +121,12 @@ $currentStatus = (string)($row['project_status'] ?? 'in_progress');
                 <label>Cover Image URL</label>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;">
                     <input type="text" id="cover_image_field" name="cover_image" value="<?= h($row['cover_image'] ?? '') ?>" placeholder="/uploads/media/project-cover.jpg">
-                    <button type="button" class="btn ai-image-btn" data-kind="project">✨ Generate with AI</button>
+                    <button type="button" class="btn-secondary" id="ai_photo_prompt_btn">✨ Create photo prompt</button>
+                    <button type="button" class="btn" id="ai_image_btn">Generate image</button>
+                </div>
+                <div id="photo_prompt_wrap" style="display:none;margin-top:10px;">
+                    <label>Photo prompt (editable) — this is used to create the image</label>
+                    <textarea id="photo_prompt" style="min-height:70px;"></textarea>
                 </div>
                 <div id="ai_image_status" class="muted" style="font-size:13px;margin-top:6px;"></div>
             </div>
@@ -173,43 +178,51 @@ $currentStatus = (string)($row['project_status'] ?? 'in_progress');
     const nameEl = document.querySelector('input[name="name"]');
     const descEl = document.querySelector('textarea[name="description"]');
     const coverEl = document.getElementById('cover_image_field');
-    const status = document.getElementById('ai_image_status');
+    const statusEl = document.getElementById('ai_image_status');
+    const promptWrap = document.getElementById('photo_prompt_wrap');
+    const promptEl = document.getElementById('photo_prompt');
+    const promptBtn = document.getElementById('ai_photo_prompt_btn');
+    const imageBtn = document.getElementById('ai_image_btn');
+    const btns = [promptBtn, imageBtn].filter(Boolean);
 
-    document.querySelectorAll('.ai-image-btn').forEach(function(btn){
-        btn.addEventListener('click', async function(){
-            if (!nameEl || nameEl.value.trim() === '') { alert('Enter a project name first.'); return; }
-            if (coverEl && coverEl.value.trim() && !confirm('Replace the current cover image with an AI-generated one?')) return;
+    function busy(on, msg){ btns.forEach(b => b.disabled = on); if (statusEl) statusEl.textContent = msg || ''; }
 
-            const original = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Generating image…';
-            if (status) status.textContent = 'Creating an image — this can take 10–30 seconds.';
-            try {
-                const body = new URLSearchParams();
-                body.append('csrf_token', csrf);
-                body.append('kind', 'project');
-                body.append('title', nameEl.value);
-                body.append('context', descEl ? descEl.value : '');
-                const res = await fetch('/admin/ai_image_generate.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: body.toString()
-                });
-                const _t = await res.text();
-                let data;
-                try { data = JSON.parse(_t); }
-                catch (err) { data = {ok:false, error:'The server did not return a valid response (it may have timed out). Set Image Model to dall-e-3 in AI API Settings and try again.'}; }
-                if (!data.ok) { if (status) status.textContent = ''; alert('Image error: ' + (data.error || 'Unknown error')); return; }
-                if (coverEl) coverEl.value = data.url;
-                if (status) status.textContent = 'Image added. Remember to Save Project.';
-            } catch (e) {
-                if (status) status.textContent = '';
-                alert('Request failed: ' + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = original;
-            }
+    async function postForm(url, params){
+        const body = new URLSearchParams();
+        body.append('csrf_token', csrf);
+        Object.keys(params).forEach(k => body.append(k, params[k]));
+        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString()});
+        const text = await res.text();
+        try { return JSON.parse(text); }
+        catch (e) { return {ok:false, error:'The server did not return a valid response (it may have timed out). Please try again.'}; }
+    }
+
+    // Step 1: create an editable photo prompt
+    if (promptBtn) promptBtn.addEventListener('click', async function(){
+        if (!nameEl || nameEl.value.trim() === '') { alert('Enter a project name first.'); return; }
+        busy(true, 'Creating a photo prompt…');
+        const brief = nameEl.value + (descEl && descEl.value.trim() ? ' — ' + descEl.value.trim() : '');
+        const data = await postForm('/admin/ai_marketing_generate.php', {mode:'photo_prompt', brief: brief});
+        if (!data.ok) { busy(false); alert('AI error: ' + (data.error || 'Unknown error')); return; }
+        if (data.photo_prompt) { promptWrap.style.display = ''; promptEl.value = data.photo_prompt; }
+        busy(false, 'Photo prompt ready. Edit it if you like, then click Generate image.');
+    });
+
+    // Step 2: generate the image from the (edited) prompt
+    if (imageBtn) imageBtn.addEventListener('click', async function(){
+        if (!nameEl || nameEl.value.trim() === '') { alert('Enter a project name first.'); return; }
+        if (coverEl && coverEl.value.trim() && !confirm('Replace the current cover image with an AI-generated one?')) return;
+        busy(true, 'Generating image — this can take 10–30 seconds.');
+        const prompt = promptEl && promptEl.value.trim() ? promptEl.value.trim() : '';
+        const data = await postForm('/admin/ai_image_generate.php', {
+            kind: 'project',
+            title: nameEl.value,
+            context: descEl ? descEl.value : '',
+            prompt: prompt
         });
+        if (!data.ok) { busy(false); alert('Image error: ' + (data.error || 'Unknown error')); return; }
+        if (coverEl) coverEl.value = data.url;
+        busy(false, 'Image added. Remember to Save Project.');
     });
 })();
 </script>

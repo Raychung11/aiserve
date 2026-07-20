@@ -143,7 +143,12 @@ admin_header($id > 0 ? 'Edit Post' : 'Create Post');
                         <div style="display:flex;gap:10px;flex-wrap:wrap;">
                             <input type="text" id="featured_image_field" name="featured_image" value="<?= h($row['featured_image'] ?? '') ?>" placeholder="/uploads/media/blog-cover.jpg">
                             <button type="button" class="btn-secondary" onclick="openMediaPicker('featured_image_field')">Pick Media</button>
-                            <button type="button" class="btn ai-image-btn" data-kind="post">✨ Generate with AI</button>
+                            <button type="button" class="btn-secondary" id="ai_photo_prompt_btn">✨ Create photo prompt</button>
+                            <button type="button" class="btn" id="ai_image_btn">Generate image</button>
+                        </div>
+                        <div id="photo_prompt_wrap" style="display:none;margin-top:10px;">
+                            <label>Photo prompt (editable) — this is used to create the image</label>
+                            <textarea id="photo_prompt" style="min-height:70px;"></textarea>
                         </div>
                         <div id="ai_image_status" class="muted" style="font-size:13px;margin-top:6px;"></div>
                     </div>
@@ -428,44 +433,53 @@ function openMediaPicker(targetId) {
         });
     });
 
-    // --- AI image generation ---
+    // --- AI image generation (two-step: prompt first, then image) ---
     const imgStatus = document.getElementById('ai_image_status');
     const featuredField = document.getElementById('featured_image_field');
-    document.querySelectorAll('.ai-image-btn').forEach(function(btn){
-        btn.addEventListener('click', async function(){
-            if (!titleEl || titleEl.value.trim() === '') { alert('Enter a post title first.'); return; }
-            if (featuredField && featuredField.value.trim() && !confirm('Replace the current featured image with an AI-generated one?')) return;
+    const photoWrap = document.getElementById('photo_prompt_wrap');
+    const photoPromptEl = document.getElementById('photo_prompt');
+    const photoPromptBtn = document.getElementById('ai_photo_prompt_btn');
+    const genImageBtn = document.getElementById('ai_image_btn');
+    const imgBtns = [photoPromptBtn, genImageBtn].filter(Boolean);
 
-            const original = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Generating image…';
-            if (imgStatus) imgStatus.textContent = 'Creating an image — this can take 10–30 seconds.';
-            try {
-                const body = new URLSearchParams();
-                body.append('csrf_token', csrf);
-                body.append('kind', btn.dataset.kind || 'post');
-                body.append('title', titleEl.value);
-                body.append('context', (excerptEl ? excerptEl.value : '') + '\n' + (contentEl ? contentEl.value : ''));
-                const res = await fetch('/admin/ai_image_generate.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: body.toString()
-                });
-                const _t = await res.text();
-                let data;
-                try { data = JSON.parse(_t); }
-                catch (err) { data = {ok:false, error:'The server did not return a valid response (it may have timed out). For images, set Image Model to dall-e-3 in AI API Settings.'}; }
-                if (!data.ok) { if (imgStatus) imgStatus.textContent = ''; alert('Image error: ' + (data.error || 'Unknown error')); return; }
-                if (featuredField) { featuredField.value = data.url; featuredField.dispatchEvent(new Event('input')); }
-                if (imgStatus) imgStatus.textContent = 'Image added. Remember to Save Post.';
-            } catch (e) {
-                if (imgStatus) imgStatus.textContent = '';
-                alert('Request failed: ' + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = original;
-            }
+    function imgBusy(on, msg){ imgBtns.forEach(b => b.disabled = on); if (imgStatus) imgStatus.textContent = msg || ''; }
+
+    async function imgPost(url, params){
+        const body = new URLSearchParams();
+        body.append('csrf_token', csrf);
+        Object.keys(params).forEach(k => body.append(k, params[k]));
+        const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString()});
+        const text = await res.text();
+        try { return JSON.parse(text); }
+        catch (e) { return {ok:false, error:'The server did not return a valid response (it may have timed out). Please try again.'}; }
+    }
+
+    // Step 1: create an editable photo prompt
+    if (photoPromptBtn) photoPromptBtn.addEventListener('click', async function(){
+        if (!titleEl || titleEl.value.trim() === '') { alert('Enter a post title first.'); return; }
+        imgBusy(true, 'Creating a photo prompt…');
+        const brief = titleEl.value + (excerptEl && excerptEl.value.trim() ? ' — ' + excerptEl.value.trim() : '');
+        const data = await imgPost('/admin/ai_marketing_generate.php', {mode:'photo_prompt', brief: brief});
+        if (!data.ok) { imgBusy(false); alert('AI error: ' + (data.error || 'Unknown error')); return; }
+        if (data.photo_prompt) { photoWrap.style.display = ''; photoPromptEl.value = data.photo_prompt; }
+        imgBusy(false, 'Photo prompt ready. Edit it if you like, then click Generate image.');
+    });
+
+    // Step 2: generate the image from the (edited) prompt
+    if (genImageBtn) genImageBtn.addEventListener('click', async function(){
+        if (!titleEl || titleEl.value.trim() === '') { alert('Enter a post title first.'); return; }
+        if (featuredField && featuredField.value.trim() && !confirm('Replace the current featured image with an AI-generated one?')) return;
+        imgBusy(true, 'Generating image — this can take 10–30 seconds.');
+        const prompt = photoPromptEl && photoPromptEl.value.trim() ? photoPromptEl.value.trim() : '';
+        const data = await imgPost('/admin/ai_image_generate.php', {
+            kind: 'post',
+            title: titleEl.value,
+            context: (excerptEl ? excerptEl.value : '') + '\n' + (contentEl ? contentEl.value : ''),
+            prompt: prompt
         });
+        if (!data.ok) { imgBusy(false); alert('Image error: ' + (data.error || 'Unknown error')); return; }
+        if (featuredField) { featuredField.value = data.url; featuredField.dispatchEvent(new Event('input')); }
+        imgBusy(false, 'Image added. Remember to Save Post.');
     });
 })();
 </script>
