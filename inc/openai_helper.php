@@ -68,9 +68,48 @@ function openai_image_generate(string $prompt, string $model = '', string $size 
         return ['ok' => false, 'error' => 'Missing OpenAI API key'];
     }
 
-    if ($model === '') {
-        $model = get_setting('openai_image_model', 'dall-e-3');
+    $configured = $model !== '' ? $model : get_setting('openai_image_model', 'gpt-image-1');
+
+    // Try the configured model first, then fall back to the other common image
+    // models if this account does not have access to it.
+    $candidates = [$configured];
+    foreach (['gpt-image-1', 'dall-e-3', 'dall-e-2'] as $fallback) {
+        if (!in_array($fallback, $candidates, true)) {
+            $candidates[] = $fallback;
+        }
     }
+
+    $lastError = 'Image generation failed';
+    foreach ($candidates as $candidate) {
+        $result = openai_image_try($apiKey, $candidate, $prompt, $size);
+        if (!empty($result['ok'])) {
+            return $result;
+        }
+        $lastError = (string)($result['error'] ?? $lastError);
+
+        // Move on to the next model only for availability errors; stop on real
+        // problems (bad key, content policy, quota) to avoid wasted calls.
+        $isAvailabilityError =
+            stripos($lastError, 'does not exist') !== false ||
+            stripos($lastError, 'not have access') !== false ||
+            stripos($lastError, 'must be verified') !== false ||
+            stripos($lastError, 'not supported') !== false ||
+            stripos($lastError, 'unsupported') !== false ||
+            stripos($lastError, 'invalid model') !== false;
+        if (!$isAvailabilityError) {
+            return $result;
+        }
+    }
+
+    return ['ok' => false, 'error' => $lastError];
+}
+
+/**
+ * Single image-generation attempt for one model.
+ *
+ * @return array{ok:bool, bytes?:string, ext?:string, model?:string, error?:string}
+ */
+function openai_image_try(string $apiKey, string $model, string $prompt, string $size): array {
     if ($size === '') {
         if (stripos($model, 'dall-e-3') !== false) {
             $size = '1792x1024';
@@ -87,9 +126,12 @@ function openai_image_generate(string $prompt, string $model = '', string $size 
         'size'   => $size,
         'n'      => 1,
     ];
-    // Note: we intentionally do NOT send `response_format`. gpt-image-1 rejects
-    // it (always returns base64), and the current dall-e endpoint rejects it
-    // too. dall-e then returns a URL, which we download below.
+    // Speed up gpt-image-1 so it is less likely to hit server time limits.
+    // We do NOT send response_format: gpt-image-1 returns base64 and dall-e
+    // returns a URL, both handled below.
+    if (stripos($model, 'gpt-image') !== false) {
+        $payload['quality'] = 'medium';
+    }
 
     $ch = curl_init('https://api.openai.com/v1/images/generations');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -99,7 +141,7 @@ function openai_image_generate(string $prompt, string $model = '', string $size 
         'Authorization: Bearer ' . $apiKey,
     ]);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 180);
 
     $raw = curl_exec($ch);
     $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);

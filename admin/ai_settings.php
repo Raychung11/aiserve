@@ -98,8 +98,8 @@ admin_header('AI API Settings');
 
             <div class="field">
                 <label>Image Model</label>
-                <input type="text" name="openai_image_model" value="<?= h(get_setting('openai_image_model', 'dall-e-3')) ?>" placeholder="dall-e-3">
-                <div class="muted" style="font-size:13px;">dall-e-3 (recommended — fast, works on any account) or gpt-image-1 (higher quality but slower and needs a verified OpenAI org)</div>
+                <input type="text" name="openai_image_model" value="<?= h(get_setting('openai_image_model', 'gpt-image-1')) ?>" placeholder="gpt-image-1">
+                <div class="muted" style="font-size:13px;">gpt-image-1 or dall-e-3. If the chosen model isn't available on your account, the system automatically falls back to one that is.</div>
             </div>
 
             <div class="field full">
