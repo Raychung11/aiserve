@@ -99,7 +99,10 @@ admin_header('SEO Meta');
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     body: body.toString()
                 });
-                const data = await res.json();
+                const _t = await res.text();
+                let data;
+                try { data = JSON.parse(_t); }
+                catch (err) { data = {ok:false, error:'The server did not return a valid response (it may have timed out). Please try again.'}; }
                 if (data.ok) {
                     if (titleEl && data.title) titleEl.value = data.title;
                     if (descEl && data.description) descEl.value = data.description;

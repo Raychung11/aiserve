@@ -69,7 +69,7 @@ function openai_image_generate(string $prompt, string $model = '', string $size 
     }
 
     if ($model === '') {
-        $model = get_setting('openai_image_model', 'gpt-image-1');
+        $model = get_setting('openai_image_model', 'dall-e-3');
     }
     if ($size === '') {
         if (stripos($model, 'dall-e-3') !== false) {

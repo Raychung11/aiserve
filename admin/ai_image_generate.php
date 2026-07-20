@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../inc/ai_endpoint.php';
 require_once __DIR__ . '/../inc/admin_auth.php';
 require_once __DIR__ . '/../inc/admin_csrf.php';
 require_once __DIR__ . '/../inc/openai_helper.php';

@@ -408,7 +408,10 @@ function openMediaPicker(targetId) {
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     body: body.toString()
                 });
-                const data = await res.json();
+                const _t = await res.text();
+                let data;
+                try { data = JSON.parse(_t); }
+                catch (err) { data = {ok:false, error:'The server did not return a valid response (it may have timed out). For images, set Image Model to dall-e-3 in AI API Settings.'}; }
                 if (!data.ok) { statusEl.textContent = ''; alert('AI error: ' + (data.error || 'Unknown error')); return; }
 
                 setVal(contentEl, data.content);
@@ -448,7 +451,10 @@ function openMediaPicker(targetId) {
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     body: body.toString()
                 });
-                const data = await res.json();
+                const _t = await res.text();
+                let data;
+                try { data = JSON.parse(_t); }
+                catch (err) { data = {ok:false, error:'The server did not return a valid response (it may have timed out). For images, set Image Model to dall-e-3 in AI API Settings.'}; }
                 if (!data.ok) { if (imgStatus) imgStatus.textContent = ''; alert('Image error: ' + (data.error || 'Unknown error')); return; }
                 if (featuredField) { featuredField.value = data.url; featuredField.dispatchEvent(new Event('input')); }
                 if (imgStatus) imgStatus.textContent = 'Image added. Remember to Save Post.';

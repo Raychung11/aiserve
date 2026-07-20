@@ -191,7 +191,9 @@ AiServe.my</textarea>
         body.append('csrf_token', csrf);
         Object.keys(params).forEach(k => body.append(k, params[k]));
         const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString()});
-        return res.json();
+        const text = await res.text();
+        try { return JSON.parse(text); }
+        catch (e) { return {ok:false, error:'The server did not return a valid response (it may have timed out). If generating an image, set Image Model to dall-e-3 in AI API Settings.'}; }
     }
 
     if (draftBtn) draftBtn.addEventListener('click', async function(){

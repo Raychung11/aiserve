@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_setting('openai_model', $model !== '' ? $model : 'gpt-4.1-mini');
 
     $imageModel = trim((string)($_POST['openai_image_model'] ?? ''));
-    set_setting('openai_image_model', $imageModel !== '' ? $imageModel : 'gpt-image-1');
+    set_setting('openai_image_model', $imageModel !== '' ? $imageModel : 'dall-e-3');
 
     $message = 'AI settings saved.';
 
@@ -98,8 +98,8 @@ admin_header('AI API Settings');
 
             <div class="field">
                 <label>Image Model</label>
-                <input type="text" name="openai_image_model" value="<?= h(get_setting('openai_image_model', 'gpt-image-1')) ?>" placeholder="gpt-image-1">
-                <div class="muted" style="font-size:13px;">gpt-image-1 (best; needs a verified OpenAI org) or dall-e-3</div>
+                <input type="text" name="openai_image_model" value="<?= h(get_setting('openai_image_model', 'dall-e-3')) ?>" placeholder="dall-e-3">
+                <div class="muted" style="font-size:13px;">dall-e-3 (recommended — fast, works on any account) or gpt-image-1 (higher quality but slower and needs a verified OpenAI org)</div>
             </div>
 
             <div class="field full">

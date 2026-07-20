@@ -195,7 +195,10 @@ $currentStatus = (string)($row['project_status'] ?? 'in_progress');
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     body: body.toString()
                 });
-                const data = await res.json();
+                const _t = await res.text();
+                let data;
+                try { data = JSON.parse(_t); }
+                catch (err) { data = {ok:false, error:'The server did not return a valid response (it may have timed out). Set Image Model to dall-e-3 in AI API Settings and try again.'}; }
                 if (!data.ok) { if (status) status.textContent = ''; alert('Image error: ' + (data.error || 'Unknown error')); return; }
                 if (coverEl) coverEl.value = data.url;
                 if (status) status.textContent = 'Image added. Remember to Save Project.';
