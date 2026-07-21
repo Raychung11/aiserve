@@ -128,6 +128,7 @@ $currentStatus = (string)($row['project_status'] ?? 'in_progress');
                     <label>Photo prompt (editable) — this is used to create the image</label>
                     <textarea id="photo_prompt" style="min-height:70px;"></textarea>
                 </div>
+                <img id="ai_image_preview" alt="Generated cover image" style="display:none;max-width:100%;border-radius:14px;border:1px solid var(--line);margin-top:10px;">
                 <div id="ai_image_status" class="muted" style="font-size:13px;margin-top:6px;"></div>
             </div>
 
@@ -222,6 +223,8 @@ $currentStatus = (string)($row['project_status'] ?? 'in_progress');
         });
         if (!data.ok) { busy(false); alert('Image error: ' + (data.error || 'Unknown error')); return; }
         if (coverEl) coverEl.value = data.url;
+        const preview = document.getElementById('ai_image_preview');
+        if (preview) { preview.src = data.url; preview.style.display = 'block'; }
         busy(false, 'Image added. Remember to Save Project.');
     });
 })();

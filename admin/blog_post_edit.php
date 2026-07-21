@@ -150,6 +150,7 @@ admin_header($id > 0 ? 'Edit Post' : 'Create Post');
                             <label>Photo prompt (editable) — this is used to create the image</label>
                             <textarea id="photo_prompt" style="min-height:70px;"></textarea>
                         </div>
+                        <img id="ai_image_preview" alt="Generated featured image" style="display:none;max-width:100%;border-radius:14px;border:1px solid var(--line);margin-top:10px;">
                         <div id="ai_image_status" class="muted" style="font-size:13px;margin-top:6px;"></div>
                     </div>
 
@@ -479,6 +480,8 @@ function openMediaPicker(targetId) {
         });
         if (!data.ok) { imgBusy(false); alert('Image error: ' + (data.error || 'Unknown error')); return; }
         if (featuredField) { featuredField.value = data.url; featuredField.dispatchEvent(new Event('input')); }
+        const preview = document.getElementById('ai_image_preview');
+        if (preview) { preview.src = data.url; preview.style.display = 'block'; }
         imgBusy(false, 'Image added. Remember to Save Post.');
     });
 })();
