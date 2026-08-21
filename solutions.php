@@ -66,4 +66,18 @@ include __DIR__ . '/inc/public_header.php';
     </div>
 </section>
 
+<section class="section">
+    <div class="container">
+        <div class="card" style="text-align:center;padding:40px 24px;">
+            <div class="label" style="justify-content:center;">SME Agentic AI Initiative</div>
+            <h2 style="margin-top:8px;">A full programme: AiServe SME AI Transformation</h2>
+            <p style="max-width:680px;margin:0 auto 20px;">
+                A 7-step journey from business process mapping and SOP digitisation to AI customer service,
+                AI business actions, and a live performance dashboard — consulting plus platform.
+            </p>
+            <a href="/sme-ai-transformation.php" class="btn-primary">Explore the 7-step programme</a>
+        </div>
+    </div>
+</section>
+
 <?php include __DIR__ . '/inc/public_footer.php'; ?>

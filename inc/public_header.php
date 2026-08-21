@@ -539,6 +539,7 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
         <nav class="nav-links">
             <a href="/ai-bos.php">Ai-BOS</a>
             <a href="/solutions.php">Solutions</a>
+            <a href="/sme-ai-transformation.php">SME Transformation</a>
             <a href="/industries.php">Industries</a>
             <a href="/projects.php">Projects</a>
             <a href="/about.php">About</a>
@@ -555,6 +556,7 @@ $siteLogoAlt = get_setting('site_logo_alt', 'AiServe.my');
         <div id="mobileNav" class="mobile-nav">
             <a href="/ai-bos.php">Ai-BOS</a>
             <a href="/solutions.php">Solutions</a>
+            <a href="/sme-ai-transformation.php">SME Transformation</a>
             <a href="/industries.php">Industries</a>
             <a href="/projects.php">Projects</a>
             <a href="/about.php">About</a>

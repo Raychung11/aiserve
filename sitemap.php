@@ -14,6 +14,7 @@ $staticPages = [
     ['', '1.0'],
     ['ai-bos.php', '0.9'],
     ['solutions.php', '0.9'],
+    ['sme-ai-transformation.php', '0.9'],
     ['industries.php', '0.8'],
     ['projects.php', '0.8'],
     ['demos.php', '0.8'],
